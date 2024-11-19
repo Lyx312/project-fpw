@@ -25,7 +25,7 @@ export default function BuyTokens() {
   return (
     <div>
       <Header />
-      <Container maxWidth="md">
+      <Container maxWidth="md" sx={{ py: 4 }}>
         {/* Header */}
 
         {/* Main Content */}
