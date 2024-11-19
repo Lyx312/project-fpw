@@ -1,101 +1,225 @@
-import Image from "next/image";
+import React from 'react';
+import {
+  AppBar,
+  Box,
+  Button,
+  Card,
+  Container,
+  Grid,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Toolbar,
+  Typography
+} from '@mui/material';
+import {
+  Search as SearchIcon,
+  QuestionMark as QuestionIcon,
+  Language as LanguageIcon
+} from '@mui/icons-material';
+import SocialMediaIcons from './(components)/SocialMediaIcons';
 
-export default function Home() {
+const LandingPage = () => {
+  const categories = [
+    'Art Design',
+    'UI & UX Design',
+    'Data Entry',
+    'Graphic Design',
+    'Video Editing',
+    'Virtual Assistant',
+    'Website Design',
+    'Mobile App Programming',
+    'Social Media Manager'
+  ];
+
+  const footerLinks = {
+    Category: ['Categories', 'Projects', 'Freelancers', 'Membership'],
+    About: ['About Us', 'How it Works', 'Team', 'Community'],
+    Terms: ['Privacy Policy', 'Terms & Conditions', 'Fees and Charges', 'Feedback']
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <Box sx={{ flexGrow: 1 }}>
+      {/* Header */}
+      <AppBar position="static" color="transparent" elevation={0}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            LOGO
+          </Typography>
+          <TextField
+            size="small"
+            placeholder="Search"
+            sx={{ mr: 2, backgroundColor: 'white' }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <IconButton><QuestionIcon /></IconButton>
+        </Toolbar>
+      </AppBar>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+      {/* Hero Section */}
+      <Container maxWidth="xl" sx={{ mt: 8, mb: 8 }}>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={6}>
+            <Typography variant="h2" gutterBottom>
+              Join the world's work marketplace
+            </Typography>
+            <Typography variant="h5" gutterBottom>
+              Find & Hire Expert Freelancers
+            </Typography>
+            <TextField
+              fullWidth
+              placeholder="Search"
+              sx={{ mt: 2, mb: 2 }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <Button variant="contained" color="primary" sx={{ mt: 2 }}>
+              Post a Job for Free?
+            </Button>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            {/* Hero image would go here */}
+          </Grid>
+        </Grid>
+      </Container>
+
+      {/* Professional Services Section */}
+      <Box sx={{ backgroundColor: '#f5f5f5', py: 8 }}>
+        <Container maxWidth="xl">
+          <Typography variant="h4" gutterBottom align="center">
+            Find the Professional Services
+          </Typography>
+          <Grid container spacing={3} sx={{ mt: 4 }}>
+            {[1, 2, 3].map((item) => (
+              <Grid item xs={12} sm={4} key={item}>
+                <Card sx={{ height: 200 }} />
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* Skills Section */}
+      <Box sx={{ backgroundColor: '#002145', color: 'white', py: 8 }}>
+        <Container maxWidth="xl">
+          <TextField
+            fullWidth
+            placeholder="Search Skills"
+            sx={{ mb: 4, backgroundColor: 'white' }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Grid container spacing={2}>
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+              <Grid item xs={12} sm={6} md={3} key={item}>
+                <Card sx={{ height: 100 }} />
+              </Grid>
+            ))}
+          </Grid>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ mt: 4, display: 'block', mx: 'auto' }}
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            More Skills
+          </Button>
+        </Container>
+      </Box>
+
+      {/* Categories Section */}
+      <Box sx={{ py: 8 }}>
+        <Container maxWidth="xl">
+          <Typography variant="h4" gutterBottom align="center">
+            Easy Way to Get Jobs Around the World
+          </Typography>
+          <Grid container spacing={2} sx={{ mb: 4 }}>
+            <Grid item xs={6}>
+              <Button fullWidth variant="contained" color="primary">
+                Indonesia
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button fullWidth variant="contained" color="primary">
+                World
+              </Button>
+            </Grid>
+          </Grid>
+          <Typography variant="h6" gutterBottom>
+            Recommendation Category
+          </Typography>
+          <Grid container spacing={2}>
+            {categories.map((category, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  sx={{ backgroundColor: '#002145', color: 'white' }}
+                >
+                  {category}
+                </Button>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* Footer */}
+      <Box sx={{ backgroundColor: '#87CEEB', color: 'black', py: 8 }}>
+        <Container maxWidth="xl">
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={3}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <QuestionIcon sx={{ mr: 1 }} />
+                <Typography>Help & Supports</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <LanguageIcon sx={{ mr: 1 }} />
+                <Typography>International</Typography>
+              </Box>
+            </Grid>
+            {Object.entries(footerLinks).map(([title, links]) => (
+              <Grid item xs={12} md={3} key={title}>
+                <Typography variant="h6" gutterBottom>
+                  {title}
+                </Typography>
+                {links.map((link) => (
+                  <Typography key={link} sx={{ mb: 1 }}>
+                    {link}
+                  </Typography>
+                ))}
+              </Grid>
+            ))}
+          </Grid>
+          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box>
+              <Typography>xx,xxx,xxx Registered Users</Typography>
+              <Typography>xx,xxx,xxx Total Jobs Posted</Typography>
+            </Box>
+            <SocialMediaIcons />
+          </Box>
+          <Typography align="right" sx={{ mt: 2 }}>
+            Copyright © 2024 Freelance Hub
+          </Typography>
+        </Container>
+      </Box>
+    </Box>
   );
-}
+};
+
+export default LandingPage;
