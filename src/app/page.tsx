@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   AppBar,
   Box,
@@ -10,38 +10,45 @@ import {
   InputAdornment,
   TextField,
   Toolbar,
-  Typography
-} from '@mui/material';
+  Typography,
+} from "@mui/material";
 import {
   Search as SearchIcon,
   QuestionMark as QuestionIcon,
-  Language as LanguageIcon
-} from '@mui/icons-material';
-import SocialMediaIcons from './(components)/SocialMediaIcons';
+  Language as LanguageIcon,
+} from "@mui/icons-material";
+import SocialMediaIcons from "./(components)/SocialMediaIcons";
+import Header from "./(components)/Header";
+import Footer from "./(components)/Footer";
 
 const LandingPage = () => {
   const categories = [
-    'Art Design',
-    'UI & UX Design',
-    'Data Entry',
-    'Graphic Design',
-    'Video Editing',
-    'Virtual Assistant',
-    'Website Design',
-    'Mobile App Programming',
-    'Social Media Manager'
+    "Art Design",
+    "UI & UX Design",
+    "Data Entry",
+    "Graphic Design",
+    "Video Editing",
+    "Virtual Assistant",
+    "Website Design",
+    "Mobile App Programming",
+    "Social Media Manager",
   ];
 
   const footerLinks = {
-    Category: ['Categories', 'Projects', 'Freelancers', 'Membership'],
-    About: ['About Us', 'How it Works', 'Team', 'Community'],
-    Terms: ['Privacy Policy', 'Terms & Conditions', 'Fees and Charges', 'Feedback']
+    Category: ["Categories", "Projects", "Freelancers", "Membership"],
+    About: ["About Us", "How it Works", "Team", "Community"],
+    Terms: [
+      "Privacy Policy",
+      "Terms & Conditions",
+      "Fees and Charges",
+      "Feedback",
+    ],
   };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       {/* Header */}
-      <AppBar position="static" color="transparent" elevation={0}>
+      {/* <AppBar position="static" color="transparent" elevation={0}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             LOGO
@@ -60,7 +67,8 @@ const LandingPage = () => {
           />
           <IconButton><QuestionIcon /></IconButton>
         </Toolbar>
-      </AppBar>
+      </AppBar> */}
+      <Header />
 
       {/* Hero Section */}
       <Container maxWidth="xl" sx={{ mt: 8, mb: 8 }}>
@@ -95,7 +103,7 @@ const LandingPage = () => {
       </Container>
 
       {/* Professional Services Section */}
-      <Box sx={{ backgroundColor: '#f5f5f5', py: 8 }}>
+      <Box sx={{ backgroundColor: "#f5f5f5", py: 8 }}>
         <Container maxWidth="xl">
           <Typography variant="h4" gutterBottom align="center">
             Find the Professional Services
@@ -111,12 +119,12 @@ const LandingPage = () => {
       </Box>
 
       {/* Skills Section */}
-      <Box sx={{ backgroundColor: '#002145', color: 'white', py: 8 }}>
+      <Box sx={{ backgroundColor: "#002145", color: "white", py: 8 }}>
         <Container maxWidth="xl">
           <TextField
             fullWidth
             placeholder="Search Skills"
-            sx={{ mb: 4, backgroundColor: 'white' }}
+            sx={{ mb: 4, backgroundColor: "white" }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -135,7 +143,7 @@ const LandingPage = () => {
           <Button
             variant="contained"
             color="primary"
-            sx={{ mt: 4, display: 'block', mx: 'auto' }}
+            sx={{ mt: 4, display: "block", mx: "auto" }}
           >
             More Skills
           </Button>
@@ -169,7 +177,7 @@ const LandingPage = () => {
                 <Button
                   fullWidth
                   variant="contained"
-                  sx={{ backgroundColor: '#002145', color: 'white' }}
+                  sx={{ backgroundColor: "#002145", color: "white" }}
                 >
                   {category}
                 </Button>
@@ -180,7 +188,7 @@ const LandingPage = () => {
       </Box>
 
       {/* Footer */}
-      <Box sx={{ backgroundColor: '#87CEEB', color: 'black', py: 8 }}>
+      {/* <Box sx={{ backgroundColor: '#87CEEB', color: 'black', py: 8 }}>
         <Container maxWidth="xl">
           <Grid container spacing={4}>
             <Grid item xs={12} md={3}>
@@ -217,7 +225,8 @@ const LandingPage = () => {
             Copyright © 2024 Freelance Hub
           </Typography>
         </Container>
-      </Box>
+      </Box> */}
+      <Footer />
     </Box>
   );
 };

@@ -10,41 +10,14 @@ import {
   Avatar,
   Grid,
 } from "@mui/material";
+import Footer from "@/app/(components)/Footer";
+import Header from "@/app/(components)/Header";
 
 const UserProfile = () => {
   return (
     <Box sx={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
       {/* Header */}
-      <Box
-        sx={{
-          backgroundColor: "#6699CC",
-          padding: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="h6" sx={{ color: "#fff" }}>
-          LOGO
-        </Typography>
-        <Box>
-          <TextField
-            size="small"
-            placeholder="Search"
-            sx={{ backgroundColor: "#fff", borderRadius: 1, marginRight: 2 }}
-          />
-          {/* Dummy icons */}
-          <span role="img" aria-label="cart">
-            🛒
-          </span>
-          <span role="img" aria-label="question">
-            ❓
-          </span>
-          <span role="img" aria-label="notification">
-            🔔
-          </span>
-        </Box>
-      </Box>
+      <Header />
 
       {/* Main Content */}
       <Box
@@ -134,32 +107,7 @@ const UserProfile = () => {
       </Box>
 
       {/* Footer */}
-      <Box
-        sx={{ backgroundColor: "#6699CC", color: "#fff", padding: 2, mt: 4 }}
-      >
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={3}>
-            <Typography variant="subtitle1">Help & Supports</Typography>
-            <Typography variant="body2">International</Typography>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Typography variant="subtitle1">Category</Typography>
-            <Typography variant="body2">Categories</Typography>
-            <Typography variant="body2">Projects</Typography>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Typography variant="subtitle1">About</Typography>
-            <Typography variant="body2">How it Works</Typography>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Typography variant="subtitle1">Terms</Typography>
-            <Typography variant="body2">Privacy Policy</Typography>
-          </Grid>
-        </Grid>
-        <Typography variant="body2" align="center" mt={2}>
-          Copyright © 2024 (Nama Team)
-        </Typography>
-      </Box>
+      <Footer />
     </Box>
   );
 };
