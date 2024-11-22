@@ -1,19 +1,51 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 interface IUser extends Document {
-    username: string;
     email: string;
+    country_id: number;
     password: string;
+    first_name: string;
+    last_name: string;
+    phone: string;
+    role: string;
+    cv_path: string;
+    pfp_path: string;
+    gender: string;
+    balance: number;
+    is_banned: boolean;
+    status: string;
+    is_email_verified: boolean;
     createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
 }
 
-const UserSchema: Schema = new Schema({
-    username: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now }
-});
+const UserSchema: Schema = new Schema(
+    {
+        email: { type: String, required: true, unique: true },
+        country_id: { type: Number, ref: 'Country', required: true },
+        password: { type: String, required: true },
+        first_name: { type: String, required: true },
+        last_name: { type: String, required: true },
+        phone: { type: String, required: true },
+        role: { type: String, required: true },
+        cv_path: { type: String, default: null },
+        pfp_path: { type: String, default: null },
+        gender: { type: String, enum: ['M', 'F'], default: null },
+        balance: { type: Number, default: 0 },
+        is_banned: { type: Boolean, default: false },
+        status: { type: String, enum: ['Available', 'Away'], default: null },
+        is_email_verified: { type: Boolean, default: false },
+        createdAt: { type: Date, default: Date.now },
+        updatedAt: { type: Date, default: null },
+        deletedAt: { type: Date, default: null },
+    },
+    {
+        _id: false,
+        timestamps: true
+    }
+);
 
-const User = mongoose.models.users || mongoose.model<IUser>('users', UserSchema);
+const User = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 
 export default User;
