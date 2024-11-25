@@ -17,9 +17,9 @@ import {
   QuestionMark as QuestionIcon,
   Language as LanguageIcon,
 } from "@mui/icons-material";
-import SocialMediaIcons from "./(components)/SocialMediaIcons";
-import Header from "./(components)/Header";
-import Footer from "./(components)/Footer";
+import SocialMediaIcons from "../(components)/SocialMediaIcons";
+import Header from "../(components)/Header";
+import Footer from "../(components)/Footer";
 
 const LandingPage = () => {
   const categories = [

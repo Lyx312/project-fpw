@@ -171,7 +171,7 @@ const RegisterPage: React.FC = () => {
             <Typography variant="body2" display="inline">
               Already have an account?{' '}
             </Typography>
-            <Link href="#" variant="body2" underline="hover">
+            <Link href="/login" variant="body2" underline="hover">
               Login
             </Link>
           </Box>
