@@ -9,9 +9,6 @@ const Post_categorySchema: Schema = new Schema(
     {
         post_id: { type: Number, required: true },
         category_id: { type: String, required: true },
-    },
-    {
-        _id: false,
     }
 );
 

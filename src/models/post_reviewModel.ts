@@ -23,7 +23,6 @@ const Post_reviewSchema: Schema = new Schema(
         deletedAt: { type: Date, default: null },
     },
     {
-        _id: false,
         timestamps: true,
     }
 );

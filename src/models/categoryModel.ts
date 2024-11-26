@@ -9,9 +9,6 @@ const CategorySchema: Schema = new Schema(
     {
         category_id: { type: Number, required: true, unique: true },
         category_name: { type: String, required: true },
-    },
-    {
-        _id: false,
     }
 );
 

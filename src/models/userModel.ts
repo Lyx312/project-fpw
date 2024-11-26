@@ -15,6 +15,7 @@ interface IUser extends Document {
     is_banned: boolean;
     status: string;
     is_email_verified: boolean;
+    email_token: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date;
@@ -36,12 +37,12 @@ const UserSchema: Schema = new Schema(
         is_banned: { type: Boolean, default: false },
         status: { type: String, enum: ['Available', 'Away'], default: null },
         is_email_verified: { type: Boolean, default: false },
+        email_token: { type: String, default: null },
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date, default: null },
         deletedAt: { type: Date, default: null },
     },
     {
-        _id: false,
         timestamps: true
     }
 );

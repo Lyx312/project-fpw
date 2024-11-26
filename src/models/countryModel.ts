@@ -9,9 +9,6 @@ const CountrySchema: Schema = new Schema(
     {
         country_id: { type: Number, required: true, unique: true },
         country_name: { type: String, required: true },
-    },
-    {
-        _id: false,
     }
 );
 
