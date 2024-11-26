@@ -34,40 +34,8 @@ const LandingPage = () => {
     "Social Media Manager",
   ];
 
-  const footerLinks = {
-    Category: ["Categories", "Projects", "Freelancers", "Membership"],
-    About: ["About Us", "How it Works", "Team", "Community"],
-    Terms: [
-      "Privacy Policy",
-      "Terms & Conditions",
-      "Fees and Charges",
-      "Feedback",
-    ],
-  };
-
   return (
     <Box sx={{ flexGrow: 1 }}>
-      {/* Header */}
-      {/* <AppBar position="static" color="transparent" elevation={0}>
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            LOGO
-          </Typography>
-          <TextField
-            size="small"
-            placeholder="Search"
-            sx={{ mr: 2, backgroundColor: 'white' }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <IconButton><QuestionIcon /></IconButton>
-        </Toolbar>
-      </AppBar> */}
       <Header />
 
       {/* Hero Section */}
@@ -103,7 +71,7 @@ const LandingPage = () => {
       </Container>
 
       {/* Professional Services Section */}
-      <Box sx={{ backgroundColor: "#f5f5f5", py: 8 }}>
+      <Box sx={{ backgroundColor: "#EAD8B1", py: 8 }}>
         <Container maxWidth="xl">
           <Typography variant="h4" gutterBottom align="center">
             Find the Professional Services
@@ -156,7 +124,7 @@ const LandingPage = () => {
           <Typography variant="h4" gutterBottom align="center">
             Easy Way to Get Jobs Around the World
           </Typography>
-          <Grid container spacing={2} sx={{ mb: 4 }}>
+          <Grid container spacing={2} sx={{ mb: 4}}>
             <Grid item xs={6}>
               <Button fullWidth variant="contained" color="primary">
                 Indonesia
@@ -187,45 +155,6 @@ const LandingPage = () => {
         </Container>
       </Box>
 
-      {/* Footer */}
-      {/* <Box sx={{ backgroundColor: '#87CEEB', color: 'black', py: 8 }}>
-        <Container maxWidth="xl">
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={3}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <QuestionIcon sx={{ mr: 1 }} />
-                <Typography>Help & Supports</Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <LanguageIcon sx={{ mr: 1 }} />
-                <Typography>International</Typography>
-              </Box>
-            </Grid>
-            {Object.entries(footerLinks).map(([title, links]) => (
-              <Grid item xs={12} md={3} key={title}>
-                <Typography variant="h6" gutterBottom>
-                  {title}
-                </Typography>
-                {links.map((link) => (
-                  <Typography key={link} sx={{ mb: 1 }}>
-                    {link}
-                  </Typography>
-                ))}
-              </Grid>
-            ))}
-          </Grid>
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box>
-              <Typography>xx,xxx,xxx Registered Users</Typography>
-              <Typography>xx,xxx,xxx Total Jobs Posted</Typography>
-            </Box>
-            <SocialMediaIcons />
-          </Box>
-          <Typography align="right" sx={{ mt: 2 }}>
-            Copyright © 2024 Freelance Hub
-          </Typography>
-        </Container>
-      </Box> */}
       <Footer />
     </Box>
   );
