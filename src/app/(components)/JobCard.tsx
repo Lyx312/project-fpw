@@ -1,7 +1,7 @@
 import React from "react";
-import { Box, Card, CardContent, Typography, Chip, Stack } from "@mui/material";
+import { Card, CardContent, Typography, Chip, Stack } from "@mui/material";
 
-const JobCard = () => {
+const JobCard = (props) => {
   return (
     <Card
       sx={{
@@ -14,41 +14,33 @@ const JobCard = () => {
       }}
     >
       <CardContent>
-        <Typography variant="subtitle2">
-          Posted... Seconds/Minutes Ago
-        </Typography>
+        <Typography variant="subtitle2">Posted {props.postedTime}</Typography>
         <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-          Job Title
+          {props.title}
         </Typography>
         <Typography variant="body2">
-          ✅ Payment Verified · Rating ★★★★★ · Location
+          {props.paymentVerified
+            ? "✅ Payment Verified"
+            : "❌ Payment Not Verified"}{" "}
+          · Rating {props.rating} · {props.location}
         </Typography>
         <Typography variant="body2" sx={{ marginTop: 1, marginBottom: 2 }}>
-          Category · Tenure · Range Salary
+          {props.category} · {props.tenure} · {props.salaryRange}
         </Typography>
         <Typography variant="body2" sx={{ marginBottom: 2 }}>
-          Job Description
+          {props.description}
         </Typography>
         <Stack direction="row" spacing={1}>
-          <Chip
-            label="Skill Requirements"
-            sx={{ backgroundColor: "#6aaede", color: "#fff" }}
-          />
-          <Chip
-            label="Skill Requirements"
-            sx={{ backgroundColor: "#6aaede", color: "#fff" }}
-          />
-          <Chip
-            label="Skill Requirements"
-            sx={{ backgroundColor: "#6aaede", color: "#fff" }}
-          />
-          <Chip
-            label="Skill Requirements"
-            sx={{ backgroundColor: "#6aaede", color: "#fff" }}
-          />
+          {props.skills.map((skill, index) => (
+            <Chip
+              key={index}
+              label={skill}
+              sx={{ backgroundColor: "#6aaede", color: "#fff" }}
+            />
+          ))}
         </Stack>
         <Typography variant="body2" sx={{ marginTop: 1 }}>
-          Job Tokens: Less than 8
+          Job Tokens: {props.tokens}
         </Typography>
       </CardContent>
     </Card>
