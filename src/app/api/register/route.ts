@@ -45,6 +45,9 @@ export async function POST(req: Request) {
             email_token: token,
         });
 
+        if (role === 'freelancer') {
+            newUser.is_approved = false;
+        }
         await newUser.save();
 
         // Send verification email

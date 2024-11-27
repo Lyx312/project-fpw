@@ -13,6 +13,7 @@ interface IUser extends Document {
     gender: string;
     balance: number;
     is_banned: boolean;
+    is_approved: boolean;
     status: string;
     is_email_verified: boolean;
     email_token: string;
@@ -29,12 +30,13 @@ const UserSchema: Schema = new Schema(
         first_name: { type: String, required: true },
         last_name: { type: String, required: true },
         phone: { type: String, required: true },
-        role: { type: String, required: true },
+        role: { type: String, enum: ["customer", "freelancer"], required: true },
         cv_path: { type: String, default: null },
         pfp_path: { type: String, default: null },
         gender: { type: String, enum: ['M', 'F'], default: null },
         balance: { type: Number, default: 0 },
         is_banned: { type: Boolean, default: false },
+        is_approved: { type: Boolean, default: null },
         status: { type: String, enum: ['Available', 'Away'], default: null },
         is_email_verified: { type: Boolean, default: false },
         email_token: { type: String, default: null },
