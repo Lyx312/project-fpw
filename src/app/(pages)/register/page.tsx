@@ -14,22 +14,25 @@ import {
   IconButton
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import axios from 'axios';
 
 interface RegisterFormData {
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  phoneNumber: string;
+  phone: string;
   password: string;
   termsAccepted: boolean;
+  role?: string;
+  country_id?: number;
 }
 
 const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState<RegisterFormData>({
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
     email: '',
-    phoneNumber: '',
+    phone: '',
     password: '',
     termsAccepted: false,
   });
@@ -42,10 +45,29 @@ const RegisterPage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     console.log('Form submitted:', formData);
     // Add your registration logic here
+
+    const { termsAccepted, ...dataToSubmit } = formData;
+
+    if (termsAccepted === false) {
+      return
+    }
+
+    dataToSubmit.role = "freelancer";
+    dataToSubmit.country_id = 1;
+    console.log(`${process.env.NEXT_PUBLIC_BASE_URL}/api`);
+    
+    try {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/register`, dataToSubmit);
+      const data = await response.data;
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+
   };
 
   return (
@@ -76,21 +98,21 @@ const RegisterPage: React.FC = () => {
 
           <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
             <TextField
-              name="firstName"
+              name="first_name"
               label="First Name"
               fullWidth
               required
-              value={formData.firstName}
+              value={formData.first_name}
               onChange={handleChange}
               variant="outlined"
               size="small"
             />
             <TextField
-              name="lastName"
+              name="last_name"
               label="Last Name"
               fullWidth
               required
-              value={formData.lastName}
+              value={formData.last_name}
               onChange={handleChange}
               variant="outlined"
               size="small"
@@ -110,11 +132,11 @@ const RegisterPage: React.FC = () => {
           />
 
           <TextField
-            name="phoneNumber"
+            name="phone"
             label="Phone Number"
             fullWidth
             required
-            value={formData.phoneNumber}
+            value={formData.phone}
             onChange={handleChange}
             variant="outlined"
             size="small"

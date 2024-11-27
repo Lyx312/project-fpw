@@ -19,13 +19,13 @@ import {
   VisibilityOff,
   Close as CloseIcon
 } from '@mui/icons-material';
+import axios from 'axios';
 
 interface LoginFormProps {
-  onSubmit: (email: string, password: string) => Promise<void>;
   onClose?: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, onClose }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -46,7 +46,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, onClose }) => {
     event.preventDefault();
     try {
       setIsLoading(true);
-      await onSubmit(formData.email, formData.password);
+      
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/login`, formData);
+      const data = await response.data;
+      console.log(data);
+
     } catch (error) {
       console.error('Login error:', error);
       // Handle error appropriately
