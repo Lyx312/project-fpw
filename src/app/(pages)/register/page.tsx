@@ -12,6 +12,10 @@ import {
   Paper,
   Link,
   IconButton,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
@@ -23,8 +27,9 @@ interface RegisterFormData {
   phone: string;
   password: string;
   termsAccepted: boolean;
-  role?: string;
-  country_id?: number;
+  role: string;
+  country_id: string;
+  file?: File | null;
 }
 
 const RegisterPage: React.FC = () => {
@@ -35,29 +40,59 @@ const RegisterPage: React.FC = () => {
     phone: '',
     password: '',
     termsAccepted: false,
+    role: '',
+    country_id: '',
+    file: null,
   });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const countries = [
+    { id: '1', name: 'United States' },
+    { id: '2', name: 'Indonesia' },
+    { id: '3', name: 'Japan' },
+    { id: '4', name: 'Germany' },
+    { id: '5', name: 'India' },
+  ];
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, checked } = event.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: name === 'termsAccepted' ? checked : value,
     }));
+  };
+
+  const handleRoleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData(prev => ({
+      ...prev,
+      role: event.target.value as string,
+    }));
+  };
+
+  const handleCountryChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData(prev => ({
+      ...prev,
+      country_id: event.target.value as string,
+    }));
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        file: event.target.files[0],
+      }));
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     console.log('Form submitted:', formData);
 
-    const { termsAccepted, ...dataToSubmit } = formData;
+    const { termsAccepted, file, ...dataToSubmit } = formData;
 
     if (!termsAccepted) {
       return;
     }
-
-    dataToSubmit.role = 'freelancer';
-    dataToSubmit.country_id = 1;
-    console.log(`${process.env.NEXT_PUBLIC_BASE_URL}/api`);
 
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/register`, dataToSubmit);
@@ -73,16 +108,14 @@ const RegisterPage: React.FC = () => {
       sx={{
         minHeight: '100vh',
         display: 'flex',
-        alignItems: 'center',
         justifyContent: 'center',
-        position: 'relative',
+        alignItems: 'center',
         backgroundImage: 'url(/assets/images/coba.png)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundColor: '#F5EFE6', // Fallback warna krem lembut
+        position: 'relative',
       }}
     >
-      {/* Overlay */}
       <Box
         sx={{
           position: 'absolute',
@@ -90,46 +123,32 @@ const RegisterPage: React.FC = () => {
           left: 0,
           width: '100%',
           height: '100%',
-          bgcolor: 'rgba(0, 0, 0, 0.5)', // Lapisan gelap semi-transparan
-          backdropFilter: 'blur(10px)', // Efek blur
-          zIndex: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Overlay untuk gelap
+          zIndex: 0,
         }}
       />
 
-      <Container
-        maxWidth="sm"
-        sx={{
-          position: 'relative',
-          zIndex: 2, // Konten tetap di atas overlay
-        }}
-      >
+      <Container maxWidth="sm" sx={{ zIndex: 1 }}>
         <Paper
-          elevation={4}
+          elevation={3}
           sx={{
             p: 4,
-            borderRadius: 4,
-            backgroundColor: '#FFF9F1', 
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
+            borderRadius: 2,
+            backgroundColor: 'rgba(255, 255, 255, 0.9)', // Semi transparan
           }}
         >
-          {/* <IconButton
+          <IconButton
             sx={{
               position: 'absolute',
               right: 8,
               top: 8,
-              color: '#C5AA89',
             }}
-          > */}
-            {/* <CloseIcon /> */}
-          {/* </IconButton> */}
+          >
+            <CloseIcon />
+          </IconButton>
 
           <Box component="form" onSubmit={handleSubmit} noValidate>
-            <Typography
-              variant="h5"
-              align="center"
-              gutterBottom
-              sx={{ color: '#6B4F4F', fontWeight: 'bold' }}
-            >
+            <Typography variant="h5" align="center" gutterBottom>
               Sign Up
             </Typography>
 
@@ -143,11 +162,6 @@ const RegisterPage: React.FC = () => {
                 onChange={handleChange}
                 variant="outlined"
                 size="small"
-                sx={{
-                  '& .MuiInputBase-root': {
-                    bgcolor: '#FDF6E4',
-                  },
-                }}
               />
               <TextField
                 name="last_name"
@@ -158,11 +172,6 @@ const RegisterPage: React.FC = () => {
                 onChange={handleChange}
                 variant="outlined"
                 size="small"
-                sx={{
-                  '& .MuiInputBase-root': {
-                    bgcolor: '#FDF6E4',
-                  },
-                }}
               />
             </Box>
 
@@ -175,12 +184,7 @@ const RegisterPage: React.FC = () => {
               onChange={handleChange}
               variant="outlined"
               size="small"
-              sx={{
-                mb: 2,
-                '& .MuiInputBase-root': {
-                  bgcolor: '#FDF6E4',
-                },
-              }}
+              sx={{ mb: 2 }}
             />
 
             <TextField
@@ -192,12 +196,7 @@ const RegisterPage: React.FC = () => {
               onChange={handleChange}
               variant="outlined"
               size="small"
-              sx={{
-                mb: 2,
-                '& .MuiInputBase-root': {
-                  bgcolor: '#FDF6E4',
-                },
-              }}
+              sx={{ mb: 2 }}
             />
 
             <TextField
@@ -210,13 +209,56 @@ const RegisterPage: React.FC = () => {
               onChange={handleChange}
               variant="outlined"
               size="small"
-              sx={{
-                mb: 2,
-                '& .MuiInputBase-root': {
-                  bgcolor: '#FDF6E4',
-                },
-              }}
+              sx={{ mb: 2 }}
             />
+
+            <TextField
+              select
+              name="country_id"
+              label="Country"
+              fullWidth
+              required
+              value={formData.country_id}
+              onChange={handleCountryChange}
+              variant="outlined"
+              size="small"
+              sx={{ mb: 2 }}
+            >
+              {countries.map(country => (
+                <MenuItem key={country.id} value={country.id}>
+                  {country.name}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              select
+              name="role"
+              label="Role"
+              fullWidth
+              required
+              value={formData.role}
+              onChange={handleRoleChange}
+              variant="outlined"
+              size="small"
+              sx={{ mb: 2 }}
+            >
+              <MenuItem value="customer">Customer</MenuItem>
+              <MenuItem value="freelancer">Freelancer</MenuItem>
+            </TextField>
+
+            {formData.role === 'freelancer' && (
+              <TextField
+                name="file"
+                type="file"
+                onChange={handleFileChange}
+                fullWidth
+                variant="outlined"
+                size="small"
+                sx={{ mb: 2 }}
+                inputProps={{ accept: 'application/pdf, image/*' }}
+              />
+            )}
 
             <FormControlLabel
               control={
@@ -225,14 +267,10 @@ const RegisterPage: React.FC = () => {
                   checked={formData.termsAccepted}
                   onChange={handleChange}
                   color="primary"
-                  sx={{
-                    color: '#C5AA89',
-                    '&.Mui-checked': { color: '#6B4F4F' },
-                  }}
                 />
               }
               label={
-                <Typography variant="body2" sx={{ color: '#6B4F4F' }}>
+                <Typography variant="body2">
                   I agree to Terms & Conditions
                 </Typography>
               }
@@ -245,10 +283,10 @@ const RegisterPage: React.FC = () => {
               variant="contained"
               sx={{
                 mb: 2,
-                bgcolor: '#D4B998',
+                bgcolor: '#E6D5B8',
                 color: 'black',
                 '&:hover': {
-                  bgcolor: '#C5AA89',
+                  bgcolor: '#d4c4a7',
                 },
               }}
             >
@@ -256,20 +294,10 @@ const RegisterPage: React.FC = () => {
             </Button>
 
             <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="body2" display="inline" sx={{ color: '#6B4F4F' }}>
+              <Typography variant="body2" display="inline">
                 Already have an account?{' '}
               </Typography>
-              <Link
-                href="/login"
-                variant="body2"
-                underline="hover"
-                sx={{
-                  color: '#D4B998',
-                  '&:hover': {
-                    textDecoration: 'underline',
-                  },
-                }}
-              >
+              <Link href="/login" variant="body2" underline="hover">
                 Login
               </Link>
             </Box>
