@@ -8,7 +8,6 @@ import Footer from "@/app/(components)/Footer";
 
 const Page = () => {
   const Jobs = [
-    // Data awal
     {
       id: 1,
       postedTime: "2 hours ago",
@@ -54,7 +53,6 @@ const Page = () => {
       skills: ["Figma", "Sketch", "Wireframing", "Prototyping"],
       tokens: "4 tokens",
     },
-    // Data tambahan
     {
       id: 4,
       postedTime: "1 day ago",
@@ -162,13 +160,11 @@ const Page = () => {
     },
   ];
 
-  // State untuk filter
   const [filterVerified, setFilterVerified] = useState(false);
   const [filterRemote, setFilterRemote] = useState(false);
   const [filterFulltime, setFilterFulltime] = useState(false);
   const [filteredJobs, setFilteredJobs] = useState(Jobs);
 
-  // Logika Filter
   const applyFilters = () => {
     let filtered = Jobs;
 
@@ -187,7 +183,6 @@ const Page = () => {
     setFilteredJobs(filtered);
   };
 
-  // Handle perubahan checkbox
   const handleFilterChange = (event, filterType) => {
     const { checked } = event.target;
 
@@ -200,7 +195,6 @@ const Page = () => {
     }
   };
 
-  // Update filteredJobs saat state filter berubah
   React.useEffect(() => {
     applyFilters();
   }, [filterVerified, filterRemote, filterFulltime]);
@@ -214,7 +208,7 @@ const Page = () => {
           minHeight: "100vh",
           padding: 4,
           display: "grid",
-          gridTemplateColumns: "300px 1fr", // Kolom kiri untuk filter, kanan untuk job card
+          gridTemplateColumns: "300px 1fr",
           gap: 3,
         }}
       >
