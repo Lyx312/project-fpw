@@ -9,9 +9,18 @@ import {
   Paper,
   Container,
   Link,
+  Grid,
 } from "@mui/material";
 import Footer from "@/app/(components)/Footer";
 import Header from "@/app/(components)/Header";
+
+// Define custom color palette
+const colors = {
+  primary: "#00796b",   // Teal
+  secondary: "#f57c00", // Amber
+  background: "#f5f5f5", // Light Gray
+  text: "#212121",      // Dark Gray
+};
 
 export default function BuyTokens() {
   const [tokenToBuy, setTokenToBuy] = useState<number>(20);
@@ -25,14 +34,16 @@ export default function BuyTokens() {
   return (
     <div>
       <Header />
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        {/* Header */}
-
+      <Container maxWidth="sm" sx={{ py: 4 }}>
         {/* Main Content */}
-        <Paper elevation={3} sx={{ p: 4, mt: 2, borderRadius: 2 }}>
-          <Typography variant="body1" gutterBottom>
+        <Paper elevation={4} sx={{ p: 4, borderRadius: 2, backgroundColor: colors.background }}>
+          <Typography variant="h6" gutterBottom color={colors.text}>
+            Buy Tokens
+          </Typography>
+
+          <Typography variant="body1" gutterBottom color={colors.text}>
             Your available tokens:{" "}
-            <Typography component="span" fontWeight="bold">
+            <Typography component="span" fontWeight="bold" color={colors.primary}>
               {availableTokens}
             </Typography>
           </Typography>
@@ -44,11 +55,15 @@ export default function BuyTokens() {
             value={tokenToBuy}
             onChange={handleTokenChange}
             sx={{ my: 2 }}
+            variant="outlined"
+            InputProps={{
+              style: { color: colors.text },
+            }}
           />
 
-          <Typography variant="body1" gutterBottom>
+          <Typography variant="body1" gutterBottom color={colors.text}>
             Your token balance will be:{" "}
-            <Typography component="span" fontWeight="bold">
+            <Typography component="span" fontWeight="bold" color={colors.primary}>
               {availableTokens + tokenToBuy}
             </Typography>
           </Typography>
@@ -56,7 +71,7 @@ export default function BuyTokens() {
           <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
             This bundle of Tokens will expire 1 year from today. Unused Tokens
             rollover to the next month.{" "}
-            <Link href="#" underline="hover">
+            <Link href="#" underline="hover" color={colors.primary}>
               Learn more
             </Link>
           </Typography>
@@ -64,23 +79,37 @@ export default function BuyTokens() {
             You're authorizing us to charge your account. If you have sufficient
             funds, we will withdraw from your account balance. If not, the full
             amount will be charged to your primary billing method.{" "}
-            <Link href="#" underline="hover">
+            <Link href="#" underline="hover" color={colors.primary}>
               Learn more
             </Link>
           </Typography>
 
-          <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
-            <Button variant="contained" color="primary" fullWidth>
-              Payment
-            </Button>
-            <Button variant="outlined" color="secondary" fullWidth>
-              Cancel
-            </Button>
-          </Box>
+          <Grid container spacing={2} sx={{ mt: 3 }}>
+            <Grid item xs={6}>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ padding: "12px", backgroundColor: colors.primary, "&:hover": { backgroundColor: "#004d40" } }}
+              >
+                Payment
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button
+                variant="outlined"
+                color="secondary"
+                fullWidth
+                sx={{ padding: "12px", borderColor: colors.secondary, color: colors.secondary, "&:hover": { borderColor: "#e65100", backgroundColor: "#fff3e0" } }}
+              >
+                Cancel
+              </Button>
+            </Grid>
+          </Grid>
         </Paper>
-
-        {/* Footer */}
       </Container>
+
+      {/* Footer */}
       <Footer />
     </div>
   );
