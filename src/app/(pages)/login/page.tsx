@@ -12,13 +12,9 @@ import {
   Link,
   Paper,
   TextField,
-  Typography
+  Typography,
 } from '@mui/material';
-import {
-  Visibility,
-  VisibilityOff,
-  Close as CloseIcon
-} from '@mui/icons-material';
+import { Visibility, VisibilityOff, Close as CloseIcon } from '@mui/icons-material';
 import axios from 'axios';
 
 interface LoginFormProps {
@@ -29,16 +25,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    rememberMe: false
+    rememberMe: false,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked } = event.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: name === 'rememberMe' ? checked : value
+      [name]: name === 'rememberMe' ? checked : value,
     }));
   };
 
@@ -46,21 +42,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
     event.preventDefault();
     try {
       setIsLoading(true);
-      
+
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/login`, formData);
       const data = await response.data;
       console.log(data);
-
     } catch (error) {
       console.error('Login error:', error);
-      // Handle error appropriately
     } finally {
       setIsLoading(false);
     }
   };
 
   const togglePasswordVisibility = () => {
-    setShowPassword(prev => !prev);
+    setShowPassword((prev) => !prev);
   };
 
   return (
@@ -70,12 +64,34 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        position: 'relative',
         backgroundImage: 'url(/assets/images/coba.png)',
         backgroundSize: 'cover',
-        backgroundPosition: 'center'
+        backgroundPosition: 'center',
+        backgroundColor: '#F5EFE6', // Fallback warna krem lembut
       }}
     >
-      <Container maxWidth="sm">
+      {/* Overlay dengan efek blur */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          bgcolor: 'rgba(0, 0, 0, 0.5)', // Lapisan gelap semi-transparan
+          backdropFilter: 'blur(10px)', // Efek blur
+          zIndex: 1,
+        }}
+      />
+
+      <Container
+        maxWidth="sm"
+        sx={{
+          position: 'relative',
+          zIndex: 2, // Konten tetap di atas overlay
+        }}
+      >
         <Paper
           elevation={3}
           sx={{
@@ -83,7 +99,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
             position: 'relative',
             width: '100%',
             maxWidth: 400,
-            mx: 'auto'
+            mx: 'auto',
+            borderRadius: 4,
+            bgcolor: '#FFF9F1', // Warna krem terang untuk konten
           }}
         >
           {onClose && (
@@ -92,14 +110,21 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
               sx={{
                 position: 'absolute',
                 right: 8,
-                top: 8
+                top: 8,
+                color: '#C5AA89',
               }}
             >
               <CloseIcon />
             </IconButton>
           )}
 
-          <Typography variant="h5" component="h2" align="center" gutterBottom>
+          <Typography
+            variant="h5"
+            component="h2"
+            align="center"
+            gutterBottom
+            sx={{ color: '#6B4F4F' }}
+          >
             Sign In
           </Typography>
 
@@ -115,6 +140,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
               autoFocus
               value={formData.email}
               onChange={handleChange}
+              sx={{
+                '& .MuiInputBase-root': {
+                  bgcolor: '#FDF6E4',
+                },
+              }}
             />
 
             <TextField
@@ -141,6 +171,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
                   </InputAdornment>
                 ),
               }}
+              sx={{
+                '& .MuiInputBase-root': {
+                  bgcolor: '#FDF6E4',
+                },
+              }}
             />
 
             <Box
@@ -149,7 +184,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 mt: 2,
-                mb: 2
+                mb: 2,
               }}
             >
               <FormControlLabel
@@ -158,12 +193,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
                     name="rememberMe"
                     checked={formData.rememberMe}
                     onChange={handleChange}
-                    color="primary"
+                    sx={{
+                      color: '#C5AA89',
+                      '&.Mui-checked': { color: '#6B4F4F' },
+                    }}
                   />
                 }
                 label="Remember me"
               />
-              <Link href="#" variant="body2" color="primary">
+              <Link
+                href="#"
+                variant="body2"
+                sx={{
+                  color: '#6B4F4F',
+                  '&:hover': {
+                    textDecoration: 'underline',
+                  },
+                }}
+              >
                 Forgot Password?
               </Link>
             </Box>
@@ -186,8 +233,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
             </Button>
 
             <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="body2" display="inline">
-                Dont have an account?{' '}
+              <Typography variant="body2" display="inline" sx={{ color: '#6B4F4F' }}>
+                Don't have an account?{' '}
               </Typography>
               <Link
                 href="/register"
