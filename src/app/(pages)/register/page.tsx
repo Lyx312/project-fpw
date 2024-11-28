@@ -11,7 +11,7 @@ import {
   Container,
   Paper,
   Link,
-  IconButton
+  IconButton,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
@@ -39,7 +39,7 @@ const RegisterPage: React.FC = () => {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked } = event.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: name === 'termsAccepted' ? checked : value,
     }));
@@ -48,18 +48,17 @@ const RegisterPage: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     console.log('Form submitted:', formData);
-    // Add your registration logic here
 
     const { termsAccepted, ...dataToSubmit } = formData;
 
-    if (termsAccepted === false) {
-      return
+    if (!termsAccepted) {
+      return;
     }
 
-    dataToSubmit.role = "freelancer";
+    dataToSubmit.role = 'freelancer';
     dataToSubmit.country_id = 1;
     console.log(`${process.env.NEXT_PUBLIC_BASE_URL}/api`);
-    
+
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/register`, dataToSubmit);
       const data = await response.data;
@@ -67,139 +66,217 @@ const RegisterPage: React.FC = () => {
     } catch (error) {
       console.error(error);
     }
-
   };
 
   return (
-    <Container maxWidth="sm">
-      <Paper 
-        elevation={3} 
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        backgroundImage: 'url(/assets/images/coba.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundColor: '#F5EFE6', // Fallback warna krem lembut
+      }}
+    >
+      {/* Overlay */}
+      <Box
         sx={{
-          p: 4,
-          mt: 8,
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          bgcolor: 'rgba(0, 0, 0, 0.5)', // Lapisan gelap semi-transparan
+          backdropFilter: 'blur(10px)', // Efek blur
+          zIndex: 1,
+        }}
+      />
+
+      <Container
+        maxWidth="sm"
+        sx={{
           position: 'relative',
-          borderRadius: 2,
+          zIndex: 2, // Konten tetap di atas overlay
         }}
       >
-        <IconButton
+        <Paper
+          elevation={4}
           sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
+            p: 4,
+            borderRadius: 4,
+            backgroundColor: '#FFF9F1', 
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
           }}
         >
-          <CloseIcon />
-        </IconButton>
-
-        <Box component="form" onSubmit={handleSubmit} noValidate>
-          <Typography variant="h5" align="center" gutterBottom>
-            Sign Up
-          </Typography>
-
-          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-            <TextField
-              name="first_name"
-              label="First Name"
-              fullWidth
-              required
-              value={formData.first_name}
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-            />
-            <TextField
-              name="last_name"
-              label="Last Name"
-              fullWidth
-              required
-              value={formData.last_name}
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-            />
-          </Box>
-
-          <TextField
-            name="email"
-            label="Email Address"
-            fullWidth
-            required
-            value={formData.email}
-            onChange={handleChange}
-            variant="outlined"
-            size="small"
-            sx={{ mb: 2 }}
-          />
-
-          <TextField
-            name="phone"
-            label="Phone Number"
-            fullWidth
-            required
-            value={formData.phone}
-            onChange={handleChange}
-            variant="outlined"
-            size="small"
-            sx={{ mb: 2 }}
-          />
-
-          <TextField
-            name="password"
-            label="Password"
-            type="password"
-            fullWidth
-            required
-            value={formData.password}
-            onChange={handleChange}
-            variant="outlined"
-            size="small"
-            sx={{ mb: 2 }}
-          />
-
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="termsAccepted"
-                checked={formData.termsAccepted}
-                onChange={handleChange}
-                color="primary"
-              />
-            }
-            label={
-              <Typography variant="body2">
-                I agree to Terms & Conditions
-              </Typography>
-            }
-            sx={{ mb: 2 }}
-          />
-
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
+          {/* <IconButton
             sx={{
-              mb: 2,
-              bgcolor: '#E6D5B8',
-              color: 'black',
-              '&:hover': {
-                bgcolor: '#d4c4a7',
-              },
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: '#C5AA89',
             }}
-          >
-            Register
-          </Button>
+          > */}
+            {/* <CloseIcon /> */}
+          {/* </IconButton> */}
 
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="body2" display="inline">
-              Already have an account?{' '}
+          <Box component="form" onSubmit={handleSubmit} noValidate>
+            <Typography
+              variant="h5"
+              align="center"
+              gutterBottom
+              sx={{ color: '#6B4F4F', fontWeight: 'bold' }}
+            >
+              Sign Up
             </Typography>
-            <Link href="/login" variant="body2" underline="hover">
-              Login
-            </Link>
+
+            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+              <TextField
+                name="first_name"
+                label="First Name"
+                fullWidth
+                required
+                value={formData.first_name}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+                sx={{
+                  '& .MuiInputBase-root': {
+                    bgcolor: '#FDF6E4',
+                  },
+                }}
+              />
+              <TextField
+                name="last_name"
+                label="Last Name"
+                fullWidth
+                required
+                value={formData.last_name}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+                sx={{
+                  '& .MuiInputBase-root': {
+                    bgcolor: '#FDF6E4',
+                  },
+                }}
+              />
+            </Box>
+
+            <TextField
+              name="email"
+              label="Email Address"
+              fullWidth
+              required
+              value={formData.email}
+              onChange={handleChange}
+              variant="outlined"
+              size="small"
+              sx={{
+                mb: 2,
+                '& .MuiInputBase-root': {
+                  bgcolor: '#FDF6E4',
+                },
+              }}
+            />
+
+            <TextField
+              name="phone"
+              label="Phone Number"
+              fullWidth
+              required
+              value={formData.phone}
+              onChange={handleChange}
+              variant="outlined"
+              size="small"
+              sx={{
+                mb: 2,
+                '& .MuiInputBase-root': {
+                  bgcolor: '#FDF6E4',
+                },
+              }}
+            />
+
+            <TextField
+              name="password"
+              label="Password"
+              type="password"
+              fullWidth
+              required
+              value={formData.password}
+              onChange={handleChange}
+              variant="outlined"
+              size="small"
+              sx={{
+                mb: 2,
+                '& .MuiInputBase-root': {
+                  bgcolor: '#FDF6E4',
+                },
+              }}
+            />
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="termsAccepted"
+                  checked={formData.termsAccepted}
+                  onChange={handleChange}
+                  color="primary"
+                  sx={{
+                    color: '#C5AA89',
+                    '&.Mui-checked': { color: '#6B4F4F' },
+                  }}
+                />
+              }
+              label={
+                <Typography variant="body2" sx={{ color: '#6B4F4F' }}>
+                  I agree to Terms & Conditions
+                </Typography>
+              }
+              sx={{ mb: 2 }}
+            />
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{
+                mb: 2,
+                bgcolor: '#D4B998',
+                color: 'black',
+                '&:hover': {
+                  bgcolor: '#C5AA89',
+                },
+              }}
+            >
+              Register
+            </Button>
+
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography variant="body2" display="inline" sx={{ color: '#6B4F4F' }}>
+                Already have an account?{' '}
+              </Typography>
+              <Link
+                href="/login"
+                variant="body2"
+                underline="hover"
+                sx={{
+                  color: '#D4B998',
+                  '&:hover': {
+                    textDecoration: 'underline',
+                  },
+                }}
+              >
+                Login
+              </Link>
+            </Box>
           </Box>
-        </Box>
-      </Paper>
-    </Container>
+        </Paper>
+      </Container>
+    </Box>
   );
 };
 
