@@ -14,7 +14,6 @@ import {
 import Footer from "@/app/(components)/Footer";
 import Header from "@/app/(components)/Header";
 
-// Define custom color palette
 const colors = {
   primary: "#00796b",   // Teal
   secondary: "#f57c00", // Amber
