@@ -32,7 +32,9 @@ export async function POST() {
         console.error('Missing API key');
         return NextResponse.json({ message: 'API key is missing' }, { status: 500 });
       }
-      const apiUrl = "https://api.api-ninjas.com/v1/country?name=";
+      const name = "";
+      const limit = 30;
+      const apiUrl = `https://api.api-ninjas.com/v1/country?name=${name}&limit=${limit}`;
       const headers = { 'X-Api-Key': apiKey };
   
         const response = await axios.get(apiUrl, { headers });

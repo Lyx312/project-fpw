@@ -13,7 +13,9 @@ import PersonIcon from "@mui/icons-material/Person";
 import CategoryIcon from "@mui/icons-material/Category";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import LanguageIcon from '@mui/icons-material/Language';
 import Link from "next/link";
+import Image from "next/image";
 
 const AdminSideBar = () => {
   return (
@@ -30,7 +32,7 @@ const AdminSideBar = () => {
       }}
     >
       <Typography variant="h6" component="div" sx={{ marginBottom: 2 }}>
-        Freelance Hub.
+        <Image src="/assets/images/logo.png" alt="Logo" width={180} height={80} />
       </Typography>
 
       <List>
@@ -46,12 +48,14 @@ const AdminSideBar = () => {
         </ListItem>
 
         <ListItem disablePadding>
-          <ListItemButton>
-            <ListItemIcon sx={{ color: "white" }}>
-              <PersonIcon />
-            </ListItemIcon>
-            <ListItemText primary="Users" />
-          </ListItemButton>
+          <Link href="/admin/users" passHref style={{ textDecoration: 'none', color: 'inherit' }}>
+            <ListItemButton>
+              <ListItemIcon sx={{ color: "white" }}>
+                <PersonIcon />
+              </ListItemIcon>
+              <ListItemText primary="Users" />
+            </ListItemButton>
+          </Link>
         </ListItem>
 
         <ListItem disablePadding>
@@ -69,7 +73,7 @@ const AdminSideBar = () => {
           <Link href="/admin/country" passHref style={{ textDecoration: 'none', color: 'inherit' }}>
             <ListItemButton>
               <ListItemIcon sx={{ color: "white" }}>
-                <CategoryIcon />
+                <LanguageIcon />
               </ListItemIcon>
               <ListItemText primary="Country" />
             </ListItemButton>
