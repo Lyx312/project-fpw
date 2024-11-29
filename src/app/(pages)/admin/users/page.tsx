@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useState, useEffect } from 'react';
 import {
@@ -12,6 +13,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
+  Button,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from '@mui/material';
 import axios from 'axios';
 
@@ -39,15 +46,39 @@ const AdminUsersPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [nameFilter, setNameFilter] = useState('');
+  const [countryFilter, setCountryFilter] = useState('');
 
-  // Fetch users and their associated country and role
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/userCountry');  // Assuming this API returns the users with country_name and role
+      const params: Record<string, string> = {};
+      if (nameFilter) params.name = nameFilter;
+      if (countryFilter) params.country = countryFilter;
+
+      const response = await axios.get('/api/userCountry', { params });
       setUsers(response.data);
-    } catch (error) {
-      console.error('Error fetching users:', error);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCountries = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/country');
+      if (!response.ok) {
+        throw new Error(`Error fetching countries: ${response.status}`);
+      }
+      const data = await response.json();
+      setCountries(data.data || []);
+    } catch (err: any) {
+      console.error(err.message);
+      setError('Failed to fetch countries. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -55,7 +86,12 @@ const AdminUsersPage = () => {
 
   useEffect(() => {
     fetchUsers();
+    fetchCountries();
   }, []);
+
+  const handleFilterSubmit = () => {
+    fetchUsers();
+  };
 
   return (
     <Box
@@ -77,6 +113,67 @@ const AdminUsersPage = () => {
             View and manage all users with their associated data.
           </Typography>
         </Box>
+
+        {/* Filters */}
+        <Paper
+          elevation={3}
+          sx={{
+            p: 3,
+            mb: 4,
+            backgroundColor: colors.accent,
+            borderRadius: '8px',
+          }}
+        >
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Filters
+          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 2,
+              alignItems: 'center',
+            }}
+          >
+            <TextField
+              label="Name"
+              variant="outlined"
+              value={nameFilter}
+              onChange={(e) => setNameFilter(e.target.value)}
+              sx={{ flex: 1, minWidth: 200 }}
+            />
+            <FormControl sx={{ flex: 1, minWidth: 200 }} variant="outlined">
+              <InputLabel>Country</InputLabel>
+              <Select
+                value={countryFilter}
+                onChange={(e) => setCountryFilter(e.target.value)}
+                label="Country"
+              >
+                <MenuItem value="">
+                  <em>All Countries</em>
+                </MenuItem>
+                {countries.map((country) => (
+                  <MenuItem key={country.country_id} value={country.country_id}>
+                    {country.country_name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleFilterSubmit}
+              sx={{ backgroundColor: colors.secondary }}
+            >
+              Apply Filters
+            </Button>
+          </Box>
+          {error && (
+            <Typography variant="body2" color="error" sx={{ mt: 2 }}>
+              {error}
+            </Typography>
+          )}
+        </Paper>
 
         {/* Users Table */}
         <Paper

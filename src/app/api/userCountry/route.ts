@@ -9,6 +9,7 @@ export async function GET(req: Request) {
       const { searchParams } = new URL(req.url);
       const name = searchParams.get('name'); // Filter by name
       const country = searchParams.get('country'); // Filter by country
+      const roles = searchParams.getAll('role');
 
       // Build the query object dynamically
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,8 +25,14 @@ export async function GET(req: Request) {
 
       if (country) {
           // Add country filter
-          query.country = { $regex: country, $options: 'i' };
+          query.country_id = { $regex: country, $options: 'i' };
       }
+
+      if (roles.length > 0) {
+        // Add role filter
+        query.role = { $in: roles };
+      }
+      console.log(roles);
 
       // Fetch users based on the query
       const users = await User.find(query);
@@ -45,7 +52,6 @@ export async function GET(req: Request) {
           ...user.toObject(),
           country_name: countryMap[user.country_id.toString()] || null
       }));
-      console.log(usersWithCountryName)
 
       return Response.json(usersWithCountryName, { status: 200 });
   } catch (error) {
