@@ -1,12 +1,12 @@
-import AdminSideBar from "@/app/(components)/AdminSideBar";
+'use client'
 import React from "react";
 
-const page = () => {
+const AdminPage = () => {
   return (
     <div>
-      <AdminSideBar />
+      <><h1>test</h1></>
     </div>
   );
 };
 
-export default page;
+export default AdminPage;

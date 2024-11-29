@@ -13,6 +13,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import CategoryIcon from "@mui/icons-material/Category";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import Link from "next/link";
 
 const AdminSideBar = () => {
   return (
@@ -25,6 +26,7 @@ const AdminSideBar = () => {
         display: "flex",
         flexDirection: "column",
         padding: 2,
+        position: "fixed"
       }}
     >
       <Typography variant="h6" component="div" sx={{ marginBottom: 2 }}>
@@ -33,12 +35,14 @@ const AdminSideBar = () => {
 
       <List>
         <ListItem disablePadding>
-          <ListItemButton>
-            <ListItemIcon sx={{ color: "white" }}>
-              <HomeIcon />
-            </ListItemIcon>
-            <ListItemText primary="Dashboard" />
-          </ListItemButton>
+          <Link href="/admin" passHref style={{ textDecoration: 'none', color: 'inherit' }}>
+            <ListItemButton>
+              <ListItemIcon sx={{ color: "white" }}>
+                <HomeIcon />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" />
+            </ListItemButton>
+          </Link>
         </ListItem>
 
         <ListItem disablePadding>
@@ -51,12 +55,25 @@ const AdminSideBar = () => {
         </ListItem>
 
         <ListItem disablePadding>
-          <ListItemButton>
-            <ListItemIcon sx={{ color: "white" }}>
-              <CategoryIcon />
-            </ListItemIcon>
-            <ListItemText primary="Category & Country" />
-          </ListItemButton>
+          <Link href="/admin/category" passHref style={{ textDecoration: 'none', color: 'inherit' }}>
+            <ListItemButton>
+              <ListItemIcon sx={{ color: "white" }}>
+                <CategoryIcon />
+              </ListItemIcon>
+              <ListItemText primary="Category" />
+            </ListItemButton>
+          </Link>
+        </ListItem>
+
+        <ListItem disablePadding>
+          <Link href="/admin/country" passHref style={{ textDecoration: 'none', color: 'inherit' }}>
+            <ListItemButton>
+              <ListItemIcon sx={{ color: "white" }}>
+                <CategoryIcon />
+              </ListItemIcon>
+              <ListItemText primary="Country" />
+            </ListItemButton>
+          </Link>
         </ListItem>
 
         <ListItem disablePadding>
