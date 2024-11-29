@@ -41,13 +41,13 @@ export async function GET(req: Request) {
       }, {});
 
       // Map users to include country_name instead of country_id
-      // const usersWithCountryName = users.map(user => ({
-      //     ...user.toObject(),
-      //     country_name: countryMap[user.country.toString()] || null
-      // }));
-      // console.log(usersWithCountryName)
+      const usersWithCountryName = users.map(user => ({
+          ...user.toObject(),
+          country_name: countryMap[user.country_id.toString()] || null
+      }));
+      console.log(usersWithCountryName)
 
-      return Response.json(users, { status: 200 });
+      return Response.json(usersWithCountryName, { status: 200 });
   } catch (error) {
       return Response.json({ message: 'Error fetching users', error: error }, { status: 500 });
   }
