@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, Checkbox, FormControlLabel } from "@mui/material";
 import JobCard from "@/app/(components)/JobCard";
 import Header from "@/app/(components)/Header";
 import Footer from "@/app/(components)/Footer";
+import axios from "axios";
 
 const Page = () => {
   const Jobs = [
@@ -160,23 +161,51 @@ const Page = () => {
     },
   ];
 
-  const [filterVerified, setFilterVerified] = useState(false);
-  const [filterRemote, setFilterRemote] = useState(false);
-  const [filterFulltime, setFilterFulltime] = useState(false);
-  const [filteredJobs, setFilteredJobs] = useState(Jobs);
+  const [loading, setLoading] = useState(false);
+  const [postList, setPostList] = useState([]);
+
+  // Fetch categories from the API
+  const fetchCategories = async (filterName = "") => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`/api/posts`);
+      setPostList(response.data.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch all categories on initial load
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const [filters, setFilters] = useState({
+    verified: false,
+    remote: false,
+    fulltime: false,
+  });
+
+  const [filteredJobs, setFilteredJobs] = useState(postList);
+
+  useEffect(() => {
+    applyFilters();
+  }, [filters]);
 
   const applyFilters = () => {
     let filtered = Jobs;
 
-    if (filterVerified) {
+    if (filters.verified) {
       filtered = filtered.filter((job) => job.paymentVerified);
     }
 
-    if (filterRemote) {
+    if (filters.remote) {
       filtered = filtered.filter((job) => job.location === "Remote");
     }
 
-    if (filterFulltime) {
+    if (filters.fulltime) {
       filtered = filtered.filter((job) => job.tenure === "Full-time");
     }
 
@@ -184,20 +213,11 @@ const Page = () => {
   };
 
   const handleFilterChange = (event, filterType) => {
-    const { checked } = event.target;
-
-    if (filterType === "verified") {
-      setFilterVerified(checked);
-    } else if (filterType === "remote") {
-      setFilterRemote(checked);
-    } else if (filterType === "fulltime") {
-      setFilterFulltime(checked);
-    }
+    setFilters((prev) => ({
+      ...prev,
+      [filterType]: event.target.checked,
+    }));
   };
-
-  React.useEffect(() => {
-    applyFilters();
-  }, [filterVerified, filterRemote, filterFulltime]);
 
   return (
     <div>
@@ -227,7 +247,7 @@ const Page = () => {
           <FormControlLabel
             control={
               <Checkbox
-                checked={filterVerified}
+                checked={filters.verified}
                 onChange={(event) => handleFilterChange(event, "verified")}
               />
             }
@@ -236,7 +256,7 @@ const Page = () => {
           <FormControlLabel
             control={
               <Checkbox
-                checked={filterRemote}
+                checked={filters.remote}
                 onChange={(event) => handleFilterChange(event, "remote")}
               />
             }
@@ -245,7 +265,7 @@ const Page = () => {
           <FormControlLabel
             control={
               <Checkbox
-                checked={filterFulltime}
+                checked={filters.fulltime}
                 onChange={(event) => handleFilterChange(event, "fulltime")}
               />
             }
@@ -261,11 +281,28 @@ const Page = () => {
             gap: 2,
           }}
         >
-          {filteredJobs.map((job) => (
-            <JobCard key={job.id} {...job} />
+          {postList.map((item) => (
+            <JobCard
+              key={item.post_id}
+              id={item.post_id}
+              postedTime={new Date(item.createdAt).toLocaleString()} // Atur waktu berdasarkan createdAt
+              title={item.post_title}
+              paymentVerified={item.post_status === "Verified"} // Misalkan ada status untuk verifikasi
+              rating="★★★☆☆" // Jika rating belum tersedia, gunakan default
+              location="Remote" // Beri nilai default atau gunakan data dari API jika tersedia
+              category="General" // Beri nilai default atau gunakan data dari API
+              tenure="Contract" // Beri nilai default atau gunakan data dari API
+              salaryRange={`Rp ${item.post_price.toLocaleString("id-ID")}`} // Format harga menjadi salaryRange
+              description={item.post_description}
+              skills={[]} // Jika data skills tidak ada, gunakan array kosong
+              tokens="N/A" // Jika token tidak relevan untuk Manual Post, gunakan "N/A"
+            />
           ))}
         </Box>
       </Box>
+
+      {/* Display Manual Post */}
+
       <Footer />
     </div>
   );

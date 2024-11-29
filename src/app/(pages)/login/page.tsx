@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -13,9 +13,13 @@ import {
   Paper,
   TextField,
   Typography,
-} from '@mui/material';
-import { Visibility, VisibilityOff, Close as CloseIcon } from '@mui/icons-material';
-import axios from 'axios';
+} from "@mui/material";
+import {
+  Visibility,
+  VisibilityOff,
+  Close as CloseIcon,
+} from "@mui/icons-material";
+import axios from "axios";
 
 interface LoginFormProps {
   onClose?: () => void;
@@ -23,8 +27,8 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
     rememberMe: false,
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -34,7 +38,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
     const { name, value, checked } = event.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'rememberMe' ? checked : value,
+      [name]: name === "rememberMe" ? checked : value,
     }));
   };
 
@@ -43,11 +47,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
     try {
       setIsLoading(true);
 
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/login`, formData);
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/login`,
+        formData
+      );
       const data = await response.data;
       console.log(data);
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -60,27 +67,27 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-        backgroundImage: 'url(/assets/images/coba.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundColor: '#F5EFE6', // Fallback warna krem lembut
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        backgroundImage: "url(/assets/images/coba.png)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundColor: "#F5EFE6", // Fallback warna krem lembut
       }}
     >
       {/* Overlay dengan efek blur */}
       <Box
         sx={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           left: 0,
-          width: '100%',
-          height: '100%',
-          bgcolor: 'rgba(0, 0, 0, 0.5)', // Lapisan gelap semi-transparan
-          backdropFilter: 'blur(10px)', // Efek blur
+          width: "100%",
+          height: "100%",
+          bgcolor: "rgba(0, 0, 0, 0.5)", // Lapisan gelap semi-transparan
+          backdropFilter: "blur(10px)", // Efek blur
           zIndex: 1,
         }}
       />
@@ -88,7 +95,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
       <Container
         maxWidth="sm"
         sx={{
-          position: 'relative',
+          position: "relative",
           zIndex: 2, // Konten tetap di atas overlay
         }}
       >
@@ -96,22 +103,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
           elevation={3}
           sx={{
             p: 4,
-            position: 'relative',
-            width: '100%',
+            position: "relative",
+            width: "100%",
             maxWidth: 400,
-            mx: 'auto',
+            mx: "auto",
             borderRadius: 4,
-            bgcolor: '#FFF9F1', // Warna krem terang untuk konten
+            bgcolor: "#FFF9F1", // Warna krem terang untuk konten
           }}
         >
           {onClose && (
             <IconButton
               onClick={onClose}
               sx={{
-                position: 'absolute',
+                position: "absolute",
                 right: 8,
                 top: 8,
-                color: '#C5AA89',
+                color: "#C5AA89",
               }}
             >
               <CloseIcon />
@@ -123,12 +130,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
             component="h2"
             align="center"
             gutterBottom
-            sx={{ color: '#6B4F4F' }}
+            sx={{ color: "#6B4F4F" }}
           >
             Sign In
           </Typography>
 
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 2 }}
+          >
             <TextField
               margin="normal"
               required
@@ -141,8 +153,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
               value={formData.email}
               onChange={handleChange}
               sx={{
-                '& .MuiInputBase-root': {
-                  bgcolor: '#FDF6E4',
+                "& .MuiInputBase-root": {
+                  bgcolor: "#FDF6E4",
                 },
               }}
             />
@@ -153,7 +165,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
               fullWidth
               name="password"
               label="Password"
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               id="password"
               autoComplete="current-password"
               value={formData.password}
@@ -172,17 +184,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
                 ),
               }}
               sx={{
-                '& .MuiInputBase-root': {
-                  bgcolor: '#FDF6E4',
+                "& .MuiInputBase-root": {
+                  bgcolor: "#FDF6E4",
                 },
               }}
             />
 
             <Box
               sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
                 mt: 2,
                 mb: 2,
               }}
@@ -194,8 +206,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
                     checked={formData.rememberMe}
                     onChange={handleChange}
                     sx={{
-                      color: '#C5AA89',
-                      '&.Mui-checked': { color: '#6B4F4F' },
+                      color: "#C5AA89",
+                      "&.Mui-checked": { color: "#6B4F4F" },
                     }}
                   />
                 }
@@ -205,9 +217,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
                 href="#"
                 variant="body2"
                 sx={{
-                  color: '#6B4F4F',
-                  '&:hover': {
-                    textDecoration: 'underline',
+                  color: "#6B4F4F",
+                  "&:hover": {
+                    textDecoration: "underline",
                   },
                 }}
               >
@@ -223,26 +235,30 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
               sx={{
                 mt: 2,
                 mb: 2,
-                bgcolor: '#D4B998',
-                '&:hover': {
-                  bgcolor: '#C5AA89',
+                bgcolor: "#D4B998",
+                "&:hover": {
+                  bgcolor: "#C5AA89",
                 },
               }}
             >
               Login
             </Button>
 
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="body2" display="inline" sx={{ color: '#6B4F4F' }}>
-                Don't have an account?{' '}
+            <Box sx={{ textAlign: "center" }}>
+              <Typography
+                variant="body2"
+                display="inline"
+                sx={{ color: "#6B4F4F" }}
+              >
+                Don't have an account?{" "}
               </Typography>
               <Link
                 href="/register"
                 variant="body2"
                 sx={{
-                  color: '#D4B998',
-                  '&:hover': {
-                    textDecoration: 'underline',
+                  color: "#D4B998",
+                  "&:hover": {
+                    textDecoration: "underline",
                   },
                 }}
               >
