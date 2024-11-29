@@ -320,7 +320,7 @@ const RegisterPage: React.FC = () => {
               size="small"
               sx={{ mb: 2 }}
             >
-              <MenuItem value="customer">Customer</MenuItem>
+              <MenuItem value="client">Client</MenuItem>
               <MenuItem value="freelancer">Freelancer</MenuItem>
             </TextField>
 

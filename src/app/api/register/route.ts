@@ -110,9 +110,9 @@ const userRegisterSchema = Joi.object({
         'string.empty': 'Country is required',
         'any.required': 'Country is required'
     }),
-    role: Joi.string().valid('customer', 'freelancer').required().messages({
+    role: Joi.string().valid('client', 'freelancer').required().messages({
         'string.base': 'Role should be a type of text',
-        'any.only': 'Role must be either customer or freelancer',
+        'any.only': 'Role must be either client or freelancer',
         'any.required': 'Role is required'
     }),
 });
