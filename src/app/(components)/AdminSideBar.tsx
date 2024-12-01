@@ -14,6 +14,7 @@ import CategoryIcon from "@mui/icons-material/Category";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import LanguageIcon from '@mui/icons-material/Language';
+import LogoutIcon from '@mui/icons-material/Logout';
 import Link from "next/link";
 import Image from "next/image";
 
@@ -81,21 +82,25 @@ const AdminSideBar = () => {
         </ListItem>
 
         <ListItem disablePadding>
-          <ListItemButton>
-            <ListItemIcon sx={{ color: "white" }}>
-              <AssignmentIcon />
-            </ListItemIcon>
-            <ListItemText primary="Applications" />
-          </ListItemButton>
+          <Link href="/admin/transaction" passHref style={{ textDecoration: 'none', color: 'inherit' }}>
+            <ListItemButton>
+              <ListItemIcon sx={{ color: "white" }}>
+                <AccessTimeIcon />
+              </ListItemIcon>
+              <ListItemText primary="Transaction" />
+            </ListItemButton>
+          </Link>
         </ListItem>
 
         <ListItem disablePadding>
-          <ListItemButton>
-            <ListItemIcon sx={{ color: "white" }}>
-              <AccessTimeIcon />
-            </ListItemIcon>
-            <ListItemText primary="Transaction" />
-          </ListItemButton>
+          <Link href="/login" passHref style={{ textDecoration: 'none', color: 'inherit' }}>
+            <ListItemButton>
+              <ListItemIcon sx={{ color: "white" }}>
+                <LogoutIcon />
+              </ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItemButton>
+          </Link>
         </ListItem>
       </List>
     </Box>

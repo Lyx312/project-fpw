@@ -21,6 +21,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
 import { useRouter } from 'next/navigation'
+import Header from '@/app/(components)/Header';
 
 interface RegisterFormData {
   first_name: string;
@@ -144,6 +145,8 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
+    <>
+    <Header/>
     <Box
       sx={{
         minHeight: '100vh',
@@ -177,15 +180,6 @@ const RegisterPage: React.FC = () => {
             backgroundColor: 'rgba(255, 255, 255, 0.9)', // Semi transparan
           }}
         >
-          <IconButton
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
 
           <Box component="form" onSubmit={handleSubmit} noValidate>
             <Typography variant="h5" align="center" gutterBottom>
@@ -385,6 +379,7 @@ const RegisterPage: React.FC = () => {
         </Paper>
       </Container>
     </Box>
+    </>
   );
 };
 

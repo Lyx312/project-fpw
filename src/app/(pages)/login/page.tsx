@@ -20,6 +20,7 @@ import {
   Close as CloseIcon,
 } from "@mui/icons-material";
 import axios from "axios";
+import Header from "@/app/(components)/Header";
 
 interface LoginFormProps {
   onClose?: () => void;
@@ -65,6 +66,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
   };
 
   return (
+  <>
+  <Header />
     <Box
       sx={{
         minHeight: "100vh",
@@ -78,6 +81,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
         backgroundColor: "#F5EFE6", // Fallback warna krem lembut
       }}
     >
+
+    
       {/* Overlay dengan efek blur */}
       <Box
         sx={{
@@ -268,7 +273,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
           </Box>
         </Paper>
       </Container>
+      
     </Box>
+    </>
   );
 };
 

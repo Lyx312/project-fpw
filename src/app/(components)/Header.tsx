@@ -57,7 +57,7 @@ const Header = () => {
           }}
         />
         
-        <Link href="/list" color="inherit">
+        <Link href="/posts" color="inherit">
           <IconButton color="inherit">
             <WorkIcon />
           </IconButton>
