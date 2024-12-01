@@ -22,7 +22,6 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
 import { useRouter } from 'next/navigation'
 import Header from '@/app/(components)/Header';
-import { useRouter } from 'next/navigation';
 
 interface RegisterFormData {
   first_name: string;
@@ -35,6 +34,7 @@ interface RegisterFormData {
   role: string;
   country_id: string;
   file?: File | null;
+  cv_name?: string;
 }
 
 const RegisterPage: React.FC = () => {
@@ -49,6 +49,7 @@ const RegisterPage: React.FC = () => {
     role: '',
     country_id: '',
     file: null,
+    cv_name: '',
   });
 
   const router = useRouter();

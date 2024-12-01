@@ -38,3 +38,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# storage
+/storage/*
+!/storage/
+
+# package-lock.json
+/package-lock.json

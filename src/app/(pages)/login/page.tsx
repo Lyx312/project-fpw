@@ -21,6 +21,7 @@ import {
 } from "@mui/icons-material";
 import axios from "axios";
 import Header from "@/app/(components)/Header";
+import { useRouter } from "next/navigation";
 
 interface LoginFormProps {
   onClose?: () => void;
@@ -43,6 +44,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
     }));
   };
 
+  const router = useRouter();
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
@@ -54,8 +57,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
       );
       const data = await response.data;
       console.log(data);
+      alert('Login successful');
+      router.push('/');
     } catch (error) {
       console.error("Login error:", error);
+      if (axios.isAxiosError(error) && error.response) {
+        alert(error.response.data.error);
+      } else {
+        alert('An unexpected error occurred');
+      }
     } finally {
       setIsLoading(false);
     }
