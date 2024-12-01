@@ -1,14 +1,14 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import connectDB from '../../../config/database'; 
-import User from '../../../models/userModel'; 
+import connectDB from '@/config/database'; 
+import User from '@/models/userModel'; 
 import Joi from 'joi';
 import { NextResponse } from 'next/server';
-import sendEmail from '../../../emails/mailer';
+import sendEmail from '@/emails/mailer';
 
 export async function POST(req: Request) {
     
-    const { first_name, last_name, email, phone, password, confirm_password, country_id, role } = await req.json();
+    const { first_name, last_name, email, phone, password, confirm_password, country_id, role, cv_name } = await req.json();
 
     const { error } = userRegisterSchema.validate({ first_name, last_name, email, phone, password, confirm_password, country_id, role });
     if (error) {
@@ -38,6 +38,7 @@ export async function POST(req: Request) {
             country_id,
             role,
             email_token: token,
+            cv_path: role === 'freelancer' ?  `/src/storage/cvs/${cv_name}` : null,
         });
 
         if (role === 'freelancer') {

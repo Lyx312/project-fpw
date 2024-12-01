@@ -20,7 +20,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 
 interface RegisterFormData {
   first_name: string;
@@ -119,13 +119,30 @@ const RegisterPage: React.FC = () => {
     console.log('Form submitted:', formData);
 
     const { termsAccepted, file, ...dataToSubmit } = formData;
-    
+
     if (!termsAccepted) {
       alert('Please accept the terms & conditions');
       return;
-    }  
-    
+    }
+
     try {
+      if (formData.role === 'freelancer') {
+        if (!file) {
+          alert('Please upload your CV');
+          return;
+        }
+        const formData = new FormData();
+        formData.append('file', file, `${dataToSubmit.email}.pdf`);
+
+        const uploadResponse = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/upload`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        dataToSubmit.cv_name = uploadResponse.data.name;
+      }
+
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/register`, dataToSubmit);
       const data = await response.data;
       console.log(data);
@@ -335,7 +352,7 @@ const RegisterPage: React.FC = () => {
                   variant="outlined"
                   size="small"
                   sx={{ mb: 2 }}
-                  inputProps={{ accept: 'application/pdf, image/*' }}
+                  inputProps={{ accept: 'application/pdf' }}
                 />
               </div>
             )}

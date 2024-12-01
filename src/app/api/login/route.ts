@@ -32,8 +32,10 @@ export async function POST(request: Request) {
             if (!jwtSecret) {
                 throw new Error('JWT_SECRET is not defined');
             }
-            if (!jwt.verify(user.email_token, jwtSecret)) {
-                await user.delete();
+            try {
+                jwt.verify(user.email_token, jwtSecret);
+            } catch  {
+                await User.deleteOne({ _id: user._id });
                 return NextResponse.json({ error: 'Email verification token expired. Account deleted' }, { status: 401 });
             }
 
