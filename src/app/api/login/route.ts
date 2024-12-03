@@ -3,8 +3,10 @@ import User from '../../../models/userModel';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
+import connectDB from '@/config/database';
 
 export async function POST(request: Request) {
+    await connectDB();
     try {
         const { email, password, rememberMe } = await request.json();
 
@@ -14,6 +16,7 @@ export async function POST(request: Request) {
 
         // Find user by email
         const user = await User.findOne({ email });
+        console.log(user)
         if (!user) {
             return NextResponse.json({ error: 'User not found' }, { status: 401 });
         }
