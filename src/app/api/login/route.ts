@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import User from '../../../models/userModel';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 import connectDB from '@/config/database';
 
@@ -27,16 +27,18 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
         }
 
+        // Generate JWT token using jose
+        if (!process.env.JWT_SECRET) {
+            throw new Error('JWT_SECRET is not defined');
+        }
+        const jwtSecret = new TextEncoder().encode(process.env.JWT_SECRET);
+
         // Check if user is verified
         if (!user.is_email_verified) {
 
             // delete user if email verification token is expired
-            const jwtSecret = process.env.JWT_SECRET;
-            if (!jwtSecret) {
-                throw new Error('JWT_SECRET is not defined');
-            }
             try {
-                jwt.verify(user.email_token, jwtSecret);
+                await jwtVerify(user.email_token, jwtSecret);
             } catch  {
                 await User.deleteOne({ _id: user._id });
                 return NextResponse.json({ error: 'Email verification token expired. Account deleted' }, { status: 401 });
@@ -50,15 +52,13 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Account approval pending' }, { status: 401 });
         }
 
-        // Generate JWT token
-        if (!process.env.JWT_SECRET) {
-            throw new Error('JWT_SECRET is not defined');
-        }
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: rememberMe? '7d' : '1d' });
+        const token = await new SignJWT({ id: user._id, fullName: user.first_name + user.last_name, role: user.role })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setExpirationTime(rememberMe ? '7d' : '1d')
+            .sign(jwtSecret);
 
         const cookieStore = await cookies();
-        cookieStore.set('userToken', token, { expires: new Date(Date.now() + (rememberMe? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000)) });
-
+        cookieStore.set('userToken', token, { expires: new Date(Date.now() + (rememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000)), httpOnly: true });
 
         return NextResponse.json({ token }, { status: 200 });
     } catch (error) {

@@ -1,30 +1,56 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { NextRequest } from 'next/server';
+import { jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 
+const PUBLIC_ROUTES = [
+  "/login",
+  "/register",
+  "/assets",
+]
+
+const CLIENT_ROUTES = [
+  "/detail",
+]
+
+const FREELANCER_ROUTES = [
+  "",
+]
+
+const ADMIN_ROUTES = [
+  "/admin",
+]
+
+const isPublicRoute = (url: URL) => {
+  return PUBLIC_ROUTES.find((route) => url.pathname.startsWith(route)) || url.pathname == "/";
+}
+
 export async function authMiddleware(request: NextRequest) {
+  const { nextUrl } = request;
+
+  if (isPublicRoute(nextUrl)) {
+    console.log('public route');
+    return NextResponse.next();
+  }
+
   const cookieStore = await cookies();
   const token = cookieStore.get('userToken')?.value;
-  console.log(token);
   
   if (!token) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL('/login', nextUrl));
   }
 
   try {
-    const jwtSecret = process.env.JWT_SECRET;
+    const jwtSecret = new TextEncoder().encode(process.env.JWT_SECRET);
     if (!jwtSecret) {
       throw new Error('JWT_SECRET is not defined');
     }
-    jwt.verify(token, jwtSecret);
-  } catch {
-    return NextResponse.redirect(new URL('/login', request.url));
+    await jwtVerify(token, jwtSecret);
+  } catch (error) {
+    console.log(error);
+    return NextResponse.redirect(new URL('/login', nextUrl));
   }
 
   return NextResponse.next();
+    
 }
-
-export const authConfig = {
-  matcher: ['/detail/:path*'],
-};

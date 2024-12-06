@@ -14,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body style={{margin: 0}}>
+      <body style={{ margin: 0 }}>
         <AppRouterCacheProvider>
           {/* <ThemeProvider theme={theme}> */}
           <Providers>{children}</Providers>

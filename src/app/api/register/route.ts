@@ -1,13 +1,13 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import connectDB from '@/config/database'; 
-import User from '@/models/userModel'; 
+import connectDB from '@/config/database';
+import User from '@/models/userModel';
 import Joi from 'joi';
 import { NextResponse } from 'next/server';
 import sendEmail from '@/emails/mailer';
+import { SignJWT } from 'jose';
 
 export async function POST(req: Request) {
-    
+
     const { first_name, last_name, email, phone, password, confirm_password, country_id, role, cv_name } = await req.json();
 
     const { error } = userRegisterSchema.validate({ first_name, last_name, email, phone, password, confirm_password, country_id, role });
@@ -25,9 +25,15 @@ export async function POST(req: Request) {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const token = jwt.sign({ email: email }, process.env.JWT_SECRET!, {
-            expiresIn: '1h',
-        });
+        // Generate JWT token using jose
+        if (!process.env.JWT_SECRET) {
+            throw new Error('JWT_SECRET is not defined');
+        }
+        const jwtSecret = new TextEncoder().encode(process.env.JWT_SECRET);
+        const token = await new SignJWT({ email: email })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setExpirationTime('1h')
+            .sign(jwtSecret);
 
         const newUser = new User({
             email,
@@ -38,7 +44,7 @@ export async function POST(req: Request) {
             country_id,
             role,
             email_token: token,
-            cv_path: role === 'freelancer' ?  `/src/storage/cvs/${cv_name}` : null,
+            cv_path: role === 'freelancer' ? `/src/storage/cvs/${cv_name}` : null,
         });
 
         if (role === 'freelancer') {
