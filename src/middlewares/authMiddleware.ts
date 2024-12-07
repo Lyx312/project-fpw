@@ -19,6 +19,11 @@ const FREELANCER_ROUTES = [
 
 const ADMIN_ROUTES = [
   "/admin",
+  "/admin/users",
+  "/admin/category",
+  "/admin/country",
+  "/admin/transaction",
+  "/admin/application/:id" //not sure if this is how it's written here
 ]
 
 const isPublicRoute = (url: URL) => {

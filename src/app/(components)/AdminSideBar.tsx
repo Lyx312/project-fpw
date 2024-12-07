@@ -11,7 +11,6 @@ import {
 import HomeIcon from "@mui/icons-material/Home";
 import PersonIcon from "@mui/icons-material/Person";
 import CategoryIcon from "@mui/icons-material/Category";
-import AssignmentIcon from "@mui/icons-material/Assignment";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import LanguageIcon from '@mui/icons-material/Language';
 import LogoutIcon from '@mui/icons-material/Logout';

@@ -20,6 +20,7 @@ export async function GET(req: Request) {
           query.$or = [
               { first_name: { $regex: name, $options: 'i' } },
               { last_name: { $regex: name, $options: 'i' } },
+              { email: { $regex: name, $options: 'i' } },
           ];
       }
 

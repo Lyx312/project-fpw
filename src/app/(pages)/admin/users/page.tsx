@@ -14,7 +14,6 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Button,
   MenuItem,
   Select,
   InputLabel,
@@ -49,21 +48,23 @@ const AdminUsersPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [nameFilter, setNameFilter] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
-
+  const [roleFilter, setRoleFilter] = useState('');
+  
   const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const params: Record<string, string> = {};
-      if (nameFilter) params.name = nameFilter;
-      if (countryFilter) params.country = countryFilter;
-
-      const response = await axios.get('/api/userCountry', { params });
-      setUsers(response.data);
-    } catch (err) {
-      console.error('Error fetching users:', err);
-    } finally {
-      setLoading(false);
-    }
+      setLoading(true);
+      try {
+          const params: Record<string, string> = {};
+          if (nameFilter) params.name = nameFilter;
+          if (countryFilter) params.country = countryFilter;
+          if (roleFilter) params.role = roleFilter;
+  
+          const response = await axios.get('/api/userCountry', { params });
+          setUsers(response.data);
+      } catch (err) {
+          console.error('Error fetching users:', err);
+      } finally {
+          setLoading(false);
+      }
   };
 
   const fetchCountries = async () => {
@@ -89,9 +90,9 @@ const AdminUsersPage = () => {
     fetchCountries();
   }, []);
 
-  const handleFilterSubmit = () => {
+  useEffect(() => {
     fetchUsers();
-  };
+}, [nameFilter, countryFilter, roleFilter]);
 
   return (
     <Box
@@ -136,7 +137,7 @@ const AdminUsersPage = () => {
             }}
           >
             <TextField
-              label="Name"
+              label="Name or Email"
               variant="outlined"
               value={nameFilter}
               onChange={(e) => setNameFilter(e.target.value)}
@@ -159,14 +160,28 @@ const AdminUsersPage = () => {
                 ))}
               </Select>
             </FormControl>
-            <Button
+            <FormControl sx={{ flex: 1, minWidth: 200 }} variant="outlined">
+              <InputLabel>Role</InputLabel>
+              <Select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                label="Role"
+              >
+                <MenuItem value="">
+                  <em>All Roles</em>
+                </MenuItem>
+                <MenuItem value="freelancer">Freelancer</MenuItem>
+                <MenuItem value="client">Client</MenuItem>
+              </Select>
+            </FormControl>
+            {/* <Button
               variant="contained"
               color="secondary"
               onClick={handleFilterSubmit}
               sx={{ backgroundColor: colors.secondary }}
             >
               Apply Filters
-            </Button>
+            </Button> */}
           </Box>
           {error && (
             <Typography variant="body2" color="error" sx={{ mt: 2 }}>

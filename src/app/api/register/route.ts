@@ -44,7 +44,7 @@ export async function POST(req: Request) {
             country_id,
             role,
             email_token: token,
-            cv_path: role === 'freelancer' ? `/src/storage/cvs/${cv_name}` : null,
+            cv_path: role === 'freelancer' ? `/cvs/${cv_name}` : null,
         });
 
         if (role === 'freelancer') {

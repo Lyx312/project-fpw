@@ -1,7 +1,7 @@
 import connectDB from '@/config/database';
 import User from '@/models/userModel';
 
-export async function GET(request: Request, context: { params: { id: string } }) {
+export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
   await connectDB();
 
   try {

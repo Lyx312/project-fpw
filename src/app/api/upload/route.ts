@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
 
-const UPLOAD_DIR = path.resolve("src/storage/cvs");
+const UPLOAD_DIR = path.resolve("public/cvs");
 
 export const POST = async (req: NextRequest) => {
   const formData = await req.formData();

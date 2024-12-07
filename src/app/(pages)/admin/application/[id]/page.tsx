@@ -20,6 +20,7 @@ interface ApplicationDetails {
 
 const ApplicationDetailsPage = ({ params }: { params: { id: string } }) => {
   const [application, setApplication] = useState<ApplicationDetails | null>(null);
+  const [countryName, setCountryName] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -30,6 +31,15 @@ const ApplicationDetailsPage = ({ params }: { params: { id: string } }) => {
         if (!response.ok) throw new Error('Failed to fetch application');
         const data = await response.json();
         setApplication(data);
+        if (data.country_id) {
+          const countryResponse = await fetch(`/api/country/${data.country_id}`);
+          if (countryResponse.ok) {
+            const countryData = await countryResponse.json();
+            setCountryName(countryData.data.country_name);
+          } else {
+            setCountryName('Country not found');
+          }
+        }
       } catch (error) {
         console.error('Error fetching application details:', error);
         router.push('/admin');
@@ -106,21 +116,32 @@ const ApplicationDetailsPage = ({ params }: { params: { id: string } }) => {
         </Typography>
         <Typography>{application.phone}</Typography>
         <Typography variant="h6" mt={2}>
-          Country ID:
+          Country:
         </Typography>
-        <Typography>{application.country_id}</Typography>
+        <Typography>{countryName}</Typography>
         <Typography variant="h6" mt={2}>
           Role:
         </Typography>
         <Typography>{application.role}</Typography>
         <Typography variant="h6" mt={2}>
-          CV Path:
-        </Typography>
-        <Typography>{application.cv_path || 'Not provided'}</Typography>
-        <Typography variant="h6" mt={2}>
           Gender:
         </Typography>
         <Typography>{application.gender || 'Not specified'}</Typography>
+        <Typography variant="h6" mt={2}>
+          CV Preview:
+        </Typography>
+        <Box mt={2} style={{ border: '1px solid #ccc', borderRadius: 4, overflow: 'hidden' }}>
+          {application.cv_path ? (
+            <iframe
+              src={application.cv_path}
+              style={{ width: '100%', height: '400px' }}
+              title="CV Preview"
+            />
+          ) : (
+            <Typography>No CV provided</Typography>
+          )}
+        </Box>
+        
 
         <Stack direction="row" spacing={2} mt={4}>
           <Button variant="contained" color="success" onClick={handleApprove}>
