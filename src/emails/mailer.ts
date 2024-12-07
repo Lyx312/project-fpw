@@ -10,6 +10,9 @@ const sendEmail = async (to: string, subject: string, text: string, html: string
             user: process.env.EMAIL_USER, // Your email address
             pass: process.env.EMAIL_PASS, // Your email password
         },
+        tls: {
+            rejectUnauthorized: false, // Allows self-signed certificates
+        },
     });
 
     // Setup email data
