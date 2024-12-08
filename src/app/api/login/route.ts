@@ -52,7 +52,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Account approval pending' }, { status: 401 });
         }
 
-        const token = await new SignJWT({ id: user._id, fullName: user.first_name + user.last_name, role: user.role })
+        const token = await new SignJWT({...user.toJSON()})
             .setProtectedHeader({ alg: 'HS256' })
             .setExpirationTime(rememberMe ? '7d' : '1d')
             .sign(jwtSecret);

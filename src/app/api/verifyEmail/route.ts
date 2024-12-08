@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import { jwtVerify } from 'jose';
 import connectDB from '../../../config/database';
 import User from '../../../models/userModel';
 import { NextResponse } from 'next/server';
@@ -17,15 +17,24 @@ export async function POST(req: Request) {
         if (!process.env.JWT_SECRET) {
             return NextResponse.json({ message: 'JWT secret is not defined' }, { status: 500 });
         }
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const decodedToken = decoded as jwt.JwtPayload;
+
+        let decodedToken;
+        try {
+            const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
+            decodedToken = payload;
+        } catch (error) {
+            if (error instanceof Error) {
+                return NextResponse.json({ message: 'Invalid token', error: error.message }, { status: 401 });
+            }
+            return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+        }
+
         const user = await User.findOne({ email: decodedToken.email });
 
         if (!user) {
             return NextResponse.json({ message: 'User not found' }, { status: 404 });
         }
 
-        console.log(token);
         if (user.email_token !== token) {
             return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
         }

@@ -6,7 +6,6 @@ import {
   Toolbar,
   Typography,
   TextField,
-  Box,
   Popover,
   Link,
 } from "@mui/material";
@@ -23,7 +22,8 @@ const Header = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   interface User {
     id: string;
-    fullName: string;
+    first_name: string;
+    last_name: string;
     role: string;
     exp: number;
   }
@@ -41,12 +41,13 @@ const Header = () => {
   useEffect(() => {
     const fetchUser = async () => {
       const user = await getCurrUser();
-      console.log(user);
-      
+      // console.log(user);
+
       if (user) {
         const mappedUser: User = {
           id: user.id as string,
-          fullName: user.fullName as string,
+          first_name: user.first_name as string,
+          last_name: user.last_name as string,
           role: user.role as string,
           exp: user.exp as number,
         };
@@ -75,8 +76,10 @@ const Header = () => {
         <TextField
           placeholder="Search"
           size="small"
-          InputProps={{
-            startAdornment: <SearchIcon sx={{ color: "gray", mr: 1 }} />,
+          slotProps={{
+            input: {
+              startAdornment: <SearchIcon sx={{ color: "gray", mr: 1 }} />,
+            },
           }}
           sx={{
             backgroundColor: "white",
@@ -85,7 +88,7 @@ const Header = () => {
             mr: 2,
           }}
         />
-        
+
         <Link href="/posts" color="inherit">
           <IconButton color="inherit">
             <WorkIcon />
@@ -112,48 +115,52 @@ const Header = () => {
             vertical: 'top',
             horizontal: 'left',
           }}
-          sx={{
-            zIndex: 1300,
-          }}
-          PaperProps={{
-            sx: {
-              borderRadius: 2,
-              boxShadow: 3,
-              minWidth: 100,
-              padding: 2,
+          slotProps={{
+            paper: {
+              sx: {
+                borderRadius: 2,
+                boxShadow: 3,
+                minWidth: 100,
+                padding: 2,
+              },
             },
           }}
+          sx={{
+            borderRadius: 2,
+            boxShadow: 3,
+            minWidth: 100,
+            padding: 2,
+          }}
         >
-          <Box>
+          <div>
             {currUser ? (
               <>
                 <Typography variant="body2" align="center" gutterBottom>
-                  Welcome, {currUser.fullName || "User"}!
+                  Welcome, {currUser.first_name + " " + currUser.last_name || "User"}!
                 </Typography>
                 <Typography variant="body2" align="center">
                   <Link href="/profile" underline="hover">
                     Go to Profile
                   </Link>
-                  <Box onClick={logout}>
-                    <Link href="/login" underline="hover">
-                      Logout
-                    </Link>
-                  </Box>
+                  <br />
+                  <Link href="/login" underline="hover" onClick={logout}>
+                    Logout
+                  </Link>
                 </Typography>
               </>
             ) : (
               <>
-                <Typography variant="body2" align="center" gutterBottom>
-                  You're not logged in.
+                <Typography component="div" variant="body2" align="center" gutterBottom>
+                  You&apos;re not logged in.
                 </Typography>
-                <Typography variant="body2" align="center">
+                <Typography component="div" variant="body2" align="center">
                   <Link href="/login" underline="hover">
                     Go to Login
                   </Link>
                 </Typography>
               </>
             )}
-          </Box>
+          </div>
         </Popover>
       </Toolbar>
     </AppBar>

@@ -2,12 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
 
-const UPLOAD_DIR = path.resolve("public/cvs");
-
 export const POST = async (req: NextRequest) => {
   const formData = await req.formData();
   const body = Object.fromEntries(formData);
   const file = (body.file as Blob) || null;
+  const type = body.type as string || "default";
+
+  if (!type) {
+    console.log("Type is required");
+    return NextResponse.json({
+      success: false,
+    });
+  }
+
+  const UPLOAD_DIR = path.resolve(`public/${type}`);
 
   if (file) {
     const buffer = Buffer.from(await file.arrayBuffer());

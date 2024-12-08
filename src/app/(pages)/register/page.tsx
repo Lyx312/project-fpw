@@ -136,6 +136,7 @@ const RegisterPage: React.FC = () => {
         }
         const formData = new FormData();
         formData.append('file', file, `${dataToSubmit.email}.pdf`);
+        formData.append('type', 'cv');
 
         const uploadResponse = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/upload`, formData, {
           headers: {
