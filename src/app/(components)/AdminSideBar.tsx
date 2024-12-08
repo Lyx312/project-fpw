@@ -16,6 +16,7 @@ import LanguageIcon from '@mui/icons-material/Language';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Link from "next/link";
 import Image from "next/image";
+import { getCurrUser, logout } from "@/utils/utils";
 
 const AdminSideBar = () => {
   return (
@@ -92,7 +93,7 @@ const AdminSideBar = () => {
         </ListItem>
 
         <ListItem disablePadding>
-          <Link href="/login" passHref style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link href="/login" onClick={logout} style={{ textDecoration: 'none', color: 'inherit' }}>
             <ListItemButton>
               <ListItemIcon sx={{ color: "white" }}>
                 <LogoutIcon />

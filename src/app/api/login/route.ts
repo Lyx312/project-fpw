@@ -60,7 +60,7 @@ export async function POST(request: Request) {
         const cookieStore = await cookies();
         cookieStore.set('userToken', token, { expires: new Date(Date.now() + (rememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000)), httpOnly: true });
 
-        return NextResponse.json({ token }, { status: 200 });
+        return NextResponse.json({ token, user }, { status: 200 });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

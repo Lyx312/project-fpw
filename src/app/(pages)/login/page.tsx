@@ -65,7 +65,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
       console.log(data);
       alert("Login successful");
       dispatch(resetForm());
-      router.push("/");
+      if (data.user.role == "admin") {
+        router.push("/admin");
+      }
+      else{
+        router.push("/");
+      }
+      
     } catch (error) {
       console.error("Login error:", error);
       if (axios.isAxiosError(error) && error.response) {

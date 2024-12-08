@@ -30,8 +30,14 @@ export async function GET(req: Request) {
       }
 
       if (roles.length > 0) {
-        // Add role filter
-        query.role = { $in: roles };
+        // Add role filters
+        query.role = {
+          $in: roles,  // Matches roles in the array
+          $ne: "admin" // Excludes "admin" in all cases
+        };
+      } else {
+        // Ensure "admin" is excluded even if roles array is empty
+        query.role = { $ne: "admin" };
       }
       console.log(roles);
 

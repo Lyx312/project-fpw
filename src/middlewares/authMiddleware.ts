@@ -7,6 +7,7 @@ const PUBLIC_ROUTES = [
   "/login",
   "/register",
   "/assets",
+  "/posts",
 ]
 
 const CLIENT_ROUTES = [

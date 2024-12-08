@@ -26,6 +26,7 @@ interface User {
   first_name: string;
   last_name: string;
   country_name: string;
+  balance: number;
   role: string;
 }
 
@@ -216,6 +217,7 @@ const AdminUsersPage = () => {
                     <TableCell>Email</TableCell>
                     <TableCell>Full Name</TableCell>
                     <TableCell>Country</TableCell>
+                    <TableCell>Balance</TableCell>
                     <TableCell>Role</TableCell>
                   </TableRow>
                 </TableHead>
@@ -225,6 +227,7 @@ const AdminUsersPage = () => {
                       <TableCell>{user.email}</TableCell>
                       <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
                       <TableCell>{user.country_name}</TableCell>
+                      <TableCell>{user.balance}</TableCell>
                       <TableCell>{user.role}</TableCell>
                     </TableRow>
                   ))}
