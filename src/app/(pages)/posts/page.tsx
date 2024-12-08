@@ -32,11 +32,13 @@ const Page: React.FC = () => {
     minPrice: number;
     maxPrice: number;
     category: string;
+    status: string;
   }>({
     name: "",
     minPrice: 0,
     maxPrice: 10000000,
     category: "",
+    status: "available"
   });
 
   useEffect(() => {

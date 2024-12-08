@@ -18,6 +18,7 @@ export async function GET(req: Request) {
     const minPrice = Number(searchParams.get("minPrice")) || 0;
     const maxPrice = Number(searchParams.get("maxPrice")) || Number.MAX_SAFE_INTEGER;
     const category = searchParams.get("category");
+    const status = searchParams.get("status");
 
     // Build query dynamically
     const query: any = {
@@ -26,6 +27,10 @@ export async function GET(req: Request) {
 
     if (name) {
       query.post_title = { $regex: name, $options: "i" };
+    }
+
+    if (status) {
+      query.post_status = status;
     }
 
     if (category) {
