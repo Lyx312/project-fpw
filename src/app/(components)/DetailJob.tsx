@@ -1,182 +1,149 @@
-import React from "react";
-import { Box, Typography, Button, TextField, Grid, Chip } from "@mui/material";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 
-export default function MintBurnJob() {
+import React, { useEffect, useState } from "react";
+import { Box, Typography, Chip, Button, Grid, CircularProgress, Alert, Rating } from "@mui/material";
+
+interface DetailJobProps {
+  id: string;
+}
+
+const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
+  const [post, setPost] = useState<any>(null);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch post details
+        const postResponse = await fetch(`/api/posts/${id}`);
+        if (!postResponse.ok) {
+          throw new Error("Failed to fetch post details");
+        }
+        const postData = await postResponse.json();
+        setPost(postData);
+
+        // Fetch reviews
+        const reviewsResponse = await fetch(`/api/review?id=${id}`);
+        const reviewsData = await reviewsResponse.json();
+        if (!reviewsResponse.ok) {
+          throw new Error("Failed to fetch reviews");
+        }
+        setReviews(reviewsData.data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  // Calculate average rating
+  const averageRating =
+    reviews.length > 0
+      ? reviews.reduce((acc, review) => acc + review.review_rating, 0) / reviews.length
+      : 0;
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
+
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "2rem",
+        width: "100%",
+        paddingTop: "2rem",
+        color: 'black'
       }}
     >
       <Box
         sx={{
-          backgroundColor: "#adc8d8", // Sesuaikan warna latar
-          color: "white",
-          padding: "2rem",
+          maxWidth: "1200px",
+          margin: "0 auto",
           borderRadius: "8px",
-          maxWidth: "600px",
-          width: "100%",
-          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+          boxShadow: 3,
+          padding: "2rem",
+          backgroundColor: "background.default",
         }}
       >
-        {/* Judul */}
-        <Typography
-          variant="h6"
-          fontWeight="bold"
-          gutterBottom
-          sx={{
-            fontSize: "18px",
-            marginBottom: "1rem",
-          }}
-        >
-          Developer for Display "Mint" and "Burn" transaction to Ethereum Tokens
-        </Typography>
-
-        {/* Harga */}
-        <Typography
-          variant="h6"
-          fontWeight="bold"
-          sx={{
-            color: "white",
-            fontSize: "16px",
-            marginBottom: "2rem",
-          }}
-        >
-          Rp 8.000.000 - Rp 15.000.000
-        </Typography>
-
-        {/* Deskripsi */}
-        <Typography
-          variant="body2"
-          sx={{
-            fontSize: "14px",
-            marginBottom: "1rem",
-            lineHeight: 1.6,
-          }}
-        >
-          Description Jobs Description Jobs Description Jobs Description Jobs
-          Description Jobs Description Jobs Description Jobs. Description Jobs
-          Description Jobs Description Jobs Description Jobs Description Jobs.
-        </Typography>
-
-        {/* Skill and Expertise */}
-        <Typography
-          variant="body1"
-          sx={{
-            fontSize: "16px",
-            marginTop: "2rem",
-            marginBottom: "1rem",
-            fontWeight: "bold",
-          }}
-        >
-          Skill and Expertise
-        </Typography>
-        <Grid container spacing={1} sx={{ marginBottom: "2rem" }}>
-          {["HTML", "HTML", "HTML", "HTML"].map((skill, index) => (
-            <Grid item key={index}>
-              <Chip
-                label={skill}
-                sx={{
-                  backgroundColor: "#FFDA00", // Warna kuning
-                  color: "black",
-                  fontWeight: "bold",
-                }}
-              />
-            </Grid>
-          ))}
-        </Grid>
-
-        {/* About the Job */}
-        <Box
-          sx={{
-            backgroundColor: "#c7d8e0",
-            color: "black",
-            padding: "1rem",
-            borderRadius: "8px",
-            marginBottom: "2rem",
-          }}
-        >
-          <Typography
-            variant="body1"
-            fontWeight="bold"
-            sx={{
-              fontSize: "14px",
-              marginBottom: "0.5rem",
-            }}
-          >
-            About the Job
+        <Box sx={{ marginBottom: "2rem" }}>
+          <Typography variant="h4" fontWeight="bold" gutterBottom>
+            {post.title}
           </Typography>
-          <Typography variant="body2" sx={{ fontSize: "14px" }}>
-            Token: 10 to 50
-          </Typography>
-          <Typography variant="body2" sx={{ fontSize: "14px" }}>
-            Place: Remote Project
-          </Typography>
-          <Typography variant="body2" sx={{ fontSize: "14px" }}>
-            Viewed: 7 mins ago
+          <Typography variant="subtitle1" color="text.secondary">
+            {`By: ${post.postMaker}`}
           </Typography>
         </Box>
 
-        {/* Place Your Bid */}
-        <Box
-          sx={{
-            backgroundColor: "#c7d8e0",
-            color: "black",
-            padding: "1rem",
-            borderRadius: "8px",
-          }}
-        >
-          <Typography
-            variant="body1"
-            fontWeight="bold"
-            sx={{
-              fontSize: "14px",
-              marginBottom: "1rem",
-            }}
-          >
-            Place your bid
+        <Typography variant="body1" paragraph>
+          {post.description}
+        </Typography>
+
+        <Typography variant="h6" fontWeight="bold" gutterBottom>
+          Price: {post.price.toLocaleString()} Tokens
+        </Typography>
+
+        <Box sx={{ marginY: "1rem" }}>
+          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+            Categories:
           </Typography>
-          <TextField
-            label="Bid amount"
-            type="number"
-            fullWidth
-            variant="outlined"
-            size="small"
-            sx={{
-              marginBottom: "1rem",
-              backgroundColor: "white",
-              borderRadius: "4px",
-            }}
-          />
-          <TextField
-            label="Email address"
-            type="email"
-            fullWidth
-            variant="outlined"
-            size="small"
-            sx={{
-              marginBottom: "1rem",
-              backgroundColor: "white",
-              borderRadius: "4px",
-            }}
-          />
-          <Button
-            variant="contained"
-            fullWidth
-            sx={{
-              backgroundColor: "#007bff",
-              color: "white",
-              textTransform: "none",
-            }}
-          >
-            Place bid
-          </Button>
+          <Grid container spacing={1}>
+            {post.categories.map((category: string, index: number) => (
+              <Grid item key={index}>
+                <Chip label={category} color="primary" />
+              </Grid>
+            ))}
+          </Grid>
         </Box>
+
+        <Box sx={{ marginY: "1rem" }}>
+          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+            Average Rating:
+          </Typography>
+          <Rating
+            value={averageRating}
+            precision={0.1}
+            readOnly
+            sx={{ fontSize: "2rem" }}
+          />
+          <Typography variant="body2" color="text.secondary">
+            {reviews.length > 0
+              ? `Based on ${reviews.length} reviews`
+              : "No reviews yet"}
+          </Typography>
+        </Box>
+
+        <Button variant="contained" color="primary" fullWidth sx={{ marginTop: "1rem" }}>
+          Hire
+        </Button>
       </Box>
     </Box>
   );
-}
+};
+
+export default DetailJob;

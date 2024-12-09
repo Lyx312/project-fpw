@@ -2,7 +2,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Box, Typography, TextField, Slider, Button, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  Slider,
+  Button,
+  CircularProgress,
+  Rating,
+} from "@mui/material";
+import { useRouter } from "next/navigation"; // Import useRouter
 import Header from "@/app/(components)/Header";
 import Footer from "@/app/(components)/Footer";
 import axios from "axios";
@@ -12,9 +21,10 @@ interface Post {
   title: string;
   description: string;
   price: number;
-  categories: string[]; // Updated to handle multiple categories
+  categories: string[];
   postMaker: string;
   createdAt: string;
+  averageRating: number; // Added averageRating
 }
 
 interface Category {
@@ -26,6 +36,7 @@ const Page: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [postList, setPostList] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const router = useRouter(); // Initialize the useRouter hook
 
   const [filters, setFilters] = useState<{
     name: string;
@@ -33,12 +44,16 @@ const Page: React.FC = () => {
     maxPrice: number;
     category: string;
     status: string;
+    minRating: number;
+    maxRating: number;
   }>({
     name: "",
     minPrice: 0,
     maxPrice: 10000000,
     category: "",
-    status: "available"
+    status: "available",
+    minRating: 0,
+    maxRating: 5,
   });
 
   useEffect(() => {
@@ -46,10 +61,13 @@ const Page: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchPosts();
+    const delayDebounceFn = setTimeout(() => {
+      fetchPosts();
+    }, 500);
+  
+    return () => clearTimeout(delayDebounceFn);
   }, [filters]);
 
-  // Fetch categories
   const fetchCategories = async () => {
     try {
       const response = await axios.get<{ data: Category[] }>("/api/category");
@@ -59,11 +77,12 @@ const Page: React.FC = () => {
     }
   };
 
-  // Fetch posts based on filters
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get<{ data: Post[] }>("/api/posts", { params: filters });
+      const response = await axios.get<{ data: Post[] }>("/api/posts", {
+        params: filters,
+      });
       setPostList(response.data.data);
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -72,16 +91,15 @@ const Page: React.FC = () => {
     }
   };
 
-  // Handle filter change
   const handleFilterChange = (key: keyof typeof filters, value: string | number) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const colors = {
-    primary: '#001F3F',
-    secondary: '#3A6D8C',
-    accent: '#6A9AB0',
-    text: '#EAD8B1',
+    primary: "#001F3F",
+    secondary: "#3A6D8C",
+    accent: "#6A9AB0",
+    text: "#EAD8B1",
   };
 
   return (
@@ -93,8 +111,8 @@ const Page: React.FC = () => {
           color: colors.text,
           minHeight: "100vh",
           padding: 4,
-          display: "flex", // Change grid to flex
-          flexDirection: "row", // Horizontal layout
+          display: "flex",
+          flexDirection: "row",
           gap: 3,
         }}
       >
@@ -105,8 +123,8 @@ const Page: React.FC = () => {
             color: "#fff",
             padding: 3,
             borderRadius: 2,
-            width: "300px", // Fixed width
-            flexShrink: 0, // Ensure it doesn't shrink
+            width: "300px",
+            flexShrink: 0,
           }}
         >
           <Typography variant="h6" marginBottom={2}>
@@ -118,22 +136,96 @@ const Page: React.FC = () => {
             variant="outlined"
             margin="normal"
             value={filters.name}
-            sx={{ color: colors.text }}
             onChange={(e) => handleFilterChange("name", e.target.value)}
-          />
-          <Typography>Price Range</Typography>
-          <Slider
-            value={[filters.minPrice, filters.maxPrice]}
-            onChange={(_, newValue) => {
-              if (Array.isArray(newValue)) {
-                handleFilterChange("minPrice", newValue[0]);
-                handleFilterChange("maxPrice", newValue[1]);
-              }
+            InputLabelProps={{
+              style: { color: "#fff" }, // Label text color
             }}
-            valueLabelDisplay="auto"
-            min={0}
-            max={10000000}
+            InputProps={{
+              style: { color: "#fff", borderColor: "#fff" }, // Input text color
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#fff", // Default border color
+                },
+                "&:hover fieldset": {
+                  borderColor: "#ccc", // Border color on hover
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#fff", // Border color when focused
+                },
+              },
+            }}
           />
+          <Typography>Rating Range</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2, // Space between the numbers and slider
+            }}
+          >
+            <Typography>{filters.minRating.toFixed(1)}</Typography>
+            <Slider
+              value={[filters.minRating, filters.maxRating]}
+              onChange={(_, newValue) => {
+                if (Array.isArray(newValue)) {
+                  handleFilterChange("minRating", parseFloat(newValue[0].toFixed(1)));
+                  handleFilterChange("maxRating", parseFloat(newValue[1].toFixed(1)));
+                }
+              }}
+              valueLabelDisplay="auto"
+              min={0}
+              max={5}
+              step={0.1}
+              sx={{
+                flex: 1, // Allow the slider to take up the remaining space
+              }}
+            />
+            <Typography>{filters.maxRating.toFixed(1)}</Typography>
+          </Box>
+
+          <Typography>Price Range</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2, // Space between the numbers and slider
+            }}
+          >
+            <Typography
+              sx={{
+                width: "70px", // Reserve fixed width for numbers
+                textAlign: "left", // Align text to the right
+              }}
+            >
+              {filters.minPrice.toLocaleString("en-US")}
+            </Typography>
+            <Slider
+              value={[filters.minPrice, filters.maxPrice]}
+              onChange={(_, newValue) => {
+                if (Array.isArray(newValue)) {
+                  handleFilterChange("minPrice", Math.round(newValue[0]));
+                  handleFilterChange("maxPrice", Math.round(newValue[1]));
+                }
+              }}
+              valueLabelDisplay="auto"
+              min={0}
+              max={10000000}
+              step={1}
+              sx={{
+                flex: 1, // Allow the slider to take up the remaining space
+              }}
+            />
+            <Typography
+              sx={{
+                width: "80px", // Reserve fixed width for numbers
+                textAlign: "left", // Align text to the left
+              }}
+            >
+              {filters.maxPrice.toLocaleString("en-US")}
+            </Typography>
+          </Box>
           <Typography>Category</Typography>
           <TextField
             select
@@ -142,12 +234,33 @@ const Page: React.FC = () => {
             margin="normal"
             SelectProps={{ native: true }}
             value={filters.category}
-            sx={{ color: colors.text }}
             onChange={(e) => handleFilterChange("category", e.target.value)}
+            InputLabelProps={{
+              style: { color: "#fff" }, // Label text color
+            }}
+            InputProps={{
+              style: { color: "#fff", borderColor: "#fff" }, // Input text color
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#fff", // Default border color
+                },
+                "&:hover fieldset": {
+                  borderColor: "#ccc", // Border color on hover
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#fff", // Border color when focused
+                },
+                "& .MuiSvgIcon-root": {
+                  color: "#fff", // Make the dropdown arrow white
+                },
+              },
+            }}
           >
-            <option value="">All Categories</option>
+            <option value="" style={{ color: "#000" }}>All Categories</option>
             {categories.map((cat) => (
-              <option key={cat.category_id} value={cat.category_id}>
+              <option key={cat.category_id} value={cat.category_id} style={{ color: "#000" }}>
                 {cat.category_name}
               </option>
             ))}
@@ -166,14 +279,21 @@ const Page: React.FC = () => {
         {/* Post Cards */}
         <Box
           sx={{
-            flex: 1, // Take remaining space
+            flex: 1,
             display: "flex",
-            flexDirection: "column", // Ensure one card per row
+            flexDirection: "column",
             gap: 2,
           }}
         >
           {loading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+              }}
+            >
               <CircularProgress />
             </Box>
           ) : (
@@ -187,7 +307,9 @@ const Page: React.FC = () => {
                   boxShadow: 1,
                   display: "flex",
                   flexDirection: "column",
+                  cursor: "pointer",
                 }}
+                onClick={() => router.push(`/posts/detail/${item.id}`)} // Redirect on click
               >
                 <Typography variant="h6" gutterBottom color="textPrimary">
                   {item.title}
@@ -201,10 +323,24 @@ const Page: React.FC = () => {
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   Categories:{" "}
                   {item.categories && item.categories.length > 0
-                    ? item.categories.join(", ") 
+                    ? item.categories.join(", ")
                     : "No categories available"}
                 </Typography>
-                <Typography variant="body2" color="textSecondary">{item.description}</Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {item.description}
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
+                  <Typography variant="body2" color="textSecondary" sx={{ marginRight: 1 }}>
+                    Rating:
+                  </Typography>
+                  {item.averageRating ? (
+                    <Rating value={item.averageRating} precision={0.1} readOnly />
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      No reviews yet
+                    </Typography>
+                  )}
+                </Box>
               </Box>
             ))
           )}

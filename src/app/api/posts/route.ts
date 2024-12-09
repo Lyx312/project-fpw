@@ -5,6 +5,7 @@ import Post from "../../../models/postModel";
 import User from "@/models/userModel";
 import Post_category from "@/models/post_categoryModel";
 import Category from "@/models/categoryModel";
+import Post_review from "@/models/post_reviewModel";
 
 // GET: Fetch post from MongoDB
 export async function GET(req: Request) {
@@ -17,6 +18,8 @@ export async function GET(req: Request) {
     const name = searchParams.get("name");
     const minPrice = Number(searchParams.get("minPrice")) || 0;
     const maxPrice = Number(searchParams.get("maxPrice")) || Number.MAX_SAFE_INTEGER;
+    const minRating = Number(searchParams.get("minRating")) || 0;
+    const maxRating = Number(searchParams.get("maxRating")) || 5;
     const category = searchParams.get("category");
     const status = searchParams.get("status");
 
@@ -50,7 +53,6 @@ export async function GET(req: Request) {
         select: "first_name last_name", // Fields to include
       })
       .lean();
-      console.log(posts)
 
     // Fetch categories for posts
     const postIds = posts.map((post) => post.post_id);
@@ -73,7 +75,29 @@ export async function GET(req: Request) {
       return map;
     }, {});
 
-    // Map response to include full name of the post maker and category list
+    // Fetch ratings for posts within the rating range
+    const postRatings = await Post_review.aggregate([
+      { $match: { post_id: { $in: postIds } } },
+      {
+        $group: {
+          _id: "$post_id",
+          averageRating: { $avg: "$review_rating" },
+        },
+      },
+      { $match: { averageRating: { $gte: minRating, $lte: maxRating } } },
+    ]);
+
+    // Filter posts based on the rating range
+    const filteredPostIds = postRatings.map((item) => item._id);
+    query.post_id = { $in: filteredPostIds };
+
+    // Map average rating to each post
+    const ratingMap = postRatings.reduce<Record<number, number>>((map, item) => {
+      map[item._id] = item.averageRating;
+      return map;
+    }, {});
+
+    // Map response to include full name of the post maker, category list, and average rating
     return NextResponse.json({
       message: "Posts fetched successfully",
       data: posts.map((post) => ({
@@ -84,6 +108,7 @@ export async function GET(req: Request) {
         categories: categoryMap[post.post_id] || "Uncategorized", // Join categories with a comma
         postMaker: `${post.post_email.first_name} ${post.post_email.last_name}`,
         createdAt: post.createdAt,
+        averageRating: ratingMap[post.post_id] || 0, // Add the average rating to the response
       })),
     });
   } catch (error: any) {
