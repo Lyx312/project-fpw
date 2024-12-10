@@ -31,6 +31,7 @@ interface User {
   balance: number;
   exp: number;
   pfp_path: string;
+  status?: string;
 }
 
 interface Country {
@@ -52,13 +53,14 @@ const UserProfile = () => {
     phone: '',
     pfp_path: '',
     file: null as File | null,
+    status: '',
   });
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
   const fetchUser = async () => {
     const user = await getCurrUser();
     // console.log(user);
-    
+
     if (user) {
       const mappedUser: User = {
         _id: user._id as string,
@@ -72,6 +74,7 @@ const UserProfile = () => {
         balance: user.balance as number,
         pfp_path: user.pfp_path as string,
         exp: user.exp as number,
+        status: user.status as string,
       };
       setCurrUser(mappedUser);
       setFormData({
@@ -85,6 +88,7 @@ const UserProfile = () => {
         phone: user.phone as string,
         pfp_path: user.pfp_path as string,
         file: null,
+        status: user.status as string,
       });
     } else {
       console.log('No user found');
@@ -140,7 +144,7 @@ const UserProfile = () => {
     try {
       console.log('Form Data:', formData);
       console.log(currUser);
-      
+
       const { file, ...dataToSubmit } = formData as any;
 
       if (file) {
@@ -190,7 +194,7 @@ const UserProfile = () => {
             <Grid item xs={12} md={2}>
               <Avatar
                 alt="avatar"
-                src={`${currUser?.pfp_path}`}
+                src={`${currUser?.pfp_path || ""}`}
                 sx={{
                   width: 80,
                   height: 80,
@@ -392,14 +396,40 @@ const UserProfile = () => {
             <Typography variant="subtitle1" sx={{ color: "#1A2A3A" }}>
               Your Token: {currUser?.balance}
             </Typography>
-            <Button
-              variant="text"
-              size="small"
-              sx={{ color: "#1A2A3A" }}
-            >
-              Buy Token?
-            </Button>
+            {
+              currUser?.role === "client" && (
+                <Button
+                  variant="text"
+                  size="small"
+                  sx={{ color: "#1A2A3A" }}
+                >
+                  Buy Token?
+                </Button>
+              )
+            }
           </Box>
+
+          {currUser?.role === "freelancer" && (
+            <Grid item xs={12} md={6} mt={2}>
+              <InputLabel sx={{ color: "#1A2A3A" }}>Status</InputLabel>
+              <Select
+                fullWidth
+                size="small"
+                name="status"
+                value={formData.status || ' '}
+                onChange={handleInputChange}
+                sx={{
+                  backgroundColor: "#F5F5F5",
+                  borderRadius: "6px",
+                  color: "#1A2A3A",
+                }}
+              >
+                <MenuItem value=" " disabled>Select Your Status</MenuItem>
+                <MenuItem value="Available">Available</MenuItem>
+                <MenuItem value="Away">Away</MenuItem>
+              </Select>
+            </Grid>
+          )}
 
           <Box mt={2} textAlign="center">
             <Button
