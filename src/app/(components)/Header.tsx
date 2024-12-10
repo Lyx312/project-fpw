@@ -8,6 +8,7 @@ import {
   TextField,
   Popover,
   Link,
+  Avatar,
 } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -25,6 +26,7 @@ const Header = () => {
     first_name: string;
     last_name: string;
     role: string;
+    pfp_path: string;
     exp: number;
   }
 
@@ -49,6 +51,7 @@ const Header = () => {
           first_name: user.first_name as string,
           last_name: user.last_name as string,
           role: user.role as string,
+          pfp_path: user.pfp_path as string,
           exp: user.exp as number,
         };
         setCurrUser(mappedUser);
@@ -101,7 +104,18 @@ const Header = () => {
           <NotificationsIcon />
         </IconButton>
         <IconButton color="inherit" onClick={handlePopoverOpen}>
-          <AccountCircleIcon />
+          {!currUser?.pfp_path && (<AccountCircleIcon />)}
+          {currUser?.pfp_path && (
+            <Avatar
+              alt="avatar"
+              src={`${currUser?.pfp_path || ""}`}
+              sx={{
+                width: 30,
+                height: 30,
+                border: "2px solid #1A2A3A",
+              }}
+            />
+          )}
         </IconButton>
         <Popover
           open={open}

@@ -46,9 +46,13 @@ const updateUserSchema = Joi.object({
     'string.base': 'Gender should be a type of text',
     'any.only': 'Gender must be either Male or Female',
   }),
-  pfp_path: Joi.string().optional().messages({
+  pfp_path: Joi.string().optional().allow(null).messages({
     'string.base': 'Profile picture path should be a type of text',
   }),
+  status: Joi.string().valid("Available", "Away").allow(null).optional().messages({
+    'string.base': 'Status should be a type of text',
+    'any.only': 'Status must be either Available or Away',
+  })
 })
 .and('new_password', 'old_password', 'confirm_password')
 .messages({
@@ -57,7 +61,7 @@ const updateUserSchema = Joi.object({
 
 
 // Update user endpoint logic
-export async function PUT(request: Request) {
+export async function PUT(request: Request, context: { params: { id: string } }) {
   await connectDB();
   const {
     country_id,
@@ -69,11 +73,11 @@ export async function PUT(request: Request) {
     phone,
     gender,
     pfp_path,
+    status,
   } = await request.json();
-  const url = new URL(request.url);
-  const id = url.pathname.split('/').pop();
+  const { id } = context.params;
 
-  // console.log({ country_id, old_password, new_password, confirm_password, first_name, last_name, phone, gender });
+  console.log({ country_id, old_password, new_password, confirm_password, first_name, last_name, phone, gender, status });
 
   // Validate request body
   const { error } = updateUserSchema.validate({
@@ -86,6 +90,7 @@ export async function PUT(request: Request) {
     phone,
     gender,
     pfp_path,
+    status,
   });
   if (error) {
     return Response.json({ message: error.details[0].message }, { status: 400 });
@@ -112,6 +117,7 @@ export async function PUT(request: Request) {
     if (phone) user.phone = phone;
     if (gender) user.gender = gender;
     if (pfp_path) user.pfp_path = pfp_path;
+    if (status) user.status = status;
 
     await user.save();
 
