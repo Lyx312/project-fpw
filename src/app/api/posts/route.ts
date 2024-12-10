@@ -22,6 +22,7 @@ export async function GET(req: Request) {
     const maxRating = Number(searchParams.get("maxRating")) || 5;
     const category = searchParams.get("category");
     const status = searchParams.get("status");
+    const freelancerId = searchParams.get("freelancerId");
 
     // Build query dynamically
     const query: any = {
@@ -34,6 +35,10 @@ export async function GET(req: Request) {
 
     if (status) {
       query.post_status = status;
+    }
+
+    if (freelancerId) {
+      query.post_email = freelancerId;
     }
 
     if (category) {
@@ -115,6 +120,48 @@ export async function GET(req: Request) {
     console.error("Error fetching posts:", error);
     return NextResponse.json(
       { message: "Error fetching posts", error: error.message },
+      { status: 500 }
+    );
+  }
+}
+export async function POST(req: Request) {
+  try {
+    await connectDB();
+    const body = await req.json();
+
+    // Validate input
+    const { title, description, price, email, categories } = body;
+    if (!title || !description || !price || !email) {
+      return NextResponse.json(
+        { message: "All fields are required" },
+        { status: 400 }
+      );
+    }
+  const length = (await Post.find()).length;
+    // Create a new post
+    const post = await Post.create({
+      post_id: length+1, // Unique post ID
+      post_title: title,
+      post_description: description,
+      post_price: price,
+      post_email: email, // This links to the user
+      createdAt: new Date(),
+    });
+
+    // Handle categories
+    if (categories?.length > 0) {
+      const postCategories = categories.map((categoryId: string) => ({
+        post_id: post.post_id,
+        category_id: categoryId,
+      }));
+      await Post_category.insertMany(postCategories);
+    }
+
+    return NextResponse.json({ message: "Post created successfully", post });
+  } catch (error: any) {
+    console.error("Error creating post:", error);
+    return NextResponse.json(
+      { message: "Error creating post", error: error.message },
       { status: 500 }
     );
   }
