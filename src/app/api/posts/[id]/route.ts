@@ -15,6 +15,7 @@ interface Post {
       first_name: string;
       last_name: string;
     };
+    post_status: string;
     createdAt: string;
   }
 
@@ -57,6 +58,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
         title: post.post_title,
         description: post.post_description,
         price: post.post_price,
+        status: post.post_status,
         categories,
         categories_id,
         postMaker: `${post.post_email?.first_name || ""} ${post.post_email?.last_name || ""}`.trim(),
@@ -71,21 +73,22 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     }
   }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, context: { params: { id: string } }) {
   try {
     await connectDB();
-    const { id } = params;
+    const { id } = await context.params;
     const body = await req.json();
 
     // Validate input
-    const { title, description, price, categories } = body;
+    const { title, description, price, categories, status } = body;
     if (!title || !description || !price) {
       return NextResponse.json(
         { message: "Title, description, and price are required" },
         { status: 400 }
       );
     }
-
+    console.log(status);
+    
     // Find and update the post
     const updatedPost = await Post.findOneAndUpdate(
       { post_id: id },
@@ -93,6 +96,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
         post_title: title,
         post_description: description,
         post_price: price,
+        post_status: status,
       },
       { new: true }
     );

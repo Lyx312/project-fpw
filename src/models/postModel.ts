@@ -19,7 +19,7 @@ const PostSchema: Schema = new Schema(
         post_title: { type: String, required: true },
         post_description: { type: String, required: true },
         post_price: { type: Number, required: true },
-        post_status: { type: String, required: true },
+        post_status: { type: String, enum: ['available', 'unavailable'], default: "available" },
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date, default: null },
         deletedAt: { type: Date, default: null },

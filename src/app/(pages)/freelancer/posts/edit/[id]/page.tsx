@@ -9,10 +9,15 @@ import {
   Button,
   Typography,
   Grid,
-  Checkbox,
-  FormControlLabel,
   CircularProgress,
+  Select,
+  MenuItem,
+  Chip,
+  Box,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
+import axios from "axios";
 
 interface Category {
   category_id: string;
@@ -24,7 +29,7 @@ interface Post {
   description: string;
   price: number;
   categories: string[];
-  categories_id: string[];
+  post_status: string;
 }
 
 const EditPostPage: React.FC = () => {
@@ -34,25 +39,49 @@ const EditPostPage: React.FC = () => {
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [postStatus, setPostStatus] = useState<string>("available");
+
+  // Add item to list
+  const addToList = (
+    item: string,
+    list: string[],
+    setList: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    if (item && !list.includes(item)) {
+      setList([...list, item]);
+    }
+  };
+
+  // Remove item from list
+  const removeFromList = (
+    item: string,
+    list: string[],
+    setList: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    setList(list.filter((i) => i !== item));
+  };
 
   useEffect(() => {
     const fetchPostAndCategories = async () => {
       try {
         setLoading(true);
 
-        // Fetch post and categories in parallel
+        // Fetch post and categories in parallel using axios
         const [postResponse, categoriesResponse] = await Promise.all([
-          fetch(`/api/posts/${id}`),
-          fetch("/api/category"),
+          axios.get(`/api/posts/${id}`),
+          axios.get("/api/category"),
         ]);
 
-        const postData = await postResponse.json();
-        const categoriesData = await categoriesResponse.json();
+        const postData = postResponse.data;
+        const categoriesData = categoriesResponse.data;
 
-        if (postResponse.ok && categoriesResponse.ok) {
+        if (postResponse.status === 200 && categoriesResponse.status === 200) {
           setPost(postData);
           setCategories(postData.categories_id || []);
           setAllCategories(categoriesData.data || []);
+          setPostStatus(postData.status || "available");
+          console.log(postData);
+          
         } else {
           console.error("Failed to fetch post or categories");
         }
@@ -66,27 +95,17 @@ const EditPostPage: React.FC = () => {
     if (id) fetchPostAndCategories();
   }, [id]);
 
-  const handleCategoryChange = (categoryId: string, checked: boolean) => {
-    setCategories((prev) =>
-      checked
-        ? [...prev, categoryId]
-        : prev.filter((cat) => cat !== categoryId)
-    );
-  };
-
   const handleUpdate = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/posts/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...post,
-          categories,
-        }),
+      const response = await axios.put(`/api/posts/${id}`, {
+        ...post,
+        categories,
+        status: postStatus,
       });
-
-      if (response.ok) {
+      console.log("update");
+      
+      if (response.status === 200) {
         router.push("/freelancer/posts");
       } else {
         console.error("Failed to update post");
@@ -107,6 +126,7 @@ const EditPostPage: React.FC = () => {
         Edit Post
       </Typography>
       <Grid container spacing={2}>
+        {/* Title Field */}
         <Grid item xs={12}>
           <TextField
             label="Title"
@@ -117,6 +137,8 @@ const EditPostPage: React.FC = () => {
             }
           />
         </Grid>
+
+        {/* Description Field */}
         <Grid item xs={12}>
           <TextField
             label="Description"
@@ -131,6 +153,8 @@ const EditPostPage: React.FC = () => {
             }
           />
         </Grid>
+
+        {/* Price Field */}
         <Grid item xs={12}>
           <TextField
             label="Price"
@@ -144,26 +168,61 @@ const EditPostPage: React.FC = () => {
             }
           />
         </Grid>
+
+        {/* Categories Selection */}
         <Grid item xs={12}>
-            <Typography variant="subtitle1" gutterBottom>
-                Categories
-            </Typography>
-            {allCategories.map((cat) => (
-                <FormControlLabel
-                key={cat.category_id}
-                control={
-                    <Checkbox
-                    value={cat.category_id}
-                    checked={categories.includes(cat.category_id)}
-                    onChange={(e) =>
-                        handleCategoryChange(cat.category_id, e.target.checked)
-                    }
-                    />
+          <Typography variant="subtitle1" gutterBottom>
+            Categories
+          </Typography>
+          <FormControl fullWidth>
+            <Select
+              value=""
+              displayEmpty
+              onChange={(e) => {
+                addToList(e.target.value as string, categories, setCategories);
+              }}
+            >
+              <MenuItem value="" disabled>
+                Select a category
+              </MenuItem>
+              {allCategories.map((cat) => (
+                <MenuItem key={cat.category_id} value={cat.category_id}>
+                  {cat.category_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Box mt={2} display="flex" flexWrap="wrap" gap={1}>
+            {categories.map((category) => (
+              <Chip
+                key={category}
+                label={
+                  allCategories.find((cat) => cat.category_id === category)
+                    ?.category_name
                 }
-                label={cat.category_name}
-                />
+                onDelete={() => removeFromList(category, categories, setCategories)}
+              />
             ))}
-            </Grid>
+          </Box>
+        </Grid>
+
+        {/* Post Status Selection */}
+        <Grid item xs={12}>
+          <FormControl fullWidth>
+            <InputLabel id="post-status-label">Post Status</InputLabel>
+            <Select
+              labelId="post-status-label"
+              label="Post Status"
+              value={postStatus}
+              onChange={(e) => setPostStatus(e.target.value as string)}
+            >
+              <MenuItem value="available">Available</MenuItem>
+              <MenuItem value="unavailable">Unavailable</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+
+        {/* Update Button */}
         <Grid item xs={12}>
           <Button
             variant="contained"

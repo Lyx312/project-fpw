@@ -9,20 +9,24 @@ import {
   Button,
   Typography,
   Grid,
-  Checkbox,
-  FormControlLabel,
   CircularProgress,
+  Select,
+  MenuItem,
+  Chip,
+  Box,
+  FormControl,
 } from "@mui/material";
 import { getCurrUser } from "@/utils/utils";
+import axios from "axios";
 
 interface User {
-    id: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-    role: string;
-    exp: number;
-  }
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  exp: number;
+}
 
 const AddPostPage: React.FC = () => {
   const router = useRouter();
@@ -73,19 +77,15 @@ const AddPostPage: React.FC = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          description,
-          price,
-          email: currUser?.email,
-          categories,
-        }),
+      const response = await axios.post("/api/posts", {
+        title,
+        description,
+        price,
+        email: currUser?.email,
+        categories,
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         router.push("/freelancer/posts");
       } else {
         console.error("Failed to create post");
@@ -95,6 +95,18 @@ const AddPostPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Add item to list
+  const addToList = (item: string, list: string[], setList: React.Dispatch<React.SetStateAction<string[]>>) => {
+    if (item && !list.includes(item)) {
+      setList([...list, item]);
+    }
+  };
+
+  // Remove item from list
+  const removeFromList = (item: string, list: string[], setList: React.Dispatch<React.SetStateAction<string[]>>) => {
+    setList(list.filter((i) => i !== item));
   };
 
   return (
@@ -141,26 +153,36 @@ const AddPostPage: React.FC = () => {
           <Typography variant="subtitle1" gutterBottom>
             Categories
           </Typography>
-          {allCategories.map((cat) => (
-            <FormControlLabel
-              key={cat.category_id}
-              control={
-                <Checkbox
-                  value={cat.category_id}
-                  checked={categories.includes(cat.category_id)}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setCategories((prev) =>
-                      e.target.checked
-                        ? [...prev, value]
-                        : prev.filter((c) => c !== value)
-                    );
-                  }}
-                />
-              }
-              label={cat.category_name}
-            />
-          ))}
+          <FormControl fullWidth>
+            <Select
+              value=""
+              displayEmpty
+              onChange={(e) => {
+                addToList(e.target.value as string, categories, setCategories);
+              }}
+            >
+              <MenuItem value="" disabled>
+                Select a category
+              </MenuItem>
+              {allCategories.map((cat) => (
+                <MenuItem key={cat.category_id} value={cat.category_id}>
+                  {cat.category_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Box mt={2} display="flex" flexWrap="wrap" gap={1}>
+            {categories.map((category) => (
+              <Chip
+                key={category}
+                label={
+                  allCategories.find((cat) => cat.category_id === category)
+                    ?.category_name
+                }
+                onDelete={() => removeFromList(category, categories, setCategories)}
+              />
+            ))}
+          </Box>
         </Grid>
 
         {/* Submit Button */}
