@@ -5,7 +5,7 @@ import fs from "fs";
 export const POST = async (req: NextRequest) => {
   const formData = await req.formData();
   const body = Object.fromEntries(formData);
-  const file = (body.file as Blob) || null;
+  const file = (body.file as File) || null;
   const type = body.type as string || "default";
 
   if (!type) {
@@ -15,27 +15,33 @@ export const POST = async (req: NextRequest) => {
     });
   }
 
-  const UPLOAD_DIR = path.resolve(`public/${type}`);
+  const UPLOAD_DIR = path.normalize(path.join(process.cwd(), "public", type));
+  console.log("UPLOAD_DIR", UPLOAD_DIR);
 
   if (file) {
     const buffer = Buffer.from(await file.arrayBuffer());
+
+    // Ensure upload directory exists
     if (!fs.existsSync(UPLOAD_DIR)) {
       fs.mkdirSync(UPLOAD_DIR, { recursive: true });
     }
 
-    fs.writeFileSync(
-      path.resolve(UPLOAD_DIR, (body.file as File).name),
-      buffer
-    );
+    // Safely extract file name
+    const fileName = path.basename((body.file as File).name);
+
+    // Save the file to the designated directory
+    const filePath = path.resolve(UPLOAD_DIR, fileName);
+    fs.writeFileSync(filePath, buffer);
+
+    console.log("File uploaded successfully");
+    return NextResponse.json({
+      success: true,
+      path: `/${type}/${fileName}`,
+    });
   } else {
-    console.error("error uploading file");
+    console.error("Error uploading file");
     return NextResponse.json({
       success: false,
     });
   }
-  console.error("file uploaded successfully");
-  return NextResponse.json({
-    success: true,
-    name: (body.file as File).name,
-  });
 };

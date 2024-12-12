@@ -17,6 +17,7 @@ import {
   InputLabel,
 } from "@mui/material";
 import axios from "axios";
+import Loading from "@/app/(pages)/loading";
 
 interface Category {
   category_id: string;
@@ -113,8 +114,7 @@ const EditPostPage: React.FC = () => {
     }
   };
 
-  if (loading) return <CircularProgress />;
-
+  if (loading) return <Loading />;
   if (!post) return <Typography variant="h6">Post not found</Typography>;
 
   return (

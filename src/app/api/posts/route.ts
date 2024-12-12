@@ -137,7 +137,7 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-  const length = (await Post.find()).length;
+    const length = (await Post.find()).length;
     // Create a new post
     const post = await Post.create({
       post_id: length+1, // Unique post ID

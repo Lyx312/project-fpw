@@ -1,9 +1,7 @@
 'use client'
 import React, { useEffect, useState } from "react";
 import {
-  Container,
   Typography,
-  CircularProgress,
   Card,
   CardContent,
   Grid,
@@ -14,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { getCurrUser } from "@/utils/utils";
 import Header from "@/app/(components)/Header";
 import Footer from "@/app/(components)/Footer";
+import Loading from "../../loading";
 
 interface User {
   id: string;
@@ -77,14 +76,7 @@ const FreelancerPostsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Container>
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-          <CircularProgress />
-        </Box>
-        <Typography variant="h6" align="center" marginTop={2}>
-          Loading...
-        </Typography>
-      </Container>
+      <Loading />
     );
   }
 

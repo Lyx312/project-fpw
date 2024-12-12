@@ -5,6 +5,7 @@ import { getCurrUser } from "@/utils/utils";
 import { Box, CircularProgress, Typography, Paper } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import Loading from "@/app/(pages)/loading";
 
 interface User {
   _id: string;
@@ -85,17 +86,7 @@ const ClientHistory = () => {
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          backgroundColor: "#1A2A3A",
-        }}
-      >
-        <CircularProgress />
-      </Box>
+      <Loading />
     );
   }
 

@@ -8,7 +8,7 @@ import { SignJWT } from 'jose';
 
 export async function POST(req: Request) {
 
-    const { first_name, last_name, email, phone, password, confirm_password, country_id, role, cv_name } = await req.json();
+    const { first_name, last_name, email, phone, password, confirm_password, country_id, role, cv_path } = await req.json();
 
     const { error } = userRegisterSchema.validate({ first_name, last_name, email, phone, password, confirm_password, country_id, role });
     if (error) {
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
             country_id,
             role,
             email_token: token,
-            cv_path: role === 'freelancer' ? `/cvs/${cv_name}` : null,
+            cv_path: role === 'freelancer' ? `${cv_path}` : null,
         });
 
         if (role === 'freelancer') {

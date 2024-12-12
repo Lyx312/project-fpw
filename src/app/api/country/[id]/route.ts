@@ -7,13 +7,13 @@ import Country from '../../../../models/countryModel'; // Adjust the path to you
 export async function GET(request: Request, context: { params: { id: string } }) {
   try {
     // Destructure params after awaiting it
-    const { params } = context;
+    const { id } = await context.params;
     
     // Connect to MongoDB
     await connectDB();
     
     // Fetch the country by country_id
-    const country = await Country.findOne({ country_id: params.id });
+    const country = await Country.findOne({ country_id: id });
 
     if (!country) {
       return NextResponse.json({ message: 'Country not found' }, { status: 404 });

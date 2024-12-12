@@ -16,7 +16,6 @@ import {
   Autocomplete,
   InputAdornment,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
@@ -34,7 +33,7 @@ interface RegisterFormData {
   role: string;
   country_id: string;
   file?: File | null;
-  cv_name?: string;
+  cv_path?: string;
 }
 
 const RegisterPage: React.FC = () => {
@@ -49,7 +48,7 @@ const RegisterPage: React.FC = () => {
     role: '',
     country_id: '',
     file: null,
-    cv_name: '',
+    cv_path: '',
   });
 
   const router = useRouter();
@@ -136,7 +135,7 @@ const RegisterPage: React.FC = () => {
         }
         const formData = new FormData();
         formData.append('file', file, `${dataToSubmit.email}.pdf`);
-        formData.append('type', 'cv');
+        formData.append('type', 'cvs');
 
         const uploadResponse = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/upload`, formData, {
           headers: {
@@ -144,7 +143,7 @@ const RegisterPage: React.FC = () => {
           },
         });
 
-        dataToSubmit.cv_name = uploadResponse.data.name;
+        dataToSubmit.cv_path = uploadResponse.data.path;
       }
 
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/register`, dataToSubmit);

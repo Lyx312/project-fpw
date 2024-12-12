@@ -72,7 +72,7 @@ const UserProfile = () => {
         country_id: user.country_id as string,
         gender: user.gender as string,
         balance: user.balance as number,
-        pfp_path: user.pfp_path as string,
+        pfp_path: `${user.pfp_path}?t=${new Date().getTime()}`,
         exp: user.exp as number,
         status: user.status as string,
       };
@@ -158,7 +158,7 @@ const UserProfile = () => {
           },
         });
 
-        dataToSubmit.pfp_path = uploadResponse.data.name;
+        dataToSubmit.pfp_path = uploadResponse.data.path;
       }
 
       const response = await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${currUser?._id}`, dataToSubmit);

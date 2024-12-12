@@ -75,7 +75,7 @@ export async function PUT(request: Request, context: { params: { id: string } })
     pfp_path,
     status,
   } = await request.json();
-  const { id } = context.params;
+  const { id } = await context.params;
 
   console.log({ country_id, old_password, new_password, confirm_password, first_name, last_name, phone, gender, status });
 
