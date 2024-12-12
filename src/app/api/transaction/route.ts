@@ -1,5 +1,6 @@
-import connectDB from '../../../config/database';
-import User_trans from '../../../models/user_transModel';
+import { NextResponse } from 'next/server';
+import connectDB from '@/config/database';
+import User_trans from '@/models/user_transModel';
 
 export async function GET(req: Request) {
   await connectDB();
@@ -27,8 +28,34 @@ export async function GET(req: Request) {
 
     const transactions = await User_trans.find(query);
 
-    return Response.json(transactions, { status: 200 });
+    return NextResponse.json(transactions, { status: 200 });
   } catch (error) {
-    return Response.json({ message: 'Error fetching transactions', error: error }, { status: 500 });
+    return NextResponse.json({ message: 'Error fetching transactions', error: error }, { status: 500 });
+  }
+}
+
+export async function POST(req: Request) {
+  await connectDB();
+
+  try {
+    const { email, post_id, price } = await req.json();
+
+    // Find the last transaction
+    const lastTrans = await User_trans.findOne().sort({ trans_id: -1 });
+
+    // Increment the last trans_id by one
+    const trans_id = lastTrans ? lastTrans.trans_id + 1 : 1;
+
+    const newUserTrans = new User_trans({
+      trans_id,
+      email,
+      post_id,
+      price
+    });
+
+    const savedUserTrans = await newUserTrans.save();
+    return NextResponse.json(savedUserTrans, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({ message: 'Error creating user transaction', error }, { status: 400 });
   }
 }

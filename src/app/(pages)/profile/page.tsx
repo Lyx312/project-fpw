@@ -392,23 +392,6 @@ const UserProfile = () => {
             </Grid>
           </Grid>
 
-          <Box mt={2}>
-            <Typography variant="subtitle1" sx={{ color: "#1A2A3A" }}>
-              Your Token: {currUser?.balance}
-            </Typography>
-            {
-              currUser?.role === "client" && (
-                <Button
-                  variant="text"
-                  size="small"
-                  sx={{ color: "#1A2A3A" }}
-                >
-                  Buy Token?
-                </Button>
-              )
-            }
-          </Box>
-
           {currUser?.role === "freelancer" && (
             <Grid item xs={12} md={6} mt={2}>
               <InputLabel sx={{ color: "#1A2A3A" }}>Status</InputLabel>
