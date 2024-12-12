@@ -64,7 +64,7 @@ const Page: React.FC = () => {
     const delayDebounceFn = setTimeout(() => {
       fetchPosts();
     }, 500);
-  
+
     return () => clearTimeout(delayDebounceFn);
   }, [filters]);
 
@@ -91,7 +91,10 @@ const Page: React.FC = () => {
     }
   };
 
-  const handleFilterChange = (key: keyof typeof filters, value: string | number) => {
+  const handleFilterChange = (
+    key: keyof typeof filters,
+    value: string | number
+  ) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -119,11 +122,12 @@ const Page: React.FC = () => {
         {/* Filter Box */}
         <Box
           sx={{
-            backgroundColor: "#003366",
-            color: "#fff",
+            backgroundColor: colors.secondary,
+            color: colors.text,
             padding: 3,
             borderRadius: 2,
             width: "300px",
+            maxHeight: "calc(100vh - 9rem)",
             flexShrink: 0,
           }}
         >
@@ -138,21 +142,21 @@ const Page: React.FC = () => {
             value={filters.name}
             onChange={(e) => handleFilterChange("name", e.target.value)}
             InputLabelProps={{
-              style: { color: "#fff" }, // Label text color
+              style: { color: colors.text },
             }}
             InputProps={{
-              style: { color: "#fff", borderColor: "#fff" }, // Input text color
+              style: { color: colors.text, borderColor: colors.text },
             }}
             sx={{
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: "#fff", // Default border color
+                  borderColor: colors.text,
                 },
                 "&:hover fieldset": {
-                  borderColor: "#ccc", // Border color on hover
+                  borderColor: colors.accent,
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#fff", // Border color when focused
+                  borderColor: colors.text,
                 },
               },
             }}
@@ -162,7 +166,7 @@ const Page: React.FC = () => {
             sx={{
               display: "flex",
               alignItems: "center",
-              gap: 2, // Space between the numbers and slider
+              gap: 2,
             }}
           >
             <Typography>{filters.minRating.toFixed(1)}</Typography>
@@ -170,17 +174,21 @@ const Page: React.FC = () => {
               value={[filters.minRating, filters.maxRating]}
               onChange={(_, newValue) => {
                 if (Array.isArray(newValue)) {
-                  handleFilterChange("minRating", parseFloat(newValue[0].toFixed(1)));
-                  handleFilterChange("maxRating", parseFloat(newValue[1].toFixed(1)));
+                  handleFilterChange(
+                    "minRating",
+                    parseFloat(newValue[0].toFixed(1))
+                  );
+                  handleFilterChange(
+                    "maxRating",
+                    parseFloat(newValue[1].toFixed(1))
+                  );
                 }
               }}
               valueLabelDisplay="auto"
               min={0}
               max={5}
               step={0.1}
-              sx={{
-                flex: 1, // Allow the slider to take up the remaining space
-              }}
+              sx={{ flex: 1 }}
             />
             <Typography>{filters.maxRating.toFixed(1)}</Typography>
           </Box>
@@ -190,15 +198,10 @@ const Page: React.FC = () => {
             sx={{
               display: "flex",
               alignItems: "center",
-              gap: 2, // Space between the numbers and slider
+              gap: 2,
             }}
           >
-            <Typography
-              sx={{
-                width: "70px", // Reserve fixed width for numbers
-                textAlign: "left", // Align text to the right
-              }}
-            >
+            <Typography sx={{ width: "70px", textAlign: "left" }}>
               {filters.minPrice.toLocaleString("en-US")}
             </Typography>
             <Slider
@@ -213,16 +216,9 @@ const Page: React.FC = () => {
               min={0}
               max={10000000}
               step={1}
-              sx={{
-                flex: 1, // Allow the slider to take up the remaining space
-              }}
+              sx={{ flex: 1 }}
             />
-            <Typography
-              sx={{
-                width: "80px", // Reserve fixed width for numbers
-                textAlign: "left", // Align text to the left
-              }}
-            >
+            <Typography sx={{ width: "80px", textAlign: "left" }}>
               {filters.maxPrice.toLocaleString("en-US")}
             </Typography>
           </Box>
@@ -236,31 +232,37 @@ const Page: React.FC = () => {
             value={filters.category}
             onChange={(e) => handleFilterChange("category", e.target.value)}
             InputLabelProps={{
-              style: { color: "#fff" }, // Label text color
+              style: { color: colors.text },
             }}
             InputProps={{
-              style: { color: "#fff", borderColor: "#fff" }, // Input text color
+              style: { color: colors.text, borderColor: colors.text },
             }}
             sx={{
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: "#fff", // Default border color
+                  borderColor: colors.text,
                 },
                 "&:hover fieldset": {
-                  borderColor: "#ccc", // Border color on hover
+                  borderColor: colors.accent,
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#fff", // Border color when focused
+                  borderColor: colors.text,
                 },
                 "& .MuiSvgIcon-root": {
-                  color: "#fff", // Make the dropdown arrow white
+                  color: colors.text,
                 },
               },
             }}
           >
-            <option value="" style={{ color: "#000" }}>All Categories</option>
+            <option value="" style={{ color: "#000" }}>
+              All Categories
+            </option>
             {categories.map((cat) => (
-              <option key={cat.category_id} value={cat.category_id} style={{ color: "#000" }}>
+              <option
+                key={cat.category_id}
+                value={cat.category_id}
+                style={{ color: "#000" }}
+              >
                 {cat.category_name}
               </option>
             ))}
@@ -283,6 +285,9 @@ const Page: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             gap: 2,
+            overflowY: "auto", 
+            maxHeight: "calc(100vh - 6rem)", 
+            paddingRight: 2, 
           }}
         >
           {loading ? (
@@ -318,23 +323,33 @@ const Page: React.FC = () => {
                   Posted by: {item.postMaker}
                 </Typography>
                 <Typography variant="h6" color="primary" gutterBottom>
-                  Price: {item.price.toLocaleString("id-ID")} Token
+                  Price: Rp. {item.price.toLocaleString("id-ID")},00-
                 </Typography>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   Categories:{" "}
-                  {item.categories && item.categories.length > 0
+                  {item.categories.length > 0
                     ? item.categories.join(", ")
                     : "No categories available"}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   {item.description}
                 </Typography>
-                <Box sx={{ display: "flex", alignItems: "center", marginTop: 1 }}>
-                  <Typography variant="body2" color="textSecondary" sx={{ marginRight: 1 }}>
+                <Box
+                  sx={{ display: "flex", alignItems: "center", marginTop: 1 }}
+                >
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ marginRight: 1 }}
+                  >
                     Rating:
                   </Typography>
                   {item.averageRating ? (
-                    <Rating value={item.averageRating} precision={0.1} readOnly />
+                    <Rating
+                      value={item.averageRating}
+                      precision={0.1}
+                      readOnly
+                    />
                   ) : (
                     <Typography variant="body2" color="text.secondary">
                       No reviews yet

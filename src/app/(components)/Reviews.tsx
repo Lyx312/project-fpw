@@ -2,7 +2,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Card, CardContent, CircularProgress, Alert } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
 
 const Reviews = ({ id }: { id: string }) => {
   const [reviews, setReviews] = useState<any[]>([]);
@@ -56,7 +63,16 @@ const Reviews = ({ id }: { id: string }) => {
   }
 
   return (
-    <Box sx={{ marginTop: "2rem", padding: "2rem" }}>
+    <Box
+      sx={{
+        maxWidth: "1250px",
+        margin: "0 auto",
+        borderRadius: "8px",
+        boxShadow: 3,
+        padding: "2rem",
+        // backgroundColor: "background.default",
+      }}
+    >
       <Typography variant="h5" fontWeight="bold" gutterBottom>
         Reviews
       </Typography>
@@ -64,7 +80,10 @@ const Reviews = ({ id }: { id: string }) => {
         <Typography>No reviews yet for this post.</Typography>
       ) : (
         reviews.map((review) => (
-          <Card key={review.review_id} sx={{ marginBottom: "1rem", boxShadow: 2 }}>
+          <Card
+            key={review.review_id}
+            sx={{ marginBottom: "1rem", boxShadow: 2 }}
+          >
             <CardContent>
               <Typography variant="subtitle1" fontWeight="bold">
                 {review.user
@@ -74,7 +93,9 @@ const Reviews = ({ id }: { id: string }) => {
               <Typography variant="body2" color="text.secondary">
                 Rating: {review.review_rating} / 5
               </Typography>
-              <Typography variant="body2">{review.review_description}</Typography>
+              <Typography variant="body2">
+                {review.review_description}
+              </Typography>
             </CardContent>
           </Card>
         ))

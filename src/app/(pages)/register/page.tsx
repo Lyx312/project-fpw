@@ -173,7 +173,7 @@ const RegisterPage: React.FC = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundImage: 'url(/assets/images/coba.png)',
+        backgroundImage: 'url(/assets/images/background-login-register.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         position: 'relative',
@@ -181,13 +181,14 @@ const RegisterPage: React.FC = () => {
     >
       <Box
         sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Overlay untuk gelap
-          zIndex: 0,
+          position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            bgcolor: "rgba(0, 0, 0, 0.5)",
+            backdropFilter: "blur(10px)",
+            zIndex: 1,
         }}
       />
 

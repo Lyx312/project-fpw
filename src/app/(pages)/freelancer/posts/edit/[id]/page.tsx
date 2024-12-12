@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -80,8 +79,6 @@ const EditPostPage: React.FC = () => {
           setCategories(postData.categories_id || []);
           setAllCategories(categoriesData.data || []);
           setPostStatus(postData.status || "available");
-          console.log(postData);
-          
         } else {
           console.error("Failed to fetch post or categories");
         }
@@ -103,8 +100,7 @@ const EditPostPage: React.FC = () => {
         categories,
         status: postStatus,
       });
-      console.log("update");
-      
+
       if (response.status === 200) {
         router.push("/freelancer/posts");
       } else {
@@ -118,14 +114,15 @@ const EditPostPage: React.FC = () => {
   };
 
   if (loading) return <CircularProgress />;
+
   if (!post) return <Typography variant="h6">Post not found</Typography>;
 
   return (
-    <Container maxWidth="sm">
-      <Typography variant="h4" gutterBottom>
+    <Container maxWidth="sm" sx={{ padding: "2rem" }}>
+      <Typography variant="h4" gutterBottom sx={{ color: "#4B6CB7", fontWeight: "bold" }}>
         Edit Post
       </Typography>
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         {/* Title Field */}
         <Grid item xs={12}>
           <TextField
@@ -135,6 +132,19 @@ const EditPostPage: React.FC = () => {
             onChange={(e) =>
               setPost((prev) => (prev ? { ...prev, title: e.target.value } : null))
             }
+            sx={{
+              "& .MuiInputLabel-root": {
+                color: "#4B6CB7",
+              },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#4B6CB7",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#3A5B8D",
+                },
+              },
+            }}
           />
         </Grid>
 
@@ -151,6 +161,19 @@ const EditPostPage: React.FC = () => {
                 prev ? { ...prev, description: e.target.value } : null
               )
             }
+            sx={{
+              "& .MuiInputLabel-root": {
+                color: "#4B6CB7",
+              },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#4B6CB7",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#3A5B8D",
+                },
+              },
+            }}
           />
         </Grid>
 
@@ -166,12 +189,25 @@ const EditPostPage: React.FC = () => {
                 prev ? { ...prev, price: Number(e.target.value) } : null
               )
             }
+            sx={{
+              "& .MuiInputLabel-root": {
+                color: "#4B6CB7",
+              },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#4B6CB7",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#3A5B8D",
+                },
+              },
+            }}
           />
         </Grid>
 
         {/* Categories Selection */}
         <Grid item xs={12}>
-          <Typography variant="subtitle1" gutterBottom>
+          <Typography variant="subtitle1" gutterBottom sx={{ color: "#4B6CB7" }}>
             Categories
           </Typography>
           <FormControl fullWidth>
@@ -180,6 +216,15 @@ const EditPostPage: React.FC = () => {
               displayEmpty
               onChange={(e) => {
                 addToList(e.target.value as string, categories, setCategories);
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderColor: "#4B6CB7",
+                  borderRadius: "8px",
+                },
+                "&:hover .MuiOutlinedInput-root": {
+                  borderColor: "#3A5B8D",
+                },
               }}
             >
               <MenuItem value="" disabled>
@@ -201,6 +246,11 @@ const EditPostPage: React.FC = () => {
                     ?.category_name
                 }
                 onDelete={() => removeFromList(category, categories, setCategories)}
+                sx={{
+                  backgroundColor: "#4B6CB7",
+                  color: "white",
+                  '&:hover': { backgroundColor: "#3A5B8D" },
+                }}
               />
             ))}
           </Box>
@@ -229,8 +279,16 @@ const EditPostPage: React.FC = () => {
             color="primary"
             onClick={handleUpdate}
             disabled={loading}
+            sx={{
+              width: "100%",
+              padding: "1rem",
+              backgroundColor: "#4B6CB7",
+              "&:hover": {
+                backgroundColor: "#3A5B8D",
+              },
+            }}
           >
-            {loading ? <CircularProgress size={24} /> : "Update"}
+            {loading ? <CircularProgress size={24} color="inherit" /> : "Update"}
           </Button>
         </Grid>
       </Grid>

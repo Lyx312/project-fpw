@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import React, { useEffect, useState } from "react";
 import {
@@ -9,6 +8,7 @@ import {
   CardContent,
   Grid,
   Button,
+  Box,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { getCurrUser } from "@/utils/utils";
@@ -78,7 +78,9 @@ const FreelancerPostsPage: React.FC = () => {
   if (loading) {
     return (
       <Container>
-        <CircularProgress />
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+          <CircularProgress />
+        </Box>
         <Typography variant="h6" align="center" marginTop={2}>
           Loading...
         </Typography>
@@ -88,17 +90,22 @@ const FreelancerPostsPage: React.FC = () => {
 
   return (
     <>
-    <Header/>
+      <Header />
       {currUser ? (
-        <>
-          <Typography variant="h4" gutterBottom>
+        <Box sx={{ padding: "2rem" }}>
+          <Typography variant="h4" gutterBottom sx={{ color: "#4B6CB7", fontWeight: "bold" }}>
             Posts by {currUser.first_name} {currUser.last_name}
           </Typography>
           <Button
             variant="contained"
             color="primary"
             onClick={handleAddPost}
-            style={{ marginBottom: "1rem" }}
+            sx={{
+              marginBottom: "1rem",
+              backgroundColor: "#4B6CB7",
+              '&:hover': { backgroundColor: "#3A5B8D" },
+              padding: "0.8rem 2rem",
+            }}
           >
             Add Post
           </Button>
@@ -107,18 +114,25 @@ const FreelancerPostsPage: React.FC = () => {
               posts.map((post) => (
                 <Grid item xs={12} md={6} key={post.id}>
                   <Card
-                    style={{ cursor: "pointer" }}
+                    sx={{
+                      cursor: "pointer",
+                      boxShadow: 3,
+                      borderRadius: 2,
+                      "&:hover": { boxShadow: 6 },
+                    }}
                     onClick={() => handleEditPost(post.id)}
                   >
                     <CardContent>
-                      <Typography variant="h6">{post.title}</Typography>
+                      <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
+                        {post.title}
+                      </Typography>
                       <Typography variant="body2" color="textSecondary" paragraph>
                         {post.description}
                       </Typography>
-                      <Typography variant="body1">
-                        <strong>Price:</strong> ${post.price}
+                      <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                        <strong>Price:</strong> ${post.price.toLocaleString()}
                       </Typography>
-                      <Typography variant="body2">
+                      <Typography variant="body2" sx={{ color: "#777" }}>
                         <strong>Categories:</strong> {post.categories.join(", ")}
                       </Typography>
                       <Typography variant="body2" color="textSecondary">
@@ -129,18 +143,18 @@ const FreelancerPostsPage: React.FC = () => {
                 </Grid>
               ))
             ) : (
-              <Typography variant="h6" color="textSecondary">
+              <Typography variant="h6" color="textSecondary" align="center" sx={{ width: "100%" }}>
                 No posts found for this user.
               </Typography>
             )}
           </Grid>
-        </>
+        </Box>
       ) : (
-        <Typography variant="h6" color="error">
+        <Typography variant="h6" color="error" align="center">
           No user data available.
         </Typography>
       )}
-      <Footer/>
+      <Footer />
     </>
   );
 };

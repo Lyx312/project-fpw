@@ -98,7 +98,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
           alignItems: "center",
           justifyContent: "center",
           position: "relative",
-          backgroundImage: "url(/assets/images/coba.png)",
+          backgroundImage: 'url(/assets/images/background-login-register.jpg)',
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundColor: "#F5EFE6",

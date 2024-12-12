@@ -2,7 +2,7 @@
 
 import Header from "@/app/(components)/Header";
 import { getCurrUser } from "@/utils/utils";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography, Paper } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -66,7 +66,6 @@ const ClientHistory = () => {
         }
       );
       console.log(response);
-
       setTransactions(response.data);
     } catch (err) {
       console.error("Error fetching transactions:", err);
@@ -119,113 +118,62 @@ const ClientHistory = () => {
   return (
     <Box sx={{ backgroundColor: "#1A2A3A", minHeight: "100vh" }}>
       <Header />
-      <Box sx={{ padding: 2 }}>
+      <Box sx={{ padding: 3 }}>
         {transactions.length > 0 ? (
           <Box>
-            <Typography variant="h6" sx={{ marginBottom: 2 }}>
+            <Typography variant="h5" sx={{ marginBottom: 2, fontWeight: 600, color: "#fff" }}>
               Transaction History
             </Typography>
-            <Box
-              component="table"
-              sx={{
-                width: "100%",
-                borderCollapse: "collapse",
-                backgroundColor: "#2B3B4B",
-                color: "#fff",
-              }}
-            >
-              <Box component="thead">
-                <Box component="tr">
-                  <Box
-                    component="th"
-                    sx={{ border: "1px solid #ccc", padding: 1 }}
-                  >
-                    Email
-                  </Box>
-                  <Box
-                    component="th"
-                    sx={{ border: "1px solid #ccc", padding: 1 }}
-                  >
-                    Post ID
-                  </Box>
-                  <Box
-                    component="th"
-                    sx={{ border: "1px solid #ccc", padding: 1 }}
-                  >
-                    Price
-                  </Box>
-                  <Box
-                    component="th"
-                    sx={{ border: "1px solid #ccc", padding: 1 }}
-                  >
-                    Start Date
-                  </Box>
-                  <Box
-                    component="th"
-                    sx={{ border: "1px solid #ccc", padding: 1 }}
-                  >
-                    End Date
-                  </Box>
-                  <Box
-                    component="th"
-                    sx={{ border: "1px solid #ccc", padding: 1 }}
-                  >
-                    Transaction Status
+            <Paper sx={{ overflow: "hidden", backgroundColor: "#2B3B4B" }}>
+              <Box
+                component="table"
+                sx={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  color: "#fff",
+                  "& th, td": {
+                    padding: "10px 15px",
+                    border: "1px solid #444",
+                  },
+                  "& th": {
+                    backgroundColor: "#3B4A5D",
+                    fontWeight: 600,
+                  },
+                  "& tr:nth-of-type(odd)": {
+                    backgroundColor: "#1E2E3E",
+                  },
+                  "& tr:hover": {
+                    backgroundColor: "#35495e",
+                  },
+                }}
+              >
+                <Box component="thead">
+                  <Box component="tr">
+                    <Box component="th">Email</Box>
+                    <Box component="th">Post ID</Box>
+                    <Box component="th">Price</Box>
+                    <Box component="th">Start Date</Box>
+                    <Box component="th">End Date</Box>
+                    <Box component="th">Transaction Status</Box>
                   </Box>
                 </Box>
+                <Box component="tbody">
+                  {transactions.map((transaction, index) => (
+                    <Box component="tr" key={index}>
+                      <Box component="td">{transaction.email}</Box>
+                      <Box component="td">{transaction.post_id}</Box>
+                      <Box component="td">{transaction.price}</Box>
+                      <Box component="td">{transaction.start_date}</Box>
+                      <Box component="td">{transaction.end_date}</Box>
+                      <Box component="td">{transaction.trans_status}</Box>
+                    </Box>
+                  ))}
+                </Box>
               </Box>
-              <Box component="tbody">
-                {transactions.map((transaction, index) => (
-                  <Box
-                    component="tr"
-                    key={index}
-                    sx={{
-                      "&:nth-of-type(odd)": { backgroundColor: "#1E2E3E" },
-                    }}
-                  >
-                    <Box
-                      component="td"
-                      sx={{ border: "1px solid #ccc", padding: 1 }}
-                    >
-                      {transaction.email}
-                    </Box>
-                    <Box
-                      component="td"
-                      sx={{ border: "1px solid #ccc", padding: 1 }}
-                    >
-                      {transaction.post_id}
-                    </Box>
-                    <Box
-                      component="td"
-                      sx={{ border: "1px solid #ccc", padding: 1 }}
-                    >
-                      {transaction.price}
-                    </Box>
-                    <Box
-                      component="td"
-                      sx={{ border: "1px solid #ccc", padding: 1 }}
-                    >
-                      {transaction.start_date}
-                    </Box>
-                    <Box
-                      component="td"
-                      sx={{ border: "1px solid #ccc", padding: 1 }}
-                    >
-                      {transaction.end_date}
-                    </Box>
-                    <Box
-                      component="td"
-                      sx={{ border: "1px solid #ccc", padding: 1 }}
-                    >
-                      {transaction.trans_status}
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-            </Box>
+            </Paper>
           </Box>
         ) : (
-          <Typography variant="h6">No transactions available</Typography>
+          <Typography variant="h6" sx={{ color: "#fff" }}>No transactions available</Typography>
         )}
       </Box>
     </Box>

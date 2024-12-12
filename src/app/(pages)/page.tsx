@@ -42,7 +42,7 @@ const LandingPage = () => {
       <Header />
 
       {/* Hero Section */}
-      <Container maxWidth="xl" sx={{ mt: 8, mb: 8, height: "100vh", display: "flex" }}>
+      <Container maxWidth="lg" sx={{ mt: 8, mb: 8, height: "100vh", display: "flex" }}>
         <Grid container spacing={4} alignItems="center">
           <Grid item xs={12} md={6}>
             <Typography variant="h2" sx={{ fontWeight: "bold" }} gutterBottom>
@@ -91,8 +91,6 @@ const LandingPage = () => {
               sx={{
                 width: "80%",
                 borderRadius: "16px",
-                
-                // boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.2)",
               }}
             />
           </Grid>
@@ -101,7 +99,7 @@ const LandingPage = () => {
 
       {/* Professional Services Section */}
       <Box sx={{ backgroundColor: colorPalette.beige, py: 10 }}>
-        <Container maxWidth="xl">
+        <Container maxWidth="lg">
           <Typography variant="h4" align="center" sx={{ fontWeight: "bold" }}>
             Find the Professional Services
           </Typography>
@@ -134,7 +132,7 @@ const LandingPage = () => {
 
       {/* Skills Section */}
       <Box sx={{ backgroundColor: colorPalette.mediumBlue, color: "white", py: 10 }}>
-        <Container maxWidth="xl">
+        <Container maxWidth="lg">
           <Typography variant="h4" align="center" sx={{ fontWeight: "bold", mb: 4 }}>
             Explore Popular Skills
           </Typography>
@@ -167,7 +165,11 @@ const LandingPage = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     transition: "transform 0.3s",
-                    "&:hover": { transform: "translateY(-10px)", background: colorPalette.darkBlue, color: colorPalette.beige },
+                    "&:hover": {
+                      transform: "translateY(-10px)",
+                      background: colorPalette.darkBlue,
+                      color: colorPalette.beige,
+                    },
                   }}
                 >
                   <Typography variant="h6" sx={{ fontWeight: "bold" }}>
@@ -182,7 +184,7 @@ const LandingPage = () => {
 
       {/* Categories Section */}
       <Box sx={{ py: 10 }}>
-        <Container maxWidth="xl">
+        <Container maxWidth="lg">
           <Typography variant="h4" align="center" sx={{ fontWeight: "bold" }}>
             Easy Way to Get Jobs Around the World
           </Typography>
