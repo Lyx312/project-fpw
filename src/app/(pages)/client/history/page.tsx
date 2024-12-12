@@ -3,10 +3,11 @@
 
 import Header from "@/app/(components)/Header";
 import { getCurrUser } from "@/utils/utils";
-import { Box, Typography, Paper } from "@mui/material";
+import { Box, Typography, Paper, Button } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Loading from "@/app/(pages)/loading";
+import { useRouter } from "next/navigation";
 
 interface User {
   _id: string;
@@ -27,6 +28,7 @@ const ClientHistory = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const fetchUser = async () => {
     try {
@@ -52,6 +54,7 @@ const ClientHistory = () => {
       }
     } catch (err) {
       setError("Failed to fetch user data");
+      console.log("Error fetching user data:", err);
     } finally {
       setLoading(false);
     }
@@ -72,6 +75,34 @@ const ClientHistory = () => {
     } catch (err) {
       console.error("Error fetching transactions:", err);
       setError("Failed to fetch transactions");
+    }
+  };
+
+  const handleViewPost = (postId: string) => {
+    router.push(`/posts/detail/${postId}`);
+  };
+
+  const handleCancelTransaction = async (transactionId: string) => {
+    try {
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/cancel`);
+      fetchUserTransaction();
+      alert("Transaction cancelled successfully");
+    } catch (err) {
+      console.error("Error cancelling transaction:", err);
+      alert("Failed to cancel transaction");
+      setError("Failed to cancel transaction");
+    }
+  };
+
+  const handlePayTransaction = async (transactionId: string) => {
+    try {
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/pay`);
+      fetchUserTransaction();
+      alert("Transaction paid successfully");
+    } catch (err) {
+      console.error("Error paying transaction:", err);
+      alert("Failed to pay transaction");
+      setError("Failed to pay transaction");
     }
   };
 
@@ -147,6 +178,7 @@ const ClientHistory = () => {
                     <Box component="th">Start Date</Box>
                     <Box component="th">End Date</Box>
                     <Box component="th">Transaction Status</Box>
+                    <Box component="th">Action</Box>
                   </Box>
                 </Box>
                 <Box component="tbody">
@@ -158,6 +190,49 @@ const ClientHistory = () => {
                       <Box component="td">{transaction.start_date}</Box>
                       <Box component="td">{transaction.end_date}</Box>
                       <Box component="td">{transaction.trans_status}</Box>
+                      <Box component="td">
+                        <Button
+                          type="button"
+                          variant="contained"
+                          color="primary"
+                          sx={{
+                            backgroundColor: "#1A2AAA",
+                            '&:hover': { backgroundColor: "#1230EE" },
+                          }}
+                          onClick={() => handleViewPost(transaction.post_id)}
+                        >
+                          View Post
+                        </Button>
+                        {["pending", "in-progress"].includes(transaction.trans_status) && (
+                          <Button
+                            type="button"
+                            variant="contained"
+                            color="primary"
+                            sx={{
+                              backgroundColor: "#1A2AAA",
+                              '&:hover': { backgroundColor: "#1230EE" },
+                            }}
+                            onClick={() => handleCancelTransaction(transaction.trans_id)}
+                          >
+                            Cancel
+                          </Button>
+                        )}
+                        {
+                          transaction.trans_status === "completed" &&
+                          <Button
+                            type="button"
+                            variant="contained"
+                            color="primary"
+                            sx={{
+                              backgroundColor: "#1A2AAA",
+                              '&:hover': { backgroundColor: "#1230EE" },
+                            }}
+                            onClick={() => handlePayTransaction(transaction.trans_id)}
+                          >
+                            Pay
+                          </Button>
+                        }
+                      </Box>
                     </Box>
                   ))}
                 </Box>

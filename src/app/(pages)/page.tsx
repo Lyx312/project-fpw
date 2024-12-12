@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  AppBar,
   Box,
   Button,
   Card,
@@ -14,13 +13,17 @@ import {
   Typography,
 } from "@mui/material";
 import { Search as SearchIcon } from "@mui/icons-material";
-import SocialMediaIcons from "../(components)/SocialMediaIcons";
 import Header from "../(components)/Header";
 import Footer from "../(components)/Footer";
 import axios from "axios";
 
 const LandingPage = () => {
-  const [allCategories, setAllCategories] = useState<any[]>([]);
+  interface Category {
+    category_id: number;
+    category_name: string;
+  }
+
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -62,7 +65,7 @@ const LandingPage = () => {
         <Grid container spacing={4} alignItems="center">
           <Grid item xs={12} md={6}>
             <Typography variant="h2" sx={{ fontWeight: "bold" }} gutterBottom>
-              Join the world's work marketplace
+              Join the world&apos;s work marketplace
             </Typography>
             <Typography variant="h5" sx={{ mb: 4 }}>
               Find & Hire Expert Freelancers

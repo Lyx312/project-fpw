@@ -44,7 +44,7 @@ const FreelancerPostsPage: React.FC = () => {
       try {
         const user = await getCurrUser();
         if (user) {
-          setCurrUser(user as any);
+          setCurrUser(user as unknown as User);
 
           // Fetch posts for the current user
           const res = await fetch(`/api/posts?freelancerId=${user.email}`);

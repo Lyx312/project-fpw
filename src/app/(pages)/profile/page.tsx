@@ -145,7 +145,7 @@ const UserProfile = () => {
       console.log('Form Data:', formData);
       console.log(currUser);
 
-      const { file, ...dataToSubmit } = formData as any;
+      const { file, ...dataToSubmit } = formData;
 
       if (file) {
         const formData = new FormData();
@@ -167,8 +167,8 @@ const UserProfile = () => {
       fetchUser();
     } catch (error) {
       console.error('Error updating profile:', error);
-      const err = error as any;
-      alert(`Error updating profile: ${err.response?.data?.message || err.message}`);
+      const err = error as axios.AxiosError;
+      alert(`Error updating profile: ${(err.response?.data as { message?: string })?.message || err.message}`);
     }
   };
 

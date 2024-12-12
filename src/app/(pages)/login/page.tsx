@@ -275,7 +275,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
                   display="inline"
                   sx={{ color: "#6B4F4F" }}
                 >
-                  Don't have an account?{" "}
+                  Don&apos;t have an account?{" "}
                 </Typography>
                 <Link
                   href="/register"

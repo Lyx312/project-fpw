@@ -42,7 +42,7 @@ const PostReviewPage: React.FC<ReviewPageProps> = ({ params }) => {
       try {
         const user = await getCurrUser();
         if (user) {
-          setCurrUser(user as any);
+          setCurrUser(user as unknown as User);
         }
       } catch (error) {
         console.error("Error fetching user or posts:", error);

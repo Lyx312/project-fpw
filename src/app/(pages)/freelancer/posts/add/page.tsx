@@ -27,13 +27,19 @@ interface User {
   exp: number;
 }
 
+interface Category {
+  category_id: number;
+  category_name: string;
+}
+
+
 const AddPostPage: React.FC = () => {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(0);
   const [categories, setCategories] = useState<string[]>([]);
-  const [allCategories, setAllCategories] = useState<any[]>([]);
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [currUser, setCurrUser] = useState<User | null>(null);
 
@@ -42,7 +48,7 @@ const AddPostPage: React.FC = () => {
       try {
         const user = await getCurrUser();
         if (user) {
-          setCurrUser(user as any);
+          setCurrUser(user as unknown as User);
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -222,7 +228,7 @@ const AddPostPage: React.FC = () => {
             {categories.map((category) => (
               <Chip
                 key={category}
-                label={allCategories.find((cat) => cat.category_id === category)?.category_name}
+                label={allCategories.find((cat) => cat.category_id === Number(category))?.category_name}
                 onDelete={() => removeFromList(category, categories, setCategories)}
                 sx={{
                   backgroundColor: "#4B6CB7",

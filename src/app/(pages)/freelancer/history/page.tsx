@@ -53,6 +53,7 @@ const FreelancerHistoryPage = () => {
       }
     } catch (err) {
       setError("Failed to fetch user data");
+      console.log("Error fetching user data:", err);
     } finally {
       setLoading(false);
     }

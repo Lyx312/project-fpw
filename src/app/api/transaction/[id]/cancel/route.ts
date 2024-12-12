@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
 import User_trans from '@/models/user_transModel';
-import mongoose from 'mongoose';
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   const { id } = await params;
 
-  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+  if (!id || isNaN(Number(id))) {
     return NextResponse.json({ message: 'Invalid transaction ID' }, { status: 400 });
   }
 
