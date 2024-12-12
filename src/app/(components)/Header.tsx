@@ -5,17 +5,15 @@ import {
   IconButton,
   Toolbar,
   Typography,
-  TextField,
   Popover,
   Link,
   Avatar,
 } from "@mui/material";
 
-import SearchIcon from "@mui/icons-material/Search";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import WorkIcon from "@mui/icons-material/Work";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import HistoryIcon from "@mui/icons-material/History";
+import HomeIcon from "@mui/icons-material/Home";
 import Image from "next/image";
 import { getCurrUser, logout } from "@/utils/utils";
 
@@ -76,33 +74,34 @@ const Header = () => {
             <Image src="/assets/images/logo.png" alt="Logo" width={100} height={50} />
           </Link>
         </Typography>
-        <TextField
-          placeholder="Search"
-          size="small"
-          slotProps={{
-            input: {
-              startAdornment: <SearchIcon sx={{ color: "gray", mr: 1 }} />,
-            },
-          }}
-          sx={{
-            backgroundColor: "white",
-            borderRadius: 1,
-            minWidth: "200px",
-            mr: 2,
-          }}
-        />
+
+        <Link href="/" color="inherit">
+          <IconButton color="inherit">
+            <HomeIcon/>
+          </IconButton>
+        </Link>
 
         <Link href="/posts" color="inherit">
           <IconButton color="inherit">
             <WorkIcon />
           </IconButton>
         </Link>
-        <IconButton color="inherit">
-          <HelpOutlineIcon />
-        </IconButton>
-        <IconButton color="inherit">
-          <NotificationsIcon />
-        </IconButton>
+        {currUser ? (
+          <>
+            <Link
+              href={
+                currUser.role === "freelancer"
+                  ? "/freelancer/history"
+                  : "/client/history"
+              }
+              color="inherit"
+            >
+              <IconButton color="inherit">
+                <HistoryIcon />
+              </IconButton>
+            </Link>
+          </>
+        ) : null}
         <IconButton color="inherit" onClick={handlePopoverOpen}>
           {!currUser?.pfp_path && (<AccountCircleIcon />)}
           {currUser?.pfp_path && (

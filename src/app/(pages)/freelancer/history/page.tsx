@@ -22,7 +22,7 @@ interface User {
   pfp_path: string;
 }
 
-const ClientHistory = () => {
+const FreelancerHistoryPage = () => {
   const [currUser, setCurrUser] = useState<User | null>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,9 +62,9 @@ const ClientHistory = () => {
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/freelancer`,
         {
-          params: { email: currUser.email },
+          params: { userEmail: currUser.email },
         }
       );
       console.log(response);
@@ -172,4 +172,4 @@ const ClientHistory = () => {
   );
 };
 
-export default ClientHistory;
+export default FreelancerHistoryPage
