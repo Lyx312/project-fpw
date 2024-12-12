@@ -3,7 +3,7 @@
 
 import Header from "@/app/(components)/Header";
 import { getCurrUser } from "@/utils/utils";
-import { Box, Typography, Paper } from "@mui/material";
+import { Box, Typography, Paper, Button, ButtonGroup } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Loading from "@/app/(pages)/loading";
@@ -27,6 +27,7 @@ const FreelancerHistoryPage = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string>("");
 
   const fetchUser = async () => {
     try {
@@ -64,10 +65,9 @@ const FreelancerHistoryPage = () => {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/freelancer`,
         {
-          params: { userEmail: currUser.email },
+          params: { userEmail: currUser.email, status: filterStatus },
         }
       );
-      console.log(response);
       setTransactions(response.data);
     } catch (err) {
       console.error("Error fetching transactions:", err);
@@ -83,12 +83,10 @@ const FreelancerHistoryPage = () => {
     if (currUser) {
       fetchUserTransaction();
     }
-  }, [currUser]);
+  }, [currUser, filterStatus]);
 
   if (loading) {
-    return (
-      <Loading />
-    );
+    return <Loading />;
   }
 
   if (error) {
@@ -111,6 +109,23 @@ const FreelancerHistoryPage = () => {
     <Box sx={{ backgroundColor: "#1A2A3A", minHeight: "100vh" }}>
       <Header />
       <Box sx={{ padding: 3 }}>
+      <ButtonGroup
+        variant="contained"
+        fullWidth
+        sx={{
+          width: '100%',
+          display: 'flex',
+          marginBottom: 1
+        }}
+      >
+        <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('')}>All</Button>
+        <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('pending')}>Pending</Button>
+        <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('in-progress')}>In Progress</Button>
+        <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('completed')}>Completed</Button>
+        <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('paid')}>Paid</Button>
+        <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('cancelled')}>Cancelled</Button>
+      </ButtonGroup>
+
         {transactions.length > 0 ? (
           <Box>
             <Typography variant="h5" sx={{ marginBottom: 2, fontWeight: 600, color: "#fff" }}>
@@ -172,4 +187,4 @@ const FreelancerHistoryPage = () => {
   );
 };
 
-export default FreelancerHistoryPage
+export default FreelancerHistoryPage;

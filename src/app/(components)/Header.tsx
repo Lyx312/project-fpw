@@ -86,7 +86,7 @@ const Header = () => {
             <WorkIcon />
           </IconButton>
         </Link>
-        {currUser ? (
+        {currUser && currUser.role !== "admin" ? (
           <>
             <Link
               href={
