@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Box,
@@ -15,19 +17,30 @@ import { Search as SearchIcon } from "@mui/icons-material";
 import SocialMediaIcons from "../(components)/SocialMediaIcons";
 import Header from "../(components)/Header";
 import Footer from "../(components)/Footer";
+import axios from "axios";
 
 const LandingPage = () => {
-  const categories = [
-    "Art Design",
-    "UI & UX Design",
-    "Data Entry",
-    "Graphic Design",
-    "Video Editing",
-    "Virtual Assistant",
-    "Website Design",
-    "Mobile App Programming",
-    "Social Media Manager",
-  ];
+  const [allCategories, setAllCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("/api/category");
+
+        console.log(response.data.data);
+
+        if (response) {
+          setAllCategories(response.data.data);
+          console.log(allCategories);
+        } else {
+          console.error("Failed to fetch categories");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const colorPalette = {
     darkBlue: "#001F3F",
@@ -42,7 +55,10 @@ const LandingPage = () => {
       <Header />
 
       {/* Hero Section */}
-      <Container maxWidth="lg" sx={{ mt: 8, mb: 8, height: "100vh", display: "flex" }}>
+      <Container
+        maxWidth="lg"
+        sx={{ mt: 8, mb: 8, height: "100vh", display: "flex" }}
+      >
         <Grid container spacing={4} alignItems="center">
           <Grid item xs={12} md={6}>
             <Typography variant="h2" sx={{ fontWeight: "bold" }} gutterBottom>
@@ -131,9 +147,19 @@ const LandingPage = () => {
       </Box>
 
       {/* Skills Section */}
-      <Box sx={{ backgroundColor: colorPalette.mediumBlue, color: "white", py: 10 }}>
+      <Box
+        sx={{
+          backgroundColor: colorPalette.mediumBlue,
+          color: "white",
+          py: 10,
+        }}
+      >
         <Container maxWidth="lg">
-          <Typography variant="h4" align="center" sx={{ fontWeight: "bold", mb: 4 }}>
+          <Typography
+            variant="h4"
+            align="center"
+            sx={{ fontWeight: "bold", mb: 4 }}
+          >
             Explore Popular Skills
           </Typography>
           <TextField
@@ -226,7 +252,7 @@ const LandingPage = () => {
             Recommendation Categories
           </Typography>
           <Grid container spacing={2}>
-            {categories.map((category, index) => (
+            {allCategories.slice(0, 9).map((category, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
                 <Button
                   fullWidth
@@ -240,7 +266,7 @@ const LandingPage = () => {
                     "&:hover": { bgcolor: colorPalette.lightBlue },
                   }}
                 >
-                  {category}
+                  {category.category_name}
                 </Button>
               </Grid>
             ))}
