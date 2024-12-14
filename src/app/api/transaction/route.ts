@@ -8,6 +8,7 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const trans_id = searchParams.get('trans_id');
+    const post_id = searchParams.get('post_id');
     const email = searchParams.get('email');
     const trans_status = searchParams.get('trans_status');
     const start_date = searchParams.get('start_date');
@@ -19,6 +20,7 @@ export async function GET(req: Request) {
     const query: any = {};
 
     if (trans_id) query.trans_id = trans_id;
+    if (post_id) query.post_id = post_id;
     if (email) query.email = { $regex: email, $options: 'i' };
     if (trans_status) query.trans_status = { $regex: trans_status, $options: 'i' };
     if (start_date) query.start_date = { $gte: new Date(start_date) };
@@ -40,6 +42,11 @@ export async function POST(req: Request) {
   try {
     const { email, post_id, price } = await req.json();
 
+    // Check if the required fields are present
+    if (!email || !post_id || !price) {
+      return NextResponse.json({ message: 'Email, post_id, and price is required' }, { status: 400 });
+    }
+
     // Find the last transaction
     const lastTrans = await User_trans.findOne().sort({ trans_id: -1 });
 
@@ -54,7 +61,7 @@ export async function POST(req: Request) {
     });
 
     const savedUserTrans = await newUserTrans.save();
-    return NextResponse.json(savedUserTrans, { status: 201 });
+    return NextResponse.json({ message: "Success creating transaction", savedUserTrans}, { status: 201 });
   } catch (error) {
     return NextResponse.json({ message: 'Error creating user transaction', error }, { status: 400 });
   }
