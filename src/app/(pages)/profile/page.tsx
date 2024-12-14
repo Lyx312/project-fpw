@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -12,7 +12,7 @@ import {
   Avatar,
   Grid,
   Container,
-  SelectChangeEvent
+  SelectChangeEvent,
 } from "@mui/material";
 import Footer from "@/app/(components)/Footer";
 import Header from "@/app/(components)/Header";
@@ -43,17 +43,17 @@ const UserProfile = () => {
   const [currUser, setCurrUser] = useState<User | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
   const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
-    old_password: '',
-    new_password: '',
-    confirm_password: '',
-    gender: ' ',
-    country_id: '',
-    phone: '',
-    pfp_path: '',
+    first_name: "",
+    last_name: "",
+    old_password: "",
+    new_password: "",
+    confirm_password: "",
+    gender: " ",
+    country_id: "",
+    phone: "",
+    pfp_path: "",
     file: null as File | null,
-    status: '',
+    status: "",
   });
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
@@ -80,9 +80,9 @@ const UserProfile = () => {
       setFormData({
         first_name: user.first_name as string,
         last_name: user.last_name as string,
-        old_password: '',
-        new_password: '',
-        confirm_password: '',
+        old_password: "",
+        new_password: "",
+        confirm_password: "",
         gender: user.gender as string,
         country_id: user.country_id as string,
         phone: user.phone as string,
@@ -91,18 +91,20 @@ const UserProfile = () => {
         status: user.status as string,
       });
     } else {
-      console.log('No user found');
+      console.log("No user found");
       setCurrUser(null);
     }
   };
 
   const fetchCountries = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/country`);
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/country`
+      );
       setCountries(response.data.data);
       console.log(response.data.data);
     } catch (error) {
-      console.error('Error fetching countries:', error);
+      console.error("Error fetching countries:", error);
     }
   };
 
@@ -111,15 +113,23 @@ const UserProfile = () => {
     fetchCountries();
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }> | SelectChangeEvent<string>) => {
-    const { name, value } = e.target as HTMLInputElement | { name?: string; value: unknown };
+  const handleInputChange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>
+      | SelectChangeEvent<string>
+  ) => {
+    const { name, value } = e.target as
+      | HTMLInputElement
+      | { name?: string; value: unknown };
     setFormData({
       ...formData,
-      [name as string]: value
+      [name as string]: value,
     });
   };
 
-  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfilePictureChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFileName(file.name);
@@ -127,48 +137,62 @@ const UserProfile = () => {
         ...formData,
         file: file,
       });
-      console.log('Selected file:', file);
+      console.log("Selected file:", file);
     }
   };
 
   const handleEditProfilePictureClick = () => {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-    fileInput.onchange = (e) => handleProfilePictureChange(e as unknown as React.ChangeEvent<HTMLInputElement>);
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.onchange = (e) =>
+      handleProfilePictureChange(
+        e as unknown as React.ChangeEvent<HTMLInputElement>
+      );
     fileInput.click();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      console.log('Form Data:', formData);
+      console.log("Form Data:", formData);
       console.log(currUser);
 
       const { file, ...dataToSubmit } = formData;
 
       if (file) {
         const formData = new FormData();
-        formData.append('file', file, `/pfp/${currUser?.email}.png`);
-        formData.append('type', 'pfp');
+        formData.append("file", file, `/pfp/${currUser?.email}.png`);
+        formData.append("type", "pfp");
 
-        const uploadResponse = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/upload`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const uploadResponse = await axios.post(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/upload`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
         dataToSubmit.pfp_path = uploadResponse.data.path;
       }
 
-      const response = await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${currUser?._id}`, dataToSubmit);
-      console.log('Profile updated:', response.data);
-      alert('Profile updated successfully');
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${currUser?._id}`,
+        dataToSubmit
+      );
+      console.log("Profile updated:", response.data);
+      alert("Profile updated successfully");
       fetchUser();
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error("Error updating profile:", error);
       const err = error as axios.AxiosError;
-      alert(`Error updating profile: ${(err.response?.data as { message?: string })?.message || err.message}`);
+      alert(
+        `Error updating profile: ${
+          (err.response?.data as { message?: string })?.message || err.message
+        }`
+      );
     }
   };
 
@@ -214,7 +238,7 @@ const UserProfile = () => {
                 size="small"
                 sx={{
                   backgroundColor: "#1A2A3A",
-                  '&:hover': { backgroundColor: "#12304E" },
+                  "&:hover": { backgroundColor: "#12304E" },
                   mt: 1,
                   ml: -1, // Added margin-left to move button slightly left
                 }}
@@ -233,6 +257,12 @@ const UserProfile = () => {
               <Typography variant="body2" color="textSecondary">
                 {currUser?.email}
               </Typography>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: "bold", color: "#1A2A3A" }}
+              >
+                Balance : {currUser?.balance}
+              </Typography>
             </Grid>
           </Grid>
 
@@ -243,7 +273,7 @@ const UserProfile = () => {
                 fullWidth
                 size="small"
                 name="first_name"
-                value={formData.first_name || ''}
+                value={formData.first_name || ""}
                 onChange={handleInputChange}
                 slotProps={{
                   inputLabel: { shrink: true },
@@ -262,7 +292,7 @@ const UserProfile = () => {
                 fullWidth
                 size="small"
                 name="last_name"
-                value={formData.last_name || ''}
+                value={formData.last_name || ""}
                 onChange={handleInputChange}
                 slotProps={{
                   inputLabel: { shrink: true },
@@ -281,7 +311,7 @@ const UserProfile = () => {
                 fullWidth
                 size="small"
                 name="phone"
-                value={formData.phone || ''}
+                value={formData.phone || ""}
                 onChange={handleInputChange}
                 slotProps={{
                   inputLabel: { shrink: true },
@@ -301,7 +331,7 @@ const UserProfile = () => {
                 size="small"
                 name="old_password"
                 type="password"
-                value={formData.old_password || ''}
+                value={formData.old_password || ""}
                 onChange={handleInputChange}
                 sx={{
                   backgroundColor: "#F5F5F5",
@@ -319,7 +349,7 @@ const UserProfile = () => {
                   size="small"
                   name="new_password"
                   type="password"
-                  value={formData.new_password || ''}
+                  value={formData.new_password || ""}
                   onChange={handleInputChange}
                   sx={{
                     backgroundColor: "#F5F5F5",
@@ -338,7 +368,7 @@ const UserProfile = () => {
                   size="small"
                   name="confirm_password"
                   type="password"
-                  value={formData.confirm_password || ''}
+                  value={formData.confirm_password || ""}
                   onChange={handleInputChange}
                   sx={{
                     backgroundColor: "#F5F5F5",
@@ -363,7 +393,9 @@ const UserProfile = () => {
                   color: "#1A2A3A",
                 }}
               >
-                <MenuItem value=" " disabled>Select Your Gender</MenuItem>
+                <MenuItem value=" " disabled>
+                  Select Your Gender
+                </MenuItem>
                 <MenuItem value="M">Male</MenuItem>
                 <MenuItem value="F">Female</MenuItem>
               </Select>
@@ -374,7 +406,7 @@ const UserProfile = () => {
                 fullWidth
                 size="small"
                 name="country_id"
-                value={formData.country_id || ''}
+                value={formData.country_id || ""}
                 onChange={handleInputChange}
                 sx={{
                   backgroundColor: "#F5F5F5",
@@ -399,7 +431,7 @@ const UserProfile = () => {
                 fullWidth
                 size="small"
                 name="status"
-                value={formData.status || ' '}
+                value={formData.status || " "}
                 onChange={handleInputChange}
                 sx={{
                   backgroundColor: "#F5F5F5",
@@ -407,7 +439,9 @@ const UserProfile = () => {
                   color: "#1A2A3A",
                 }}
               >
-                <MenuItem value=" " disabled>Select Your Status</MenuItem>
+                <MenuItem value=" " disabled>
+                  Select Your Status
+                </MenuItem>
                 <MenuItem value="Available">Available</MenuItem>
                 <MenuItem value="Away">Away</MenuItem>
               </Select>
@@ -421,7 +455,7 @@ const UserProfile = () => {
               color="primary"
               sx={{
                 backgroundColor: "#1A2A3A",
-                '&:hover': { backgroundColor: "#12304E" },
+                "&:hover": { backgroundColor: "#12304E" },
               }}
             >
               Save Changes
