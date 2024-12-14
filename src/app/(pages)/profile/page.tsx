@@ -257,12 +257,6 @@ const UserProfile = () => {
               <Typography variant="body2" color="textSecondary">
                 {currUser?.email}
               </Typography>
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: "bold", color: "#1A2A3A" }}
-              >
-                Balance : {currUser?.balance}
-              </Typography>
             </Grid>
           </Grid>
 
