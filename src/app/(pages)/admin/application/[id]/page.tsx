@@ -13,7 +13,6 @@ interface ApplicationDetails {
   phone: string;
   role: string;
   cv_path: string;
-  gender: string;
   is_approved: boolean;
 }
 
@@ -121,21 +120,13 @@ const ApplicationDetailsPage = () => {
         </Typography>
         <Typography>{countryName}</Typography>
         <Typography variant="h6" mt={2}>
-          Role:
-        </Typography>
-        <Typography>{application.role}</Typography>
-        <Typography variant="h6" mt={2}>
-          Gender:
-        </Typography>
-        <Typography>{application.gender || 'Not specified'}</Typography>
-        <Typography variant="h6" mt={2}>
           CV Preview:
         </Typography>
         <Box mt={2} style={{ border: '1px solid #ccc', borderRadius: 4, overflow: 'hidden' }}>
           {application.cv_path ? (
             <iframe
               src={application.cv_path}
-              style={{ width: '100%', height: '400px' }}
+              style={{ width: '100%', height: '100vh' }}
               title="CV Preview"
             />
           ) : (
