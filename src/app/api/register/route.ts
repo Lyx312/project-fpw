@@ -3,7 +3,7 @@ import connectDB from '@/config/database';
 import User from '@/models/userModel';
 import Joi from 'joi';
 import { NextResponse } from 'next/server';
-import sendEmail from '@/emails/mailer';
+import sendEmail, { emailTemplate } from '@/emails/mailer';
 import { SignJWT } from 'jose';
 
 export async function POST(req: Request) {
@@ -54,19 +54,29 @@ export async function POST(req: Request) {
 
         // Send verification email
         const verificationLink = `${process.env.BASE_URL}/api/verifyEmail`;
-        const emailContent = `
-            <p>Please verify your email by clicking the button below:</p>
-            <form action="${verificationLink}" method="POST">
-                <input type="hidden" name="token" value="${token}" />
-                <button type="submit">Verify Email</button>
-            </form>
-        `;
-        await sendEmail(
-            email,
+        const emailContent = emailTemplate(
             'Verify Your Email',
-            'Please verify your email by clicking the button below:',
-            emailContent
+            `Hi ${first_name},<br/><br/>
+            Thank you for registering with Freelance Hub. Please verify your email by clicking the button below:<br/><br/>
+            <form action="${verificationLink}" method="POST" style="display: inline-block;">
+                <input type="hidden" name="token" value="${token}" />
+                <button type="submit" style="background-color: #00a2ff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Verify Email</button>
+            </form><br/><br/>
+            If you did not create an account, no further action is required.<br/><br/>
+            `
         );
+
+        try {
+            await sendEmail(
+                email,
+                'Verify Your Email',
+                'Please verify your email by clicking the button below:',
+                emailContent
+            );
+        } catch (emailError) {
+            await User.deleteOne({ _id: newUser._id });
+            return NextResponse.json({ message: "Failed to send verification email. Please try again.", emailError }, { status: 500 });
+        }
 
         return NextResponse.json({ message: "Open your email to verify your account" }, { status: 201 });
     } catch (error) {

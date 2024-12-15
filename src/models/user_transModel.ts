@@ -8,6 +8,7 @@ interface IUser_trans extends Document {
     start_date: Date;
     end_date: Date;
     trans_status: string;
+    cancelled_reason: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date;
@@ -22,6 +23,7 @@ const User_transSchema: Schema = new Schema(
         start_date: { type: Date, default: null },
         end_date: { type: Date, default: null },
         trans_status: { type: String, enum: ["pending", "in-progress", "completed", "paid", "cancelled"], default: "pending" },
+        cancelled_reason: { type: String, default: null },
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date, default: null },
         deletedAt: { type: Date, default: null },

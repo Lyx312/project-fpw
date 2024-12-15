@@ -43,7 +43,7 @@ export async function POST(req: Request) {
         user.is_email_verified = true;
         await user.save();
         
-        return NextResponse.json({ message: 'Token is valid' }, { status: 200 });
+        return NextResponse.json({ message: 'Email verified. Please go back to Freelance Hub to login.' }, { status: 200 });
     } catch (error) {
         if (error instanceof Error) {
             return NextResponse.json({ message: 'Internal server error', error: error.message }, { status: 500 });

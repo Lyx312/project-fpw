@@ -1,13 +1,13 @@
 import connectDB from '@/config/database';
 import User from '@/models/userModel';
-import sendEmail from '@/emails/mailer';
+import sendEmail, { emailTemplate } from '@/emails/mailer';
 
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
   await connectDB();
 
   try {
     const { id } = await context.params;
-    const application = await User.findOne({email: id});
+    const application = await User.findOne({ email: id });
     if (!application) {
       return new Response(JSON.stringify({ message: 'Application not found' }), { status: 404 });
     }
@@ -21,7 +21,7 @@ export async function PUT(request: Request, context: { params: { id: string } })
   await connectDB();
 
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
     const application = await User.findOne({ email: id });
     if (!application) {
       return new Response(JSON.stringify({ message: 'Application not found' }), { status: 404 });
@@ -32,9 +32,9 @@ export async function PUT(request: Request, context: { params: { id: string } })
 
     await sendEmail(
       application.email,
-      'Application Approved',
+      'Application Approved - Freelance Hub',
       'Your application has been approved.',
-      '<p>Your application has been approved.</p>'
+      emailTemplate('Application Approved', 'Your application as a freelancer has been approved.')
     );
 
     return new Response(JSON.stringify({ message: 'Application approved successfully' }), { status: 200 });
@@ -47,7 +47,7 @@ export async function DELETE(request: Request, context: { params: { id: string }
   await connectDB();
 
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
     const application = await User.findOneAndDelete({ email: id });
     if (!application) {
       return new Response(JSON.stringify({ message: 'Application not found' }), { status: 404 });
@@ -55,9 +55,9 @@ export async function DELETE(request: Request, context: { params: { id: string }
 
     await sendEmail(
       application.email,
-      'Application Declined',
+      'Application Declined - Freelancer Hub',
       'Your application has been declined.',
-      '<p>Your application has been declined.</p>'
+      emailTemplate('Application Declined', 'Your application as a freelancer has been declined.')
     );
 
     return new Response(JSON.stringify({ message: 'Application deleted successfully' }), { status: 200 });

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Container, Typography, Box, CircularProgress, Button, Stack } from '@mui/material';
 
 interface ApplicationDetails {
@@ -18,11 +18,13 @@ interface ApplicationDetails {
   is_approved: boolean;
 }
 
-const ApplicationDetailsPage = ({ params }: { params: { id: string } }) => {
+const ApplicationDetailsPage = () => {
   const [application, setApplication] = useState<ApplicationDetails | null>(null);
   const [countryName, setCountryName] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  const params = useParams<{ id: string }>()
 
   useEffect(() => {
     const fetchApplication = async () => {

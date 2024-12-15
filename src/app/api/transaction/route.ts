@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/config/database';
 import User_trans from '@/models/user_transModel';
+import Post from '@/models/postModel';
+import sendEmail, { emailTemplate } from '@/emails/mailer';
+import mongoose from 'mongoose';
 
 export async function GET(req: Request) {
   await connectDB();
@@ -38,6 +41,8 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   await connectDB();
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
   try {
     const { email, post_id, price } = await req.json();
@@ -52,7 +57,7 @@ export async function POST(req: Request) {
 
     // Increment the last trans_id by one
     const trans_id = lastTrans ? lastTrans.trans_id + 1 : 1;
-
+    
     const newUserTrans = new User_trans({
       trans_id,
       email,
@@ -60,9 +65,31 @@ export async function POST(req: Request) {
       price
     });
 
-    const savedUserTrans = await newUserTrans.save();
+    const savedUserTrans = await newUserTrans.save({ session });
+
+    // Find the post by post_id to get the freelancer email
+    const post = await Post.findOne({ post_id });
+
+    if (post) {
+      const freelancerEmail = post.post_email;
+      const subject = 'Client Request to Hire - Freelance Hub';
+      const text = `A client has requested to hire you for the post titled "${post.post_title}" on Freelance Hub. Please review the request and choose to accept or decline.`;
+      const html = emailTemplate(
+        'Client Request to Hire - Freelance Hub',
+        `A client has requested to hire you for the post titled "<strong>${post.post_title}</strong>" on Freelance Hub. Please review the request and choose to accept or decline.`
+      );
+
+      // Send email to the freelancer
+      await sendEmail(freelancerEmail, subject, text, html);
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
     return NextResponse.json({ message: "Success creating transaction", savedUserTrans}, { status: 201 });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     return NextResponse.json({ message: 'Error creating user transaction', error }, { status: 400 });
   }
 }

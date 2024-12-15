@@ -3,10 +3,11 @@
 
 import Header from "@/app/(components)/Header";
 import { getCurrUser } from "@/utils/utils";
-import { Box, Typography, Paper, Button, ButtonGroup } from "@mui/material";
+import { Box, Typography, Paper, Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Loading from "@/app/(pages)/loading";
+import { useRouter } from "next/navigation";
 
 interface User {
   _id: string;
@@ -28,6 +29,11 @@ const FreelancerHistoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [transactionToCancel, setTransactionToCancel] = useState<string | null>(null);
+
+  const router = useRouter();
 
   const fetchUser = async () => {
     try {
@@ -76,6 +82,62 @@ const FreelancerHistoryPage = () => {
     }
   };
 
+  const handleViewPost = (postId: string) => {
+    router.push(`/posts/detail/${postId}`);
+  };
+
+  const handleAcceptTransaction = async (transactionId: string) => {
+    try {
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/accept`);
+      fetchUserTransaction();
+      alert("Transaction accepted successfully");
+    } catch (err) {
+      console.error("Error accepting transaction:", err);
+      alert("Failed to accept transaction");
+      setError("Failed to accept transaction");
+    }
+  };
+
+  const handleCancelTransaction = async () => {
+    if (!transactionToCancel) return;
+
+    try {
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}/cancel`, { type: "freelancer", reason: cancelReason });
+      fetchUserTransaction();
+      alert("Transaction cancelled successfully");
+      setOpenDialog(false);
+      setCancelReason("");
+      setTransactionToCancel(null);
+    } catch (err) {
+      console.error("Error cancelling transaction:", err);
+      alert("Failed to cancel transaction");
+      setError("Failed to cancel transaction");
+    }
+  };
+
+  const handleCompleteTransaction = async (transactionId: string) => {
+    try {
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/complete`);
+      fetchUserTransaction();
+      alert("Transaction completed successfully");
+    } catch (err) {
+      console.error("Error completing transaction:", err);
+      alert("Failed to complete transaction");
+      setError("Failed to complete transaction");
+    }
+  };
+
+  const openCancelDialog = (transactionId: string) => {
+    setTransactionToCancel(transactionId);
+    setOpenDialog(true);
+  };
+
+  const closeCancelDialog = () => {
+    setOpenDialog(false);
+    setCancelReason("");
+    setTransactionToCancel(null);
+  };
+
   useEffect(() => {
     fetchUser();
   }, []);
@@ -110,22 +172,22 @@ const FreelancerHistoryPage = () => {
     <Box sx={{ backgroundColor: "#1A2A3A", minHeight: "100vh" }}>
       <Header />
       <Box sx={{ padding: 3 }}>
-      <ButtonGroup
-        variant="contained"
-        fullWidth
-        sx={{
-          width: '100%',
-          display: 'flex',
-          marginBottom: 1
-        }}
-      >
-        <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('')}>All</Button>
-        <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('pending')}>Pending</Button>
-        <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('in-progress')}>In Progress</Button>
-        <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('completed')}>Completed</Button>
-        <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('paid')}>Paid</Button>
-        <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('cancelled')}>Cancelled</Button>
-      </ButtonGroup>
+        <ButtonGroup
+          variant="contained"
+          fullWidth
+          sx={{
+            width: '100%',
+            display: 'flex',
+            marginBottom: 1
+          }}
+        >
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('')}>All</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('pending')}>Pending</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('in-progress')}>In Progress</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('completed')}>Completed</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('paid')}>Paid</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('cancelled')}>Cancelled</Button>
+        </ButtonGroup>
 
         {transactions.length > 0 ? (
           <Box>
@@ -163,6 +225,7 @@ const FreelancerHistoryPage = () => {
                     <Box component="th">Start Date</Box>
                     <Box component="th">End Date</Box>
                     <Box component="th">Transaction Status</Box>
+                    <Box component="th">Action</Box>
                   </Box>
                 </Box>
                 <Box component="tbody">
@@ -174,6 +237,62 @@ const FreelancerHistoryPage = () => {
                       <Box component="td">{transaction.start_date}</Box>
                       <Box component="td">{transaction.end_date}</Box>
                       <Box component="td">{transaction.trans_status}</Box>
+                      <Box component="td">
+                        <Button
+                          type="button"
+                          variant="contained"
+                          color="primary"
+                          sx={{
+                            backgroundColor: "#1A2AAA",
+                            '&:hover': { backgroundColor: "#1230EE" },
+                          }}
+                          onClick={() => handleViewPost(transaction.post_id)}
+                        >
+                          View Post
+                        </Button>
+                        {(transaction.trans_status === "pending") && (
+                          <Button
+                            type="button"
+                            variant="contained"
+                            color="primary"
+                            sx={{
+                              backgroundColor: "#1A2AAA",
+                              '&:hover': { backgroundColor: "#1230EE" },
+                            }}
+                            onClick={() => handleAcceptTransaction(transaction.trans_id)}
+                          >
+                            Accept
+                          </Button>
+                        )}
+                        {["pending", "in-progress"].includes(transaction.trans_status) && (
+                          <Button
+                            type="button"
+                            variant="contained"
+                            color="primary"
+                            sx={{
+                              backgroundColor: "#1A2AAA",
+                              '&:hover': { backgroundColor: "#1230EE" },
+                            }}
+                            onClick={() => openCancelDialog(transaction.trans_id)}
+                          >
+                            Cancel
+                          </Button>
+                        )}
+                        {(transaction.trans_status === "in-progress") && (
+                          <Button
+                            type="button"
+                            variant="contained"
+                            color="primary"
+                            sx={{
+                              backgroundColor: "#1A2AAA",
+                              '&:hover': { backgroundColor: "#1230EE" },
+                            }}
+                            onClick={() => handleCompleteTransaction(transaction.trans_id)}
+                          >
+                            Complete
+                          </Button>
+                        )}
+                      </Box>
                     </Box>
                   ))}
                 </Box>
@@ -184,6 +303,29 @@ const FreelancerHistoryPage = () => {
           <Typography variant="h6" sx={{ color: "#fff" }}>No transactions available</Typography>
         )}
       </Box>
+
+      <Dialog open={openDialog} onClose={closeCancelDialog}>
+        <DialogTitle>Cancel Transaction</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please provide a reason for cancelling the transaction.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Reason"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeCancelDialog}>Nevermind</Button>
+          <Button onClick={handleCancelTransaction} disabled={!cancelReason}>Confirm</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

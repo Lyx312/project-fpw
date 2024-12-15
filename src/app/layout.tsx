@@ -14,6 +14,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head
+        style={{
+          margin: 0,
+          padding: 0,
+          boxSizing: "border-box",
+        }}
+      >
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#000000" />
+        <meta
+          name="description"
+          content="Web site created using create-next-app"
+        />
+        <link rel="icon" href="./assets/images/logo.png" />
+        <title>Freelance Hub</title>
+      </head>
       <body style={{ margin: 0 }}>
         <AppRouterCacheProvider>
           {/* <ThemeProvider theme={theme}> */}
