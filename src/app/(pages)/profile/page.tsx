@@ -28,7 +28,6 @@ interface User {
   phone: string;
   gender: string;
   country_id: string;
-  balance: number;
   exp: number;
   pfp_path: string;
   status?: string;
@@ -71,7 +70,6 @@ const UserProfile = () => {
         phone: user.phone as string,
         country_id: user.country_id as string,
         gender: user.gender as string,
-        balance: user.balance as number,
         pfp_path: `${user.pfp_path}?t=${new Date().getTime()}`,
         exp: user.exp as number,
         status: user.status as string,

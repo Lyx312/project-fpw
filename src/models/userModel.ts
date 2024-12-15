@@ -11,7 +11,6 @@ interface IUser extends Document {
     cv_path: string;
     pfp_path: string;
     gender: string;
-    balance: number;
     is_banned: boolean;
     is_approved: boolean;
     status: string;
@@ -34,7 +33,6 @@ const UserSchema: Schema = new Schema(
         cv_path: { type: String, default: null },
         pfp_path: { type: String, default: null },
         gender: { type: String, enum: ['M', 'F'], default: null },
-        balance: { type: Number, default: 0 },
         is_banned: { type: Boolean, default: false },
         is_approved: { type: Boolean, default: null },
         status: { type: String, enum: ['Available', 'Away'], default: null },

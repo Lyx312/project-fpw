@@ -14,7 +14,6 @@ interface ApplicationDetails {
   role: string;
   cv_path: string;
   gender: string;
-  balance: number;
   is_approved: boolean;
 }
 
