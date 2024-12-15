@@ -2,7 +2,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Chip, Button, Grid, CircularProgress, Alert, Rating } from "@mui/material";
+import { Box, Typography, Chip, Button, Grid, Alert, Rating } from "@mui/material";
+import { getCurrUser } from "@/utils/utils";
+import { useRouter } from "next/navigation";
+import Loading from "../(pages)/loading";
+import axios from "axios";
 
 interface DetailJobProps {
   id: string;
@@ -11,8 +15,12 @@ interface DetailJobProps {
 const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
   const [post, setPost] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [activeTransaction, setActiveTransaction] = useState<boolean>(false);
+  const [currUser, setCurrUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,20 +28,36 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
         setLoading(true);
 
         // Fetch post details
-        const postResponse = await fetch(`/api/posts/${id}`);
-        if (!postResponse.ok) {
-          throw new Error("Failed to fetch post details");
+        const postResponse = await axios.get(`/api/posts/${id}`);
+        setPost(postResponse.data);
+
+        const user = await getCurrUser();
+        setCurrUser(user);
+
+        if (user) {
+          // Fetch transactions
+          const transactionsResponse = await axios.get(`/api/transaction?post_id=${id}&email=${user.email}`);
+          const transactionsData = transactionsResponse.data;
+          console.log(transactionsData);
+          
+          // check if theres a transaction with status pending, in-progress, or completed
+          const hasActiveTransaction = transactionsData.some(
+            (transaction: any) =>
+              transaction.trans_status === "pending" ||
+              transaction.trans_status === "in-progress" ||
+              transaction.trans_status === "completed"
+          );
+
+          if (hasActiveTransaction) {
+            // Handle the case where there is an active transaction
+            console.log("There is an active transaction");
+            setActiveTransaction(true);
+          }
         }
-        const postData = await postResponse.json();
-        setPost(postData);
 
         // Fetch reviews
-        const reviewsResponse = await fetch(`/api/review?id=${id}`);
-        const reviewsData = await reviewsResponse.json();
-        if (!reviewsResponse.ok) {
-          throw new Error("Failed to fetch reviews");
-        }
-        setReviews(reviewsData.data);
+        const reviewsResponse = await axios.get(`/api/review?id=${id}`);
+        setReviews(reviewsResponse.data.data);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -49,19 +73,41 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
     reviews.length > 0
       ? reviews.reduce((acc, review) => acc + review.review_rating, 0) / reviews.length
       : 0;
+    
+  const handleHire = async () => {
+    if (!currUser) {
+      alert("Please login first");
+      router.push("/login");
+      return;
+    }
+
+    if (currUser.role !== "client") {
+      alert("Only clients can hire freelancers");
+      return;
+    }
+
+    try {
+      const response = await axios.post("/api/transaction", {
+        email: currUser.email,
+        post_id: id,
+        price: post.price,
+      });
+
+      if (response.status === 201) {
+        alert("Successfully hired freelancer. Please wait for the freelancer to accept");
+        setActiveTransaction(true);
+      } else {
+        alert("Failed to hire freelancer");
+      }
+    } catch (error) {
+      console.error("Error creating transaction:", error);
+      alert("An error occurred while hiring the freelancer");
+    }
+  };
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
+      <Loading />
     );
   }
 
@@ -138,8 +184,15 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
           </Typography>
         </Box>
 
-        <Button variant="contained" color="primary" fullWidth sx={{ marginTop: "1rem" }}>
-          Hire
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          sx={{ marginTop: "1rem" }}
+          disabled={activeTransaction}
+          onClick={handleHire}
+        >
+          {activeTransaction ? "There's an active transaction" : "Hire"}
         </Button>
       </Box>
     </Box>
