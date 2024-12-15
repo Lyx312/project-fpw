@@ -61,7 +61,7 @@ const updateUserSchema = Joi.object({
 
 
 // Update user endpoint logic
-export async function PUT(request: Request, context: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
   await connectDB();
   const {
     country_id,
@@ -74,8 +74,9 @@ export async function PUT(request: Request, context: { params: { id: string } })
     gender,
     pfp_path,
     status,
+    is_banned
   } = await request.json();
-  const { id } = await context.params;
+  const { id } = await params;
 
   console.log({ country_id, old_password, new_password, confirm_password, first_name, last_name, phone, gender, status });
 
@@ -118,6 +119,7 @@ export async function PUT(request: Request, context: { params: { id: string } })
     if (gender) user.gender = gender;
     if (pfp_path) user.pfp_path = pfp_path;
     if (status) user.status = status;
+    if (is_banned) user.is_banned = is_banned;
 
     await user.save();
 

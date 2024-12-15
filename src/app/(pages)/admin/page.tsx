@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Box, List, ListItemText, CircularProgress, ListItem, ListItemButton } from '@mui/material';
+import { Container, Typography, Box, List, ListItemText, ListItem, ListItemButton } from '@mui/material';
 import Link from 'next/link';
+import Loading from '../loading';
 
 interface Application {
   _id: string;
@@ -34,11 +35,7 @@ const ApplicationsPage = () => {
 
   if (loading) {
     return (
-      <Container>
-        <Box textAlign="center" mt={4}>
-          <CircularProgress />
-        </Box>
-      </Container>
+      <Loading />
     );
   }
 

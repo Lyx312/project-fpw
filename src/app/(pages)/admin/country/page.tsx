@@ -89,7 +89,7 @@ const CountryManager: React.FC = () => {
         </Alert>
       )}
 
-<Box sx={{ mb: 2, display: 'grid', gap: 2, gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+      <Box sx={{ mb: 2, display: 'grid', gap: 2, gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
         <TextField
           label="Country Name"
           value={nameFilter}

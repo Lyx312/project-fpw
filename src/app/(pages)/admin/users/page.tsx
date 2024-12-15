@@ -18,15 +18,18 @@ import {
   Select,
   InputLabel,
   FormControl,
+  Button,
 } from '@mui/material';
 import axios from 'axios';
 
 interface User {
+  _id: string;
   email: string;
   first_name: string;
   last_name: string;
   country_name: string;
   role: string;
+  is_banned: boolean;
 }
 
 interface Country {
@@ -49,22 +52,22 @@ const AdminUsersPage = () => {
   const [nameFilter, setNameFilter] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
-  
+
   const fetchUsers = async () => {
-      setLoading(true);
-      try {
-          const params: Record<string, string> = {};
-          if (nameFilter) params.name = nameFilter;
-          if (countryFilter) params.country = countryFilter;
-          if (roleFilter) params.role = roleFilter;
-  
-          const response = await axios.get('/api/userCountry', { params });
-          setUsers(response.data);
-      } catch (err) {
-          console.error('Error fetching users:', err);
-      } finally {
-          setLoading(false);
-      }
+    setLoading(true);
+    try {
+      const params: Record<string, string> = {};
+      if (nameFilter) params.name = nameFilter;
+      if (countryFilter) params.country = countryFilter;
+      if (roleFilter) params.role = roleFilter;
+
+      const response = await axios.get('/api/userCountry', { params });
+      setUsers(response.data);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchCountries = async () => {
@@ -92,7 +95,16 @@ const AdminUsersPage = () => {
 
   useEffect(() => {
     fetchUsers();
-}, [nameFilter, countryFilter, roleFilter]);
+  }, [nameFilter, countryFilter, roleFilter]);
+
+  const handleBanUnban = async (user: User) => {
+    try {
+      await axios.put(`/api/users/${user._id}/ban`);
+      fetchUsers();
+    } catch (err) {
+      console.error('Error banning/unbanning user:', err);
+    }
+  }
 
   return (
     <Box
@@ -217,6 +229,7 @@ const AdminUsersPage = () => {
                     <TableCell>Full Name</TableCell>
                     <TableCell>Country</TableCell>
                     <TableCell>Role</TableCell>
+                    <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -226,6 +239,15 @@ const AdminUsersPage = () => {
                       <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
                       <TableCell>{user.country_name}</TableCell>
                       <TableCell>{user.role}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => handleBanUnban(user)}
+                        >
+                          {user.is_banned ? 'Unban' : 'Ban'}
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

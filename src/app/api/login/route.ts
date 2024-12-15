@@ -52,6 +52,12 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Account approval pending' }, { status: 401 });
         }
 
+        // check if user is banned
+        if (user.is_banned) {
+            return NextResponse.json({ error: 'Your account is banned' }, { status: 401 });
+        }
+
+        // Generate JWT token
         const token = await new SignJWT({...user.toJSON()})
             .setProtectedHeader({ alg: 'HS256' })
             .setExpirationTime(rememberMe ? '7d' : '1d')
