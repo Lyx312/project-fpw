@@ -1,5 +1,5 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { getCurrUser } from "@/utils/utils";
 import {
   Button,
@@ -29,6 +29,7 @@ interface User {
 
 const PostReviewPage: React.FC<ReviewPageProps> = ({ params }) => {
   const { id } = params;
+  const router = useRouter();
 
   const [reviewRating, setReviewRating] = useState("");
   const [reviewDescription, setReviewDescription] = useState("");
@@ -89,6 +90,7 @@ const PostReviewPage: React.FC<ReviewPageProps> = ({ params }) => {
     } finally {
       setLoading(false);
     }
+    router.push(`/`);
   };
 
   return (

@@ -1,99 +1,110 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { MidtransClient } from 'midtrans-node-client';
-import User_trans from '../../../models/user_transModel'; // Adjust the path based on your project structure
-import connectDB from '@/config/database';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { NextRequest, NextResponse } from "next/server";
+import { MidtransClient } from "midtrans-node-client";
+import User_trans from "../../../models/user_transModel"; // Adjust the path based on your project structure
+import connectDB from "@/config/database";
+import axios from "axios";
 
-const serverKey = process.env.MIDTRANS_SERVER_KEY || '';
-const clientKey = process.env.MIDTRANS_CLIENT_KEY || '';
+const serverKey = process.env.MIDTRANS_SERVER_KEY || "";
+const clientKey = process.env.MIDTRANS_CLIENT_KEY || "";
 
 if (!serverKey || !clientKey) {
-  throw new Error('Midtrans API keys are not defined in the environment variables');
+  throw new Error("Midtrans API keys are not defined in the environment variables");
 }
 
 const snap = new MidtransClient.Snap({
   isProduction: false,
   serverKey: serverKey,
-  clientKey: clientKey
+  clientKey: clientKey,
 });
 
-
 export async function POST(req: NextRequest) {
-    console.log(serverKey);
-    console.log(clientKey)
-    try {
-      await connectDB();
-      const body = await req.json();
-      console.log("Request body:", body);
-  
-      const { email, post_id, price, start_date, end_date } = body;
-      if (!email || !post_id || !price || !start_date || !end_date) {
-        return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-      }
-  
-      const trans = (await User_trans.find()).length;
+  try {
+    await connectDB();
+    const { transactionId } = await req.json();
 
-      const newTransaction = await User_trans.create({
-        trans_id: (trans+1),
-        email,
-        post_id,
-        price,
-        start_date: new Date(start_date),
-        end_date: new Date(end_date),
-        trans_status: "pending",
-      });
-      console.log("New transaction created in DB:", newTransaction);
-  
-      const transactionDetails = {
-        transaction_details: {
-          order_id: `TRANS-${newTransaction.trans_id}`,
-          gross_amount: parseFloat(price),
-        },
-        customer_details: {
-          email,
-        },
-      };
-  
-      try {
-        const transaction = await snap.createTransaction(transactionDetails);
-        console.log("Midtrans transaction created:", transaction);
-        return NextResponse.json({ token: transaction.token, transaction: newTransaction });
-      } catch (error) {
-        console.error("Midtrans transaction error:", error);
-        return NextResponse.json({ error: "Failed to create transaction with Midtrans" }, { status: 500 });
-      }      
-    } catch (error) {
-      console.error("API error:", error);
-      return NextResponse.json({ error: "Failed to create transaction" }, { status: 500 });
+    if (!transactionId) {
+      return NextResponse.json({ error: "Missing transaction ID" }, { status: 400 });
     }
+
+    const transaction = await User_trans.findOne({ trans_id: transactionId });
+    if (!transaction || transaction.trans_status !== "completed") {
+      return NextResponse.json({ error: "Invalid or non-payable transaction" }, { status: 400 });
+    }
+
+    const transactionDetails = {
+      transaction_details: {
+        order_id: `TRANS-${transaction.trans_id}`,
+        gross_amount: transaction.price,
+      },
+      customer_details: {
+        email: transaction.email,
+      },
+      payment_type: "bank_transfer",
+      bank_transfer: {
+        bank: "bca",
+      },
+    };
+
+    const snapTransaction = await snap.createTransaction(transactionDetails);
+    console.log("Snap token created:", snapTransaction.token);
+    console.log("Order ID created:", `TRANS-${transaction.trans_id}`);
+
+    return NextResponse.json({ token: snapTransaction.token });
+  } catch (error) {
+    console.error("Midtrans API error:", error);
+    return NextResponse.json({ error: "Failed to initiate transaction" }, { status: 500 });
   }
+}
 
 export async function PUT(req: NextRequest) {
   try {
-    const body = await req.json();
+    await connectDB();
+    const { transactionId } = await req.json();
 
-    // Validate required fields
-    const { order_id, transaction_status } = body;
-    if (!order_id || !transaction_status) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    if (!transactionId) {
+      return NextResponse.json({ error: "Missing transaction ID" }, { status: 400 });
     }
 
-    // Extract transaction ID from order_id
-    const transId = parseInt(order_id.replace('TRANS-', ''), 10);
+    const transaction = await User_trans.findOne({ trans_id: transactionId });
+    if (!transaction) {
+      return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
+    }
 
-    // Update transaction status in MongoDB
-    const updatedTransaction = await User_trans.findOneAndUpdate(
-      { trans_id: transId },
-      { trans_status: transaction_status, updatedAt: new Date() },
-      { new: true }
+    const orderId = `TRANS-${transaction.trans_id}`;
+    console.log("Order ID being sent to Midtrans:", orderId);
+
+    try {
+      const url = `https://api.sandbox.midtrans.com/v2/${orderId}/approve`;
+
+    // Make a POST request to approve the transaction
+    const response = await axios.post(
+      url,
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${Buffer.from(serverKey + ':').toString('base64')}`,
+        },
+      }
     );
-
-    if (!updatedTransaction) {
-      return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
+      
+    } catch (midtransError: any) {
+      console.error("Midtrans API error:", midtransError);
+      if (midtransError.message.includes("Transaction doesn't exist")) {
+        console.error(
+          "The transaction may not have been created in Midtrans. Verify the order ID and creation process."
+        );
+      }
+      return NextResponse.json({ error: "Failed to fetch status from Midtrans" }, { status: 500 });
     }
 
-    return NextResponse.json({ transaction: updatedTransaction });
+    transaction.trans_status = "paid";
+    await transaction.save();
+
+    return NextResponse.json({ message: "Transaction status updated to completed in database and Midtrans" });
   } catch (error) {
-    console.error('Failed to update transaction:', error);
-    return NextResponse.json({ error: 'Failed to update transaction' }, { status: 500 });
+    console.error("Error updating transaction status:", error);
+    return NextResponse.json({ error: "Failed to update transaction status" }, { status: 500 });
   }
 }
