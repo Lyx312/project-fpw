@@ -24,8 +24,10 @@ const LandingPage = () => {
   }
 
   interface Service {
+    id: number;
     title: string;
     description: string;
+    averageRating: number;
   }
 
   const [allCategories, setAllCategories] = useState<Category[]>([]);
@@ -149,30 +151,38 @@ const LandingPage = () => {
           <Grid container spacing={4} sx={{ mt: 4 }}>
             {serviceByRating.slice(0, 3).map((item, index) => (
               <Grid item xs={12} sm={4} key={index}>
-                <Card
-                  sx={{
-                    height: 250,
-                    borderRadius: "16px",
-                    boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
-                    transition: "transform 0.3s",
-                    "&:hover": { transform: "translateY(-10px)" },
-                  }}
-                >
-                  <CardContent>
-                    <Typography
-                      variant="h6"
-                      sx={{ fontWeight: "bold", textAlign: "center" }}
-                    >
-                      {item.title}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ textAlign: "center", mt: 1, color: "gray" }}
-                    >
-                      {item.description}
-                    </Typography>
-                  </CardContent>
-                </Card>
+                <Button href={"/posts/detail/" + item.id}>
+                  <Card
+                    sx={{
+                      height: 250,
+                      borderRadius: "16px",
+                      boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
+                      transition: "transform 0.3s",
+                      "&:hover": { transform: "translateY(-10px)" },
+                    }}
+                  >
+                    <CardContent>
+                      <Typography
+                        variant="h6"
+                        sx={{ fontWeight: "bold", textAlign: "center" }}
+                      >
+                        {item.title}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ textAlign: "center", mt: 1, color: "gray" }}
+                      >
+                        {item.description}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ textAlign: "center", mt: 1, color: "gray" }}
+                      >
+                        Rating : {item.averageRating}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Button>
               </Grid>
             ))}
           </Grid>
