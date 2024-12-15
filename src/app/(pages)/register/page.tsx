@@ -15,6 +15,9 @@ import {
   MenuItem,
   Autocomplete,
   InputAdornment,
+  Select,
+  FormControl,
+  Chip,
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -34,6 +37,12 @@ interface RegisterFormData {
   country_id: string;
   file?: File | null;
   cv_path?: string;
+  categories: string[];
+}
+
+interface Category {
+  category_id: number;
+  category_name: string;
 }
 
 const RegisterPage: React.FC = () => {
@@ -49,6 +58,7 @@ const RegisterPage: React.FC = () => {
     country_id: '',
     file: null,
     cv_path: '',
+    categories: [],
   });
 
   const router = useRouter();
@@ -70,6 +80,8 @@ const RegisterPage: React.FC = () => {
   }
 
   const [countries, setCountries] = useState<Country[]>([]);
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -82,6 +94,19 @@ const RegisterPage: React.FC = () => {
     };
 
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/category`);
+        setAllCategories(response.data.data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
   }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -114,6 +139,16 @@ const RegisterPage: React.FC = () => {
         file: event.target.files ? event.target.files[0] : null,
       }));
     }
+  };
+
+  const addToList = (item: string, list: string[], setList: React.Dispatch<React.SetStateAction<string[]>>) => {
+    if (item && !list.includes(item)) {
+      setList([...list, item]);
+    }
+  };
+
+  const removeFromList = (item: string, list: string[], setList: React.Dispatch<React.SetStateAction<string[]>>) => {
+    setList(list.filter((i) => i !== item));
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -165,22 +200,22 @@ const RegisterPage: React.FC = () => {
 
   return (
     <>
-    <Header/>
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundImage: 'url(/assets/images/background-login-register.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        position: 'relative',
-      }}
-    >
+      <Header />
       <Box
         sx={{
-          position: "absolute",
+          minHeight: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundImage: 'url(/assets/images/background-login-register.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          position: 'relative',
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
             top: 0,
             left: 0,
             width: "100%",
@@ -188,217 +223,252 @@ const RegisterPage: React.FC = () => {
             bgcolor: "rgba(0, 0, 0, 0.5)",
             backdropFilter: "blur(10px)",
             zIndex: 1,
-        }}
-      />
-
-      <Container maxWidth="sm" sx={{ zIndex: 1 }}>
-        <Paper
-          elevation={3}
-          sx={{
-            p: 4,
-            borderRadius: 2,
-            backgroundColor: 'rgba(255, 255, 255, 0.9)', // Semi transparan
           }}
-        >
+        />
 
-          <Box component="form" onSubmit={handleSubmit} noValidate>
-            <Typography variant="h5" align="center" gutterBottom>
-              Sign Up
-            </Typography>
+        <Container maxWidth="sm" sx={{ zIndex: 1 }}>
+          <Paper
+            elevation={3}
+            sx={{
+              p: 4,
+              borderRadius: 2,
+              backgroundColor: 'rgba(255, 255, 255, 0.9)', // Semi transparan
+            }}
+          >
 
-            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-              <TextField
-                name="first_name"
-                label="First Name"
-                fullWidth
-                required
-                value={formData.first_name}
-                onChange={handleChange}
-                variant="outlined"
-                size="small"
-              />
-              <TextField
-                name="last_name"
-                label="Last Name"
-                fullWidth
-                required
-                value={formData.last_name}
-                onChange={handleChange}
-                variant="outlined"
-                size="small"
-              />
-            </Box>
+            <Box component="form" onSubmit={handleSubmit} noValidate>
+              <Typography variant="h5" align="center" gutterBottom>
+                Sign Up
+              </Typography>
 
-            <TextField
-              name="email"
-              label="Email Address"
-              fullWidth
-              required
-              value={formData.email}
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-              sx={{ mb: 2 }}
-            />
-
-            <TextField
-              name="phone"
-              label="Phone Number"
-              fullWidth
-              required
-              value={formData.phone}
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-              sx={{ mb: 2 }}
-            />
-
-            <TextField
-              name="password"
-              label="Password"
-              type={showPassword ? 'text' : 'password'}
-              fullWidth
-              required
-              value={formData.password}
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-              sx={{ mb: 2 }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={togglePasswordVisibility}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-            
-            <TextField
-              name="confirm_password"
-              label="Confirm Password"
-              type={showConfirmPassword ? 'text' : 'password'}
-              fullWidth
-              required
-              value={formData.confirm_password}
-              onChange={handleChange}
-              variant="outlined"
-              size="small"
-              sx={{ mb: 2 }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle confirm password visibility"
-                      onClick={toggleConfirmPasswordVisibility}
-                      edge="end"
-                    >
-                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <Autocomplete
-              options={countries}
-              getOptionLabel={(option) => option.country_name}
-              onChange={handleCountryChange}
-              renderInput={(params) => (
+              <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                 <TextField
-                  {...params}
-                  label="Country"
+                  name="first_name"
+                  label="First Name"
                   fullWidth
                   required
-                  variant="outlined"
-                  size="small"
-                  sx={{ mb: 2 }}
-                />
-              )}
-            />
-
-            <TextField
-              select
-              name="role"
-              label="Role"
-              fullWidth
-              required
-              value={formData.role}
-              onChange={handleRoleChange}
-              variant="outlined"
-              size="small"
-              sx={{ mb: 2 }}
-            >
-              <MenuItem value="client">Client</MenuItem>
-              <MenuItem value="freelancer">Freelancer</MenuItem>
-            </TextField>
-
-            {formData.role === 'freelancer' && (
-              <div>
-                Upload CV:
-                <TextField
-                  name="file"
-                  type="file"
-                  onChange={handleFileChange}
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  sx={{ mb: 2 }}
-                  inputProps={{ accept: 'application/pdf' }}
-                />
-              </div>
-            )}
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="termsAccepted"
-                  checked={formData.termsAccepted}
+                  value={formData.first_name}
                   onChange={handleChange}
-                  color="primary"
+                  variant="outlined"
+                  size="small"
                 />
-              }
-              label={
-                <Typography variant="body2">
-                  I agree to Terms & Conditions
+                <TextField
+                  name="last_name"
+                  label="Last Name"
+                  fullWidth
+                  required
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  variant="outlined"
+                  size="small"
+                />
+              </Box>
+
+              <TextField
+                name="email"
+                label="Email Address"
+                fullWidth
+                required
+                value={formData.email}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+                sx={{ mb: 2 }}
+              />
+
+              <TextField
+                name="phone"
+                label="Phone Number"
+                fullWidth
+                required
+                value={formData.phone}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+                sx={{ mb: 2 }}
+              />
+
+              <TextField
+                name="password"
+                label="Password"
+                type={showPassword ? 'text' : 'password'}
+                fullWidth
+                required
+                value={formData.password}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+                sx={{ mb: 2 }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={togglePasswordVisibility}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <TextField
+                name="confirm_password"
+                label="Confirm Password"
+                type={showConfirmPassword ? 'text' : 'password'}
+                fullWidth
+                required
+                value={formData.confirm_password}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+                sx={{ mb: 2 }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle confirm password visibility"
+                        onClick={toggleConfirmPasswordVisibility}
+                        edge="end"
+                      >
+                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <Autocomplete
+                options={countries}
+                getOptionLabel={(option) => option.country_name}
+                onChange={handleCountryChange}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Country"
+                    fullWidth
+                    required
+                    variant="outlined"
+                    size="small"
+                    sx={{ mb: 2 }}
+                  />
+                )}
+              />
+
+              <TextField
+                select
+                name="role"
+                label="Role"
+                fullWidth
+                required
+                value={formData.role}
+                onChange={handleRoleChange}
+                variant="outlined"
+                size="small"
+                sx={{ mb: 2 }}
+              >
+                <MenuItem value="client">Client</MenuItem>
+                <MenuItem value="freelancer">Freelancer</MenuItem>
+              </TextField>
+
+              {formData.role === 'freelancer' && (
+                <>
+                  <Box>
+                    <Typography variant="subtitle1">
+                      Upload CV
+                    </Typography>
+                    <TextField
+                      name="file"
+                      type="file"
+                      onChange={handleFileChange}
+                      fullWidth
+                      variant="outlined"
+                      size="small"
+                      sx={{ mb: 2 }}
+                      inputProps={{ accept: 'application/pdf' }}
+                    />
+                  </Box>
+
+                  <FormControl fullWidth sx={{ mb: 2 }}>
+                    <Typography variant="subtitle1">
+                      Categories
+                    </Typography>
+                    <Select
+                      value=""
+                      displayEmpty
+                      onChange={(e) => {
+                        addToList(e.target.value as string, formData.categories, (categories) => setFormData(prev => ({ ...prev, categories: categories as string[] })));
+                      }}
+                    >
+                      <MenuItem value="" disabled>
+                        Select a category
+                      </MenuItem>
+                      {allCategories.map((cat) => (
+                        <MenuItem key={cat.category_id} value={cat.category_id}>
+                          {cat.category_name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    <Box mt={2} display="flex" flexWrap="wrap" gap={1}>
+                      {formData.categories.map((category) => (
+                        <Chip
+                          key={category}
+                          label={allCategories.find((cat) => cat.category_id === Number(category))?.category_name}
+                          onDelete={() => removeFromList(category, formData.categories, (categories) => setFormData(prev => ({ ...prev, categories: categories as string[] })))}
+                        />
+                      ))}
+                    </Box>
+                  </FormControl>
+                </>
+              )}
+
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    name="termsAccepted"
+                    checked={formData.termsAccepted}
+                    onChange={handleChange}
+                    color="primary"
+                  />
+                }
+                label={
+                  <Typography variant="body2">
+                    I agree to Terms & Conditions
+                  </Typography>
+                }
+                sx={{ mb: 2 }}
+              />
+
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{
+                  mb: 2,
+                  bgcolor: '#E6D5B8',
+                  color: 'black',
+                  '&:hover': {
+                    bgcolor: '#d4c4a7',
+                  },
+                }}
+              >
+                Register
+              </Button>
+
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="body2" display="inline">
+                  Already have an account?{' '}
                 </Typography>
-              }
-              sx={{ mb: 2 }}
-            />
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{
-                mb: 2,
-                bgcolor: '#E6D5B8',
-                color: 'black',
-                '&:hover': {
-                  bgcolor: '#d4c4a7',
-                },
-              }}
-            >
-              Register
-            </Button>
-
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="body2" display="inline">
-                Already have an account?{' '}
-              </Typography>
-              <Link href="/login" variant="body2" underline="hover">
-                Login
-              </Link>
+                <Link href="/login" variant="body2" underline="hover">
+                  Login
+                </Link>
+              </Box>
             </Box>
-          </Box>
-        </Paper>
-      </Container>
-    </Box>
+          </Paper>
+        </Container>
+      </Box>
     </>
   );
 };

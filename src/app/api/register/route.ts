@@ -1,25 +1,31 @@
 import bcrypt from 'bcrypt';
 import connectDB from '@/config/database';
 import User from '@/models/userModel';
+import User_category from '@/models/user_categoryModel'; // Import the User_category model
 import Joi from 'joi';
 import { NextResponse } from 'next/server';
 import sendEmail, { emailTemplate } from '@/emails/mailer';
 import { SignJWT } from 'jose';
+import mongoose from 'mongoose';
 
 export async function POST(req: Request) {
-
-    const { first_name, last_name, email, phone, password, confirm_password, country_id, role, cv_path } = await req.json();
+    const { first_name, last_name, email, phone, password, confirm_password, country_id, role, cv_path, categories } = await req.json();
 
     const { error } = userRegisterSchema.validate({ first_name, last_name, email, phone, password, confirm_password, country_id, role });
     if (error) {
         return NextResponse.json({ message: error.details[0].message }, { status: 400 });
     }
 
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
         await connectDB();
 
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ email }).session(session);
         if (existingUser) {
+            await session.abortTransaction();
+            session.endSession();
             return NextResponse.json({ message: 'Email already in use' }, { status: 400 });
         }
 
@@ -50,7 +56,22 @@ export async function POST(req: Request) {
         if (role === 'freelancer') {
             newUser.is_approved = false;
         }
-        await newUser.save();
+        await newUser.save({ session });
+
+        // Create user_category documents for each category ID only if the role is 'freelancer'
+        if (role === 'freelancer' && Array.isArray(categories)) {
+            if (categories.length === 0) {
+                await session.abortTransaction();
+                session.endSession();
+                return NextResponse.json({ message: 'Please select at least one category' }, { status: 400 });
+            }
+
+            const userCategories = categories.map((category_id: number) => ({
+                email,
+                category_id
+            }));
+            await User_category.insertMany(userCategories, { session });
+        }
 
         // Send verification email
         const verificationLink = `${process.env.BASE_URL}/api/verifyEmail`;
@@ -74,12 +95,17 @@ export async function POST(req: Request) {
                 emailContent
             );
         } catch (emailError) {
-            await User.deleteOne({ _id: newUser._id });
+            await session.abortTransaction();
+            session.endSession();
             return NextResponse.json({ message: "Failed to send verification email. Please try again.", emailError }, { status: 500 });
         }
 
+        await session.commitTransaction();
+        session.endSession();
         return NextResponse.json({ message: "Open your email to verify your account" }, { status: 201 });
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         console.error(error);
         return NextResponse.json({ message: error }, { status: 500 });
     }
