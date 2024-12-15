@@ -23,18 +23,21 @@ const LandingPage = () => {
     category_name: string;
   }
 
+  interface Service {
+    title: string;
+    description: string;
+  }
+
   const [allCategories, setAllCategories] = useState<Category[]>([]);
+  const [serviceByRating, setServiceByRating] = useState<Service[]>([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get("/api/category");
 
-        console.log(response.data.data);
-
         if (response) {
           setAllCategories(response.data.data);
-          console.log(allCategories);
         } else {
           console.error("Failed to fetch categories");
         }
@@ -42,7 +45,28 @@ const LandingPage = () => {
         console.error("Error:", error);
       }
     };
+
+    const fetchService = async () => {
+      try {
+        const response = await axios.get("/api/posts");
+
+        if (response) {
+          const sortedData = response.data.data.sort(
+            (a: { averageRating: number }, b: { averageRating: number }) =>
+              b.averageRating - a.averageRating
+          );
+
+          console.log(sortedData);
+          setServiceByRating(sortedData);
+        } else {
+          console.error("Failed to fetch Service");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
     fetchCategories();
+    fetchService();
   }, []);
 
   const colorPalette = {
@@ -123,8 +147,8 @@ const LandingPage = () => {
             Find the Professional Services
           </Typography>
           <Grid container spacing={4} sx={{ mt: 4 }}>
-            {[1, 2, 3].map((item) => (
-              <Grid item xs={12} sm={4} key={item}>
+            {serviceByRating.slice(0, 3).map((item, index) => (
+              <Grid item xs={12} sm={4} key={index}>
                 <Card
                   sx={{
                     height: 250,
@@ -139,7 +163,13 @@ const LandingPage = () => {
                       variant="h6"
                       sx={{ fontWeight: "bold", textAlign: "center" }}
                     >
-                      Service {item}
+                      {item.title}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ textAlign: "center", mt: 1, color: "gray" }}
+                    >
+                      {item.description}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -215,43 +245,6 @@ const LandingPage = () => {
       <Box sx={{ py: 10 }}>
         <Container maxWidth="lg">
           <Typography variant="h4" align="center" sx={{ fontWeight: "bold" }}>
-            Easy Way to Get Jobs Around the World
-          </Typography>
-          <Grid container spacing={2} sx={{ my: 4 }}>
-            <Grid item xs={6}>
-              <Button
-                fullWidth
-                variant="contained"
-                sx={{
-                  py: 1.5,
-                  borderRadius: "30px",
-                  background: colorPalette.gradientButton,
-                  color: "white",
-                  fontWeight: "bold",
-                  "&:hover": { opacity: 0.9 },
-                }}
-              >
-                Indonesia
-              </Button>
-            </Grid>
-            <Grid item xs={6}>
-              <Button
-                fullWidth
-                variant="contained"
-                sx={{
-                  py: 1.5,
-                  borderRadius: "30px",
-                  background: colorPalette.gradientButton,
-                  color: "white",
-                  fontWeight: "bold",
-                  "&:hover": { opacity: 0.9 },
-                }}
-              >
-                World
-              </Button>
-            </Grid>
-          </Grid>
-          <Typography variant="h6" sx={{ fontWeight: "bold", mb: 4 }}>
             Recommendation Categories
           </Typography>
           <Grid container spacing={2}>
