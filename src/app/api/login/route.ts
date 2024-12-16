@@ -4,15 +4,19 @@ import bcrypt from 'bcrypt';
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 import connectDB from '@/config/database';
+import Joi from 'joi';
 
 export async function POST(request: Request) {
-    await connectDB();
-    try {
-        const { email, password, rememberMe } = await request.json();
+    const { email, password, rememberMe } = await request.json();
+        
+    const { error } = userLoginSchema.validate({ email, password, rememberMe });
 
-        if (!email || !password) {
-            return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
-        }
+    if (error) {
+        return NextResponse.json({ error: error.details[0].message }, { status: 400 });
+    }
+
+    try {
+        await connectDB();
 
         // Find user by email
         const user = await User.findOne({ email });
@@ -72,3 +76,23 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+
+const userLoginSchema = Joi.object({
+    email: Joi.string()
+        .email({ tlds: { allow: true } })
+        .required()
+        .messages({
+            'string.email': 'Email is incorrect',
+            'string.empty': 'Email is required',
+        }),
+
+    password: Joi.string()
+        .min(6)
+        .required()
+        .messages({
+            'string.empty': 'Password is required',
+            'string.min': 'Password must be at least 6 characters long',
+        }),
+
+    rememberMe: Joi.boolean().optional(),
+});
