@@ -74,6 +74,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     gender,
     pfp_path,
     status,
+    categories,
     is_banned
   } = await request.json();
   const { id } = await params;
@@ -111,6 +112,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       }
     }
 
+    if (user.role === 'freelancer' && categories.length === 0) {
+      return Response.json({ message: 'Please select at least one category' }, { status: 400 });
+    }
+
     if (country_id) user.country_id = country_id;
     if (new_password) user.password = await bcrypt.hash(new_password, 10);
     if (first_name) user.first_name = first_name;
@@ -120,6 +125,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     if (pfp_path) user.pfp_path = pfp_path;
     if (status) user.status = status;
     if (is_banned) user.is_banned = is_banned;
+    if (categories) user.categories = categories;
 
     await user.save();
 

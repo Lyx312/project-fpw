@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
 import connectDB from '@/config/database';
 import User from '@/models/userModel';
-import User_category from '@/models/user_categoryModel'; // Import the User_category model
 import Joi from 'joi';
 import { NextResponse } from 'next/server';
 import sendEmail, { emailTemplate } from '@/emails/mailer';
@@ -41,6 +40,12 @@ export async function POST(req: Request) {
             .setExpirationTime('1h')
             .sign(jwtSecret);
 
+        if (role === 'freelancer' && categories.length === 0) {
+            await session.abortTransaction();
+            session.endSession();
+            return NextResponse.json({ message: 'Please select at least one category' }, { status: 400 });
+        }
+
         const newUser = new User({
             email,
             password: hashedPassword,
@@ -51,27 +56,11 @@ export async function POST(req: Request) {
             role,
             email_token: token,
             cv_path: role === 'freelancer' ? `${cv_path}` : null,
+            categories: role === 'freelancer' && Array.isArray(categories) ? categories : [],
+            is_approved: role === 'freelancer' ? false : null
         });
 
-        if (role === 'freelancer') {
-            newUser.is_approved = false;
-        }
         await newUser.save({ session });
-
-        // Create user_category documents for each category ID only if the role is 'freelancer'
-        if (role === 'freelancer' && Array.isArray(categories)) {
-            if (categories.length === 0) {
-                await session.abortTransaction();
-                session.endSession();
-                return NextResponse.json({ message: 'Please select at least one category' }, { status: 400 });
-            }
-
-            const userCategories = categories.map((category_id: number) => ({
-                email,
-                category_id
-            }));
-            await User_category.insertMany(userCategories, { session });
-        }
 
         // Send verification email
         const verificationLink = `${process.env.BASE_URL}/api/verifyEmail`;

@@ -4,6 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Container, Typography, Box, CircularProgress, Button, Stack } from '@mui/material';
 
+interface Category {
+  _id: string;
+  category_id: number;
+  category_name: string;
+}
 interface ApplicationDetails {
   _id: string;
   first_name: string;
@@ -12,6 +17,7 @@ interface ApplicationDetails {
   country_id: string;
   phone: string;
   role: string;
+  categories: Category[];
   cv_path: string;
   is_approved: boolean;
 }
@@ -119,6 +125,14 @@ const ApplicationDetailsPage = () => {
           Country:
         </Typography>
         <Typography>{countryName}</Typography>
+        <Typography variant="h6" mt={2}>
+          Categories:
+        </Typography>
+        <ul>
+          {application.categories.map((category) => (
+            <li key={category._id}>{category.category_name}</li>
+          ))}
+        </ul>
         <Typography variant="h6" mt={2}>
           CV Preview:
         </Typography>

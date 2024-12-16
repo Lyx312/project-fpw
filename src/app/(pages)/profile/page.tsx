@@ -13,6 +13,8 @@ import {
   Grid,
   Container,
   SelectChangeEvent,
+  Chip,
+  FormControl,
 } from "@mui/material";
 import Footer from "@/app/(components)/Footer";
 import Header from "@/app/(components)/Header";
@@ -28,9 +30,16 @@ interface User {
   phone: string;
   gender: string;
   country_id: string;
+  categories?: string[];
   exp: number;
   pfp_path: string;
   status?: string;
+}
+
+interface Category {
+  _id: string;
+  category_id: number;
+  category_name: string;
 }
 
 interface Country {
@@ -41,6 +50,7 @@ interface Country {
 const UserProfile = () => {
   const [currUser, setCurrUser] = useState<User | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -52,14 +62,13 @@ const UserProfile = () => {
     phone: "",
     pfp_path: "",
     file: null as File | null,
+    categories: [] as string[],
     status: "",
   });
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
   const fetchUser = async () => {
     const user = await getCurrUser();
-    // console.log(user);
-
     if (user) {
       const mappedUser: User = {
         _id: user._id as string,
@@ -71,6 +80,7 @@ const UserProfile = () => {
         country_id: user.country_id as string,
         gender: user.gender as string,
         pfp_path: `${user.pfp_path}?t=${new Date().getTime()}`,
+        categories: user.categories as string[],
         exp: user.exp as number,
         status: user.status as string,
       };
@@ -85,6 +95,7 @@ const UserProfile = () => {
         country_id: user.country_id as string,
         phone: user.phone as string,
         pfp_path: user.pfp_path as string,
+        categories: user.categories as string[],
         file: null,
         status: user.status as string,
       });
@@ -106,9 +117,21 @@ const UserProfile = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/category`
+      );
+      setAllCategories(response.data.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
   useEffect(() => {
     fetchUser();
     fetchCountries();
+    fetchCategories();
   }, []);
 
   const handleInputChange = (
@@ -148,6 +171,16 @@ const UserProfile = () => {
         e as unknown as React.ChangeEvent<HTMLInputElement>
       );
     fileInput.click();
+  };
+
+  const addToList = (item: string, list: string[], setList: React.Dispatch<React.SetStateAction<string[]>>) => {
+    if (item && !list.includes(item)) {
+      setList([...list, item]);
+    }
+  };
+
+  const removeFromList = (item: string, list: string[], setList: React.Dispatch<React.SetStateAction<string[]>>) => {
+    setList(list.filter((i) => i !== item));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -417,27 +450,68 @@ const UserProfile = () => {
           </Grid>
 
           {currUser?.role === "freelancer" && (
-            <Grid item xs={12} md={6} mt={2}>
-              <InputLabel sx={{ color: "#1A2A3A" }}>Status</InputLabel>
-              <Select
-                fullWidth
-                size="small"
-                name="status"
-                value={formData.status || " "}
-                onChange={handleInputChange}
-                sx={{
-                  backgroundColor: "#F5F5F5",
-                  borderRadius: "6px",
-                  color: "#1A2A3A",
-                }}
-              >
-                <MenuItem value=" " disabled>
-                  Select Your Status
-                </MenuItem>
-                <MenuItem value="Available">Available</MenuItem>
-                <MenuItem value="Away">Away</MenuItem>
-              </Select>
-            </Grid>
+            <>
+              <Grid item xs={12} md={6} mt={2}>
+                <InputLabel sx={{ color: "#1A2A3A" }}>Status</InputLabel>
+                <Select
+                  fullWidth
+                  size="small"
+                  name="status"
+                  value={formData.status || " "}
+                  onChange={handleInputChange}
+                  sx={{
+                    backgroundColor: "#F5F5F5",
+                    borderRadius: "6px",
+                    color: "#1A2A3A",
+                  }}
+                >
+                  <MenuItem value=" " disabled>
+                    Select Your Status
+                  </MenuItem>
+                  <MenuItem value="Available">Available</MenuItem>
+                  <MenuItem value="Away">Away</MenuItem>
+                </Select>
+              </Grid>
+
+              <Grid item xs={12} md={6} mt={2}>
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                  <Typography variant="subtitle1" sx={{ color: "#1A2A3A" }}>
+                    Categories
+                  </Typography>
+                  <Select
+                    value=""
+                    displayEmpty
+                    onChange={(e) => {
+                      addToList(e.target.value as string, formData.categories, (categories) => setFormData(prev => ({ ...prev, categories: categories as string[] })));
+                    }}
+                    sx={{
+                      backgroundColor: "#F5F5F5",
+                      borderRadius: "6px",
+                      color: "#1A2A3A",
+                    }}
+                  >
+                    <MenuItem value="" disabled>
+                      Select a category
+                    </MenuItem>
+                    {allCategories.map((cat) => (
+                      <MenuItem key={cat._id} value={cat._id}>
+                        {cat.category_name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                    <Box mt={2} display="flex" flexWrap="wrap" gap={1}>
+                    {formData.categories.map((category) => (
+                      <Chip
+                      key={category}
+                      label={allCategories.find((cat) => cat._id === category)?.category_name}
+                      onDelete={() => removeFromList(category, formData.categories, (categories) => setFormData(prev => ({ ...prev, categories: categories as string[] })))}
+                      sx={{ backgroundColor: "#6accf7" }} // Light blue color
+                      />
+                    ))}
+                    </Box>
+                </FormControl>
+              </Grid>
+            </>
           )}
 
           <Box mt={2} textAlign="center">

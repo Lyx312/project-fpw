@@ -41,6 +41,7 @@ interface RegisterFormData {
 }
 
 interface Category {
+  _id: string;
   category_id: number;
   category_name: string;
 }
@@ -406,7 +407,7 @@ const RegisterPage: React.FC = () => {
                         Select a category
                       </MenuItem>
                       {allCategories.map((cat) => (
-                        <MenuItem key={cat.category_id} value={cat.category_id}>
+                        <MenuItem key={cat._id} value={cat._id}>
                           {cat.category_name}
                         </MenuItem>
                       ))}
@@ -415,8 +416,9 @@ const RegisterPage: React.FC = () => {
                       {formData.categories.map((category) => (
                         <Chip
                           key={category}
-                          label={allCategories.find((cat) => cat.category_id === Number(category))?.category_name}
+                          label={allCategories.find((cat) => cat._id === category)?.category_name}
                           onDelete={() => removeFromList(category, formData.categories, (categories) => setFormData(prev => ({ ...prev, categories: categories as string[] })))}
+                          sx={{ backgroundColor: "#d1ca97" }} 
                         />
                       ))}
                     </Box>

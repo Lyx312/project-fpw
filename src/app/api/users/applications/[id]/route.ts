@@ -7,12 +7,15 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
 
   try {
     const { id } = await context.params;
-    const application = await User.findOne({ email: id });
+    const application = await User.findOne({ email: id }).populate('categories');  
     if (!application) {
       return new Response(JSON.stringify({ message: 'Application not found' }), { status: 404 });
     }
+    
     return new Response(JSON.stringify(application), { status: 200 });
   } catch (error) {
+    console.log(error);
+    
     return new Response(JSON.stringify({ message: 'Error fetching application', error }), { status: 500 });
   }
 }

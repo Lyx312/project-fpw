@@ -19,6 +19,7 @@ interface IUser extends Document {
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date;
+    categories: mongoose.Types.ObjectId[];
 }
 
 const UserSchema: Schema = new Schema(
@@ -35,6 +36,7 @@ const UserSchema: Schema = new Schema(
         gender: { type: String, enum: ['M', 'F'], default: null },
         is_banned: { type: Boolean, default: false },
         is_approved: { type: Boolean, default: null },
+        categories: [{ type: Schema.Types.ObjectId, ref: 'Category', default: null }],
         status: { type: String, enum: ['Available', 'Away'], default: null },
         is_email_verified: { type: Boolean, default: false },
         email_token: { type: String, default: null },

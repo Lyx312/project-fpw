@@ -2,7 +2,7 @@
 'use client'
 import Header from "@/app/(components)/Header";
 import { getCurrUser } from "@/utils/utils";
-import { Box, Typography, Paper, Button } from "@mui/material";
+import { Box, Typography, Paper, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Loading from "@/app/(pages)/loading";
@@ -28,13 +28,15 @@ declare global {
   }
 }
 
-
 const ClientHistory = () => {
   const [currUser, setCurrUser] = useState<User | null>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [snapLoaded, setSnapLoaded] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [transactionToCancel, setTransactionToCancel] = useState<string | null>(null);
   const router = useRouter();
 
   // Utility to load Snap.js dynamically
@@ -99,11 +101,16 @@ const ClientHistory = () => {
     router.push(`/posts/detail/${postId}`);
   };
 
-  const handleCancelTransaction = async (transactionId: string) => {
+  const handleCancelTransaction = async () => {
+    if (!transactionToCancel) return;
+
     try {
-      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/cancel`);
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}/cancel`, { type: "client", reason: cancelReason });
       fetchUserTransaction();
       alert("Transaction cancelled successfully");
+      setOpenDialog(false);
+      setCancelReason("");
+      setTransactionToCancel(null);
     } catch (err) {
       console.error("Error cancelling transaction:", err);
       alert("Failed to cancel transaction");
@@ -166,6 +173,17 @@ const ClientHistory = () => {
       console.error("Error initiating payment:", err);
       alert("Failed to start payment process. Please try again.");
     }
+  };
+
+  const openCancelDialog = (transactionId: string) => {
+    setTransactionToCancel(transactionId);
+    setOpenDialog(true);
+  };
+
+  const closeCancelDialog = () => {
+    setOpenDialog(false);
+    setCancelReason("");
+    setTransactionToCancel(null);
   };
 
   useEffect(() => {
@@ -276,7 +294,7 @@ const ClientHistory = () => {
                               backgroundColor: "#1A2AAA",
                               '&:hover': { backgroundColor: "#1230EE" },
                             }}
-                            onClick={() => handleCancelTransaction(transaction.trans_id)}
+                            onClick={() => openCancelDialog(transaction.trans_id)}
                           >
                             Cancel
                           </Button>
@@ -308,6 +326,29 @@ const ClientHistory = () => {
           </Typography>
         )}
       </Box>
+
+      <Dialog open={openDialog} onClose={closeCancelDialog}>
+        <DialogTitle>Cancel Transaction</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please provide a reason for cancelling the transaction.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Reason"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeCancelDialog}>Nevermind</Button>
+          <Button onClick={handleCancelTransaction} disabled={!cancelReason}>Confirm</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
