@@ -42,6 +42,7 @@ const colors = {
   secondary: '#3A6D8C',
   accent: '#6A9AB0',
   text: '#EAD8B1',
+  paperBackground: '#f5f5f5',
 };
 
 const AdminUsersPage = () => {
@@ -71,8 +72,6 @@ const AdminUsersPage = () => {
   };
 
   const fetchCountries = async () => {
-    setLoading(true);
-    setError(null);
     try {
       const response = await fetch('/api/country');
       if (!response.ok) {
@@ -83,8 +82,6 @@ const AdminUsersPage = () => {
     } catch (err: any) {
       console.error(err.message);
       setError('Failed to fetch countries. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -104,7 +101,7 @@ const AdminUsersPage = () => {
     } catch (err) {
       console.error('Error banning/unbanning user:', err);
     }
-  }
+  };
 
   return (
     <Box
@@ -113,7 +110,6 @@ const AdminUsersPage = () => {
         backgroundColor: colors.primary,
         color: colors.text,
         py: 6,
-        px: 2,
       }}
     >
       <Container maxWidth="lg">
@@ -122,7 +118,7 @@ const AdminUsersPage = () => {
           <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
             Manage Users
           </Typography>
-          <Typography variant="body1" sx={{ color: colors.text }}>
+          <Typography variant="body1">
             View and manage all users with their associated data.
           </Typography>
         </Box>
@@ -133,7 +129,7 @@ const AdminUsersPage = () => {
           sx={{
             p: 3,
             mb: 4,
-            backgroundColor: colors.accent,
+            backgroundColor: colors.paperBackground,
             borderRadius: '8px',
           }}
         >
@@ -186,14 +182,6 @@ const AdminUsersPage = () => {
                 <MenuItem value="client">Client</MenuItem>
               </Select>
             </FormControl>
-            {/* <Button
-              variant="contained"
-              color="secondary"
-              onClick={handleFilterSubmit}
-              sx={{ backgroundColor: colors.secondary }}
-            >
-              Apply Filters
-            </Button> */}
           </Box>
           {error && (
             <Typography variant="body2" color="error" sx={{ mt: 2 }}>
@@ -207,7 +195,7 @@ const AdminUsersPage = () => {
           elevation={3}
           sx={{
             p: 4,
-            backgroundColor: colors.accent,
+            backgroundColor: colors.paperBackground,
             borderRadius: '8px',
           }}
         >
@@ -216,7 +204,7 @@ const AdminUsersPage = () => {
           </Typography>
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-              <CircularProgress color="inherit" />
+              <CircularProgress color="primary" />
             </Box>
           ) : users.length === 0 ? (
             <Typography>No users found</Typography>
@@ -229,7 +217,7 @@ const AdminUsersPage = () => {
                     <TableCell>Full Name</TableCell>
                     <TableCell>Country</TableCell>
                     <TableCell>Role</TableCell>
-                    <TableCell>Actions</TableCell>
+                    <TableCell align="center">Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -239,10 +227,10 @@ const AdminUsersPage = () => {
                       <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
                       <TableCell>{user.country_name}</TableCell>
                       <TableCell>{user.role}</TableCell>
-                      <TableCell>
+                      <TableCell align="center">
                         <Button
                           variant="contained"
-                          color="primary"
+                          color={user.is_banned ? 'success' : 'error'}
                           onClick={() => handleBanUnban(user)}
                         >
                           {user.is_banned ? 'Unban' : 'Ban'}

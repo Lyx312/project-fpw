@@ -12,6 +12,14 @@ interface Application {
   email: string;
 }
 
+const colorPalette = {
+  darkBlue: "#001F3F",
+  mediumBlue: "#3A6D8C",
+  lightBlue: "#6A9AB0",
+  beige: "#EAD8B1",
+  gradientButton: "linear-gradient(45deg, #3A6D8C, #6A9AB0)",
+};
+
 const ApplicationsPage = () => {
   const [applications, setApplications] = useState<Application[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,16 +42,16 @@ const ApplicationsPage = () => {
   }, []);
 
   if (loading) {
-    return (
-      <Loading />
-    );
+    return <Loading />;
   }
 
   if (!applications || applications.length === 0) {
     return (
       <Container>
         <Box textAlign="center" mt={4}>
-          <Typography variant="h6">No applications found</Typography>
+          <Typography variant="h6" sx={{ color: colorPalette.darkBlue }}>
+            No applications found
+          </Typography>
         </Box>
       </Container>
     );
@@ -52,14 +60,25 @@ const ApplicationsPage = () => {
   return (
     <Container>
       <Box my={4}>
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom sx={{ color: colorPalette.mediumBlue }}>
           Pending Applications
         </Typography>
         <List>
           {applications.map((app) => (
             <Link key={app.email} href={`/admin/application/${app.email}`} passHref>
               <ListItem disablePadding>
-                <ListItemButton>
+                <ListItemButton
+                  sx={{
+                    backgroundColor: colorPalette.lightBlue,
+                    color: colorPalette.darkBlue,
+                    borderRadius: '8px',
+                    mb: 2,
+                    '&:hover': {
+                      backgroundColor: colorPalette.mediumBlue,
+                      color: colorPalette.beige,
+                    },
+                  }}
+                >
                   <ListItemText primary={`${app.first_name} ${app.last_name}`} secondary={app.email} />
                 </ListItemButton>
               </ListItem>
