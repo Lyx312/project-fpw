@@ -110,7 +110,7 @@ const PostReviewPage: React.FC<ReviewPageProps> = ({ params }) => {
     } finally {
       setLoading(false);
     }
-    router.push(`/`);
+    router.push(`/client/history`);
   };
 
   return (

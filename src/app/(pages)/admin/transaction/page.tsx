@@ -206,8 +206,8 @@ const TransactionPage = () => {
                       <TableCell>{transaction.email}</TableCell>
                       <TableCell>{transaction.post_id}</TableCell>
                       <TableCell>{transaction.price}</TableCell>
-                      <TableCell>{new Date(transaction.start_date).toLocaleDateString()}</TableCell>
-                      <TableCell>{new Date(transaction.end_date).toLocaleDateString()}</TableCell>
+                      <TableCell>{transaction.start_date ? new Date(transaction.start_date).toLocaleDateString() : "N/A"}</TableCell>
+                      <TableCell>{transaction.end_date ? new Date(transaction.end_date).toLocaleDateString() : "N/A"}</TableCell>
                       <TableCell>{transaction.trans_status}</TableCell>
                       <TableCell>
                         {new Date(transaction.createdAt).toLocaleDateString()}

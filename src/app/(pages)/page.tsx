@@ -16,6 +16,7 @@ import { Search as SearchIcon } from "@mui/icons-material";
 import Header from "../(components)/Header";
 import Footer from "../(components)/Footer";
 import axios from "axios";
+import { getCurrUser } from "@/utils/utils";
 
 const LandingPage = () => {
   interface Category {
@@ -32,43 +33,66 @@ const LandingPage = () => {
 
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [serviceByRating, setServiceByRating] = useState<Service[]>([]);
+  const [recommendedCategories, setRecommendedCategories] = useState<Category[]>([]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get("/api/category");
+
+      if (response) {
+        setAllCategories(response.data.data);
+      } else {
+        console.error("Failed to fetch categories");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const fetchService = async () => {
+    try {
+      const response = await axios.get("/api/posts");
+
+      if (response) {
+        const sortedData = response.data.data.sort(
+          (a: { averageRating: number }, b: { averageRating: number }) =>
+            b.averageRating - a.averageRating
+        );
+
+        console.log(sortedData);
+        setServiceByRating(sortedData);
+      } else {
+        console.error("Failed to fetch Service");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const fetchRecommendedCategories = async () => {
+    try {
+      const user = await getCurrUser();
+      if (user && user.role === "client") {
+        const response = await axios.get("/api/category/recommended", {
+          params: { userId: user._id },
+        });
+        console.log(response.data);
+
+        if (response) {
+          setRecommendedCategories(response.data);
+        } else {
+          console.error("Failed to fetch recommended categories");
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get("/api/category");
-
-        if (response) {
-          setAllCategories(response.data.data);
-        } else {
-          console.error("Failed to fetch categories");
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
-    const fetchService = async () => {
-      try {
-        const response = await axios.get("/api/posts");
-
-        if (response) {
-          const sortedData = response.data.data.sort(
-            (a: { averageRating: number }, b: { averageRating: number }) =>
-              b.averageRating - a.averageRating
-          );
-
-          console.log(sortedData);
-          setServiceByRating(sortedData);
-        } else {
-          console.error("Failed to fetch Service");
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
     fetchCategories();
     fetchService();
+    fetchRecommendedCategories();
   }, []);
 
   const colorPalette = {
@@ -189,68 +213,6 @@ const LandingPage = () => {
         </Container>
       </Box>
 
-      {/* Skills Section */}
-      <Box
-        sx={{
-          backgroundColor: colorPalette.mediumBlue,
-          color: "white",
-          py: 10,
-        }}
-      >
-        <Container maxWidth="lg">
-          <Typography
-            variant="h4"
-            align="center"
-            sx={{ fontWeight: "bold", mb: 4 }}
-          >
-            Explore Popular Skills
-          </Typography>
-          <TextField
-            fullWidth
-            placeholder="Search for skills"
-            sx={{
-              mb: 4,
-              bgcolor: "white",
-              borderRadius: "8px",
-              boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-            }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Grid container spacing={3}>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-              <Grid item xs={12} sm={6} md={3} key={item}>
-                <Card
-                  sx={{
-                    height: 120,
-                    borderRadius: "16px",
-                    bgcolor: colorPalette.lightBlue,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    transition: "transform 0.3s",
-                    "&:hover": {
-                      transform: "translateY(-10px)",
-                      background: colorPalette.darkBlue,
-                      color: colorPalette.beige,
-                    },
-                  }}
-                >
-                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                    Skill {item}
-                  </Typography>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
       {/* Categories Section */}
       <Box sx={{ py: 10 }}>
         <Container maxWidth="lg">
@@ -279,6 +241,40 @@ const LandingPage = () => {
           </Grid>
         </Container>
       </Box>
+
+      {/* Personalized Recommendations Section */}
+      {
+        recommendedCategories.length > 0 && (
+
+        <Box sx={{ py: 10, backgroundColor: colorPalette.lightBlue }}>
+          <Container maxWidth="lg">
+            <Typography variant="h4" align="center" sx={{ fontWeight: "bold" }} gutterBottom>
+              Personalized Recommendations
+            </Typography>
+            <Grid container spacing={2} justifyContent="center">
+              {recommendedCategories.slice(0, 9).map((category, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    sx={{
+                      py: 1.5,
+                      borderRadius: "30px",
+                      bgcolor: colorPalette.darkBlue,
+                      color: "white",
+                      fontWeight: "bold",
+                      "&:hover": { bgcolor: colorPalette.mediumBlue },
+                    }}
+                  >
+                    {category.category_name}
+                  </Button>
+                </Grid>
+              ))}
+            </Grid>
+          </Container>
+        </Box>
+        )
+      }
 
       <Footer />
     </Box>

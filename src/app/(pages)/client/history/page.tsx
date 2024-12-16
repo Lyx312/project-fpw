@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client'
+"use client";
 import Header from "@/app/(components)/Header";
 import { getCurrUser } from "@/utils/utils";
 import { Box,
@@ -48,7 +48,9 @@ const ClientHistory = () => {
   const [snapLoaded, setSnapLoaded] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
-  const [transactionToCancel, setTransactionToCancel] = useState<string | null>(null);
+  const [transactionToCancel, setTransactionToCancel] = useState<string | null>(
+    null
+  );
   const router = useRouter();
 
   // Utility to load Snap.js dynamically
@@ -56,7 +58,10 @@ const ClientHistory = () => {
     if (!snapLoaded) {
       const script = document.createElement("script");
       script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
-      script.setAttribute("data-client-key", process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!);
+      script.setAttribute(
+        "data-client-key",
+        process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!
+      );
       script.onload = () => setSnapLoaded(true);
       document.body.appendChild(script);
     }
@@ -116,7 +121,10 @@ const ClientHistory = () => {
     if (!transactionToCancel) return;
 
     try {
-      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}/cancel`, { type: "client", reason: cancelReason });
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}/cancel`,
+        { type: "client", reason: cancelReason }
+      );
       fetchUserTransaction();
       alert("Transaction cancelled successfully");
       setOpenDialog(false);
@@ -137,14 +145,14 @@ const ClientHistory = () => {
           transactionId: transaction.trans_id,
         }
       );
-  
+
       const snapToken = data.token;
-  
+
       if (!snapLoaded) {
         alert("Payment gateway not fully loaded. Please wait and try again.");
         return;
       }
-  
+
       // Proceed with the payment using the snap token
       window.snap.pay(snapToken, {
         onSuccess: async (result: any) => {
@@ -153,9 +161,12 @@ const ClientHistory = () => {
         },
         onPending: async () => {
           try {
-            await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`, {
-              transactionId: transaction.trans_id,
-            });
+            await axios.put(
+              `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
+              {
+                transactionId: transaction.trans_id,
+              }
+            );
             alert("Payment popup closed. Transaction marked as completed.");
             router.push(`/client/review/${transaction.post_id}`);
           } catch (err) {
@@ -169,9 +180,12 @@ const ClientHistory = () => {
         },
         onClose: async () => {
           try {
-            await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`, {
-              transactionId: transaction.trans_id,
-            });
+            await axios.put(
+              `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
+              {
+                transactionId: transaction.trans_id,
+              }
+            );
             alert("Payment popup closed. Transaction marked as completed.");
             router.push(`/client/review/${transaction.post_id}`);
           } catch (err) {
