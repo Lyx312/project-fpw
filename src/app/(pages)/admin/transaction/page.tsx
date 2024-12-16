@@ -1,6 +1,20 @@
-'use client'
+'use client';
 import { useEffect, useState } from 'react';
-import { Box, Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Button, LinearProgress } from '@mui/material';
+import {
+  Box,
+  Container,
+  Typography,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Button,
+  LinearProgress,
+} from '@mui/material';
 
 interface Transaction {
   trans_id: number;
@@ -20,6 +34,7 @@ const colors = {
   secondary: '#3A6D8C',
   accent: '#6A9AB0',
   text: '#EAD8B1',
+  background: '#f5f5f5',
 };
 
 const TransactionPage = () => {
@@ -38,14 +53,19 @@ const TransactionPage = () => {
   const fetchTransactions = async () => {
     setLoading(true);
     const query = new URLSearchParams(filters).toString();
-    const response = await fetch(`/api/transaction?${query}`);
-    if (response.ok) {
-      const data = await response.json();
-      setTransactions(data);
-    } else {
-      console.error('Error fetching transactions');
+    try {
+      const response = await fetch(`/api/transaction?${query}`);
+      if (response.ok) {
+        const data = await response.json();
+        setTransactions(data);
+      } else {
+        console.error('Error fetching transactions');
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,7 +100,7 @@ const TransactionPage = () => {
           </Typography>
         </Box>
 
-        {/* Filters */}
+        {/* Filters Section */}
         <Paper
           elevation={3}
           sx={{
@@ -101,73 +121,36 @@ const TransactionPage = () => {
               alignItems: 'center',
             }}
           >
-            <TextField
-              label="Transaction ID"
-              variant="outlined"
-              value={filters.trans_id}
-              onChange={handleChange}
-              sx={{ flex: 1, minWidth: 200 }}
-              name="trans_id"
-            />
-            <TextField
-              label="Email"
-              variant="outlined"
-              value={filters.email}
-              onChange={handleChange}
-              sx={{ flex: 1, minWidth: 200 }}
-              name="email"
-            />
-            <TextField
-              label="Transaction Status"
-              variant="outlined"
-              value={filters.trans_status}
-              onChange={handleChange}
-              sx={{ flex: 1, minWidth: 200 }}
-              name="trans_status"
-            />
-            <TextField
-              label="Start Date"
-              variant="outlined"
-              value={filters.start_date}
-              onChange={handleChange}
-              sx={{ flex: 1, minWidth: 200 }}
-              name="start_date"
-              type="date"
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              label="End Date"
-              variant="outlined"
-              value={filters.end_date}
-              onChange={handleChange}
-              sx={{ flex: 1, minWidth: 200 }}
-              name="end_date"
-              type="date"
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              label="Min Price"
-              variant="outlined"
-              value={filters.min_price}
-              onChange={handleChange}
-              sx={{ flex: 1, minWidth: 200 }}
-              name="min_price"
-              type="number"
-            />
-            <TextField
-              label="Max Price"
-              variant="outlined"
-              value={filters.max_price}
-              onChange={handleChange}
-              sx={{ flex: 1, minWidth: 200 }}
-              name="max_price"
-              type="number"
-            />
+            {[
+              { label: 'Transaction ID', name: 'trans_id', type: 'text' },
+              { label: 'Email', name: 'email', type: 'text' },
+              { label: 'Transaction Status', name: 'trans_status', type: 'text' },
+              { label: 'Start Date', name: 'start_date', type: 'date' },
+              { label: 'End Date', name: 'end_date', type: 'date' },
+              { label: 'Min Price', name: 'min_price', type: 'number' },
+              { label: 'Max Price', name: 'max_price', type: 'number' },
+            ].map((filter, index) => (
+              <TextField
+                key={index}
+                label={filter.label}
+                variant="outlined"
+                value={filters[filter.name as keyof typeof filters]}
+                onChange={handleChange}
+                name={filter.name}
+                type={filter.type}
+                InputLabelProps={filter.type === 'date' ? { shrink: true } : undefined}
+                sx={{ flex: 1, minWidth: 200 }}
+              />
+            ))}
             <Button
               variant="contained"
               color="secondary"
               onClick={fetchTransactions}
-              sx={{ backgroundColor: colors.secondary }}
+              sx={{
+                backgroundColor: colors.secondary,
+                color: colors.text,
+                '&:hover': { backgroundColor: '#2A5C73' },
+              }}
             >
               Apply Filters
             </Button>
@@ -175,14 +158,14 @@ const TransactionPage = () => {
         </Paper>
 
         {/* Loading Indicator */}
-        {loading && <LinearProgress />}
+        {loading && <LinearProgress sx={{ mb: 2 }} />}
 
         {/* Transactions Table */}
         <Paper
           elevation={3}
           sx={{
             p: 4,
-            backgroundColor: colors.accent,
+            backgroundColor: colors.background,
             borderRadius: '8px',
           }}
         >
@@ -190,22 +173,30 @@ const TransactionPage = () => {
             Transactions List
           </Typography>
           {transactions.length === 0 ? (
-            <Typography>No transactions found</Typography>
+            <Typography variant="body1" sx={{ textAlign: 'center' }}>
+              No transactions found.
+            </Typography>
           ) : (
             <TableContainer>
               <Table sx={{ minWidth: 650 }} aria-label="transactions table">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Transaction ID</TableCell>
-                    <TableCell>Email</TableCell>
-                    <TableCell>Post ID</TableCell>
-                    <TableCell>Price</TableCell>
-                    <TableCell>Start Date</TableCell>
-                    <TableCell>End Date</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Created At</TableCell>
-                    <TableCell>Updated At</TableCell>
-                    <TableCell>Deleted At</TableCell>
+                    {[
+                      'Transaction ID',
+                      'Email',
+                      'Post ID',
+                      'Price',
+                      'Start Date',
+                      'End Date',
+                      'Status',
+                      'Created At',
+                      'Updated At',
+                      'Deleted At',
+                    ].map((header, index) => (
+                      <TableCell key={index} sx={{ fontWeight: 'bold' }}>
+                        {header}
+                      </TableCell>
+                    ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -218,9 +209,19 @@ const TransactionPage = () => {
                       <TableCell>{new Date(transaction.start_date).toLocaleDateString()}</TableCell>
                       <TableCell>{new Date(transaction.end_date).toLocaleDateString()}</TableCell>
                       <TableCell>{transaction.trans_status}</TableCell>
-                      <TableCell>{new Date(transaction.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell>{transaction.updatedAt ? new Date(transaction.updatedAt).toLocaleDateString() : 'N/A'}</TableCell>
-                      <TableCell>{transaction.deletedAt ? new Date(transaction.deletedAt).toLocaleDateString() : 'N/A'}</TableCell>
+                      <TableCell>
+                        {new Date(transaction.createdAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        {transaction.updatedAt
+                          ? new Date(transaction.updatedAt).toLocaleDateString()
+                          : 'N/A'}
+                      </TableCell>
+                      <TableCell>
+                        {transaction.deletedAt
+                          ? new Date(transaction.deletedAt).toLocaleDateString()
+                          : 'N/A'}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

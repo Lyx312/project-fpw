@@ -24,6 +24,7 @@ const colors = {
   secondary: '#3A6D8C',
   accent: '#6A9AB0',
   text: '#EAD8B1',
+  background: '#f5f5f5',
 };
 
 const CategoriesPage = () => {
@@ -87,7 +88,7 @@ const CategoriesPage = () => {
           <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
             Manage Categories
           </Typography>
-          <Typography variant="body1" sx={{ color: colors.text }}>
+          <Typography variant="body1">
             Search, add, and manage your categories effortlessly.
           </Typography>
         </Box>
@@ -97,7 +98,7 @@ const CategoriesPage = () => {
           elevation={3}
           sx={{
             p: 4,
-            backgroundColor: colors.accent,
+            backgroundColor: colors.background,
             borderRadius: '8px',
             mb: 4,
           }}
@@ -107,17 +108,7 @@ const CategoriesPage = () => {
             fullWidth
             value={searchTerm}
             onChange={handleSearchChange}
-            variant="filled"
-            InputProps={{
-              style: {
-                color: colors.primary,
-                backgroundColor: colors.secondary,
-                borderRadius: '8px',
-              },
-            }}
-            InputLabelProps={{
-              style: { color: colors.primary },
-            }}
+            variant="outlined"
             sx={{ mb: 3 }}
           />
           <TextField
@@ -125,17 +116,7 @@ const CategoriesPage = () => {
             fullWidth
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
-            variant="filled"
-            InputProps={{
-              style: {
-                color: colors.primary,
-                backgroundColor: colors.secondary,
-                borderRadius: '8px',
-              },
-            }}
-            InputLabelProps={{
-              style: { color: colors.primary },
-            }}
+            variant="outlined"
             sx={{ mb: 3 }}
           />
           <Button
@@ -158,7 +139,7 @@ const CategoriesPage = () => {
           elevation={3}
           sx={{
             p: 4,
-            backgroundColor: colors.accent,
+            backgroundColor: colors.background,
             borderRadius: '8px',
           }}
         >
@@ -167,23 +148,28 @@ const CategoriesPage = () => {
           </Typography>
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-              <CircularProgress color="inherit" />
+              <CircularProgress color="primary" />
             </Box>
           ) : categories.length === 0 ? (
-            <Typography>No categories found</Typography>
+            <Typography variant="body1" sx={{ textAlign: 'center' }}>
+              No categories found
+            </Typography>
           ) : (
             <List sx={{ maxHeight: '400px', overflowY: 'auto' }}>
               {categories.map((category) => (
                 <ListItem
                   key={category.category_id}
                   sx={{
-                    borderBottom: `1px solid ${colors.primary}`,
+                    borderBottom: `1px solid ${colors.accent}`,
                     '&:hover': { backgroundColor: colors.secondary },
                   }}
                 >
                   <ListItemText
                     primary={category.category_name}
-                    sx={{ color: colors.primary }}
+                    sx={{
+                      color: colors.primary,
+                      fontWeight: 'bold',
+                    }}
                   />
                 </ListItem>
               ))}

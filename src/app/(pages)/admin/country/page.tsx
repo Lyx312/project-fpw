@@ -23,21 +23,23 @@ const CountryManager: React.FC = () => {
   const [countries, setCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [nameFilter, setNameFilter] = useState('');
-  const [limit, setLimit] = useState(30);
-  const [minPopulation, setMinPopulation] = useState(0);
-  const [maxPopulation, setMaxPopulation] = useState(0);
-  const [minArea, setMinArea] = useState(0);
-  const [maxArea, setMaxArea] = useState(0);
+
+  const [filters, setFilters] = useState({
+    nameFilter: '',
+    limit: 30,
+    minPopulation: 0,
+    maxPopulation: 0,
+    minArea: 0,
+    maxArea: 0,
+  });
 
   const fetchCountries = async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await fetch('/api/country');
-      if (!response.ok) {
-        throw new Error(`Error fetching countries: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Error fetching countries: ${response.status}`);
+
       const data = await response.json();
       setCountries(data.data || []);
     } catch (err: any) {
@@ -52,9 +54,11 @@ const CountryManager: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/country?name=${nameFilter}&limit=${limit}&min_population=${minPopulation}&max_population=${maxPopulation}&min_area=${minArea}&max_area=${maxArea}`, {
-        method: 'POST',
-      });
+      const { nameFilter, limit, minPopulation, maxPopulation, minArea, maxArea } = filters;
+      const response = await fetch(
+        `/api/country?name=${nameFilter}&limit=${limit}&min_population=${minPopulation}&max_population=${maxPopulation}&min_area=${minArea}&max_area=${maxArea}`,
+        { method: 'POST' }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -63,7 +67,6 @@ const CountryManager: React.FC = () => {
 
       const data = await response.json();
       console.log(data.message);
-
       fetchCountries();
     } catch (err: any) {
       console.error(err.message);
@@ -71,6 +74,10 @@ const CountryManager: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFilterChange = (key: string, value: any) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   useEffect(() => {
@@ -89,63 +96,49 @@ const CountryManager: React.FC = () => {
         </Alert>
       )}
 
-      <Box sx={{ mb: 2, display: 'grid', gap: 2, gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
-        <TextField
-          label="Country Name"
-          value={nameFilter}
-          onChange={(e) => setNameFilter(e.target.value)}
-          variant="outlined"
-        />
-        <TextField
-          label="Limit"
-          type="number"
-          value={limit}
-          onChange={(e) => setLimit(Number(e.target.value))}
-          variant="outlined"
-        />
-        <TextField
-          label="Min Population"
-          type="number"
-          value={minPopulation}
-          onChange={(e) => setMinPopulation(Number(e.target.value))}
-          variant="outlined"
-        />
-        <TextField
-          label="Max Population"
-          type="number"
-          value={maxPopulation}
-          onChange={(e) => setMaxPopulation(Number(e.target.value))}
-          variant="outlined"
-        />
-        <TextField
-          label="Min Area (sq km)"
-          type="number"
-          value={minArea}
-          onChange={(e) => setMinArea(Number(e.target.value))}
-          variant="outlined"
-        />
-        <TextField
-          label="Max Area (sq km)"
-          type="number"
-          value={maxArea}
-          onChange={(e) => setMaxArea(Number(e.target.value))}
-          variant="outlined"
-        />
+      {/* Filters Section */}
+      <Box
+        sx={{
+          mb: 2,
+          display: 'grid',
+          gap: 2,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        }}
+      >
+        {[
+          { label: 'Country Name', key: 'nameFilter', type: 'text' },
+          { label: 'Limit', key: 'limit', type: 'number' },
+          { label: 'Min Population', key: 'minPopulation', type: 'number' },
+          { label: 'Max Population', key: 'maxPopulation', type: 'number' },
+          { label: 'Min Area (sq km)', key: 'minArea', type: 'number' },
+          { label: 'Max Area (sq km)', key: 'maxArea', type: 'number' },
+        ].map((field) => (
+          <TextField
+            key={field.key}
+            label={field.label}
+            type={field.type}
+            value={filters[field.key as keyof typeof filters]}
+            onChange={(e) => handleFilterChange(field.key, field.type === 'number' ? Number(e.target.value) : e.target.value)}
+            variant="outlined"
+          />
+        ))}
       </Box>
 
+      {/* Action Button */}
       <Button
         variant="contained"
         color="primary"
         onClick={insertCountries}
         disabled={loading}
         sx={{ mb: 2 }}
-        startIcon={loading && <CircularProgress size={20} />}
+        startIcon={loading ? <CircularProgress size={20} /> : null}
       >
         {loading ? 'Processing...' : 'Fetch and Insert from API'}
       </Button>
 
       <Divider sx={{ mb: 2 }} />
 
+      {/* Country List */}
       <Typography variant="h6" gutterBottom>
         Countries in Database
       </Typography>
