@@ -1,8 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client'
+"use client";
 import Header from "@/app/(components)/Header";
 import { getCurrUser } from "@/utils/utils";
-import { Box, Typography, Paper, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Paper,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+} from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Loading from "@/app/(pages)/loading";
@@ -35,7 +46,9 @@ const ClientHistory = () => {
   const [snapLoaded, setSnapLoaded] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
-  const [transactionToCancel, setTransactionToCancel] = useState<string | null>(null);
+  const [transactionToCancel, setTransactionToCancel] = useState<string | null>(
+    null
+  );
   const router = useRouter();
 
   // Utility to load Snap.js dynamically
@@ -43,7 +56,10 @@ const ClientHistory = () => {
     if (!snapLoaded) {
       const script = document.createElement("script");
       script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
-      script.setAttribute("data-client-key", process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!);
+      script.setAttribute(
+        "data-client-key",
+        process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!
+      );
       script.onload = () => setSnapLoaded(true);
       document.body.appendChild(script);
     }
@@ -103,7 +119,10 @@ const ClientHistory = () => {
     if (!transactionToCancel) return;
 
     try {
-      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}/cancel`, { type: "client", reason: cancelReason });
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}/cancel`,
+        { type: "client", reason: cancelReason }
+      );
       fetchUserTransaction();
       alert("Transaction cancelled successfully");
       setOpenDialog(false);
@@ -124,14 +143,14 @@ const ClientHistory = () => {
           transactionId: transaction.trans_id,
         }
       );
-  
+
       const snapToken = data.token;
-  
+
       if (!snapLoaded) {
         alert("Payment gateway not fully loaded. Please wait and try again.");
         return;
       }
-  
+
       // Proceed with the payment using the snap token
       window.snap.pay(snapToken, {
         onSuccess: async (result: any) => {
@@ -140,9 +159,12 @@ const ClientHistory = () => {
         },
         onPending: async () => {
           try {
-            await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`, {
-              transactionId: transaction.trans_id,
-            });
+            await axios.put(
+              `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
+              {
+                transactionId: transaction.trans_id,
+              }
+            );
             alert("Payment popup closed. Transaction marked as completed.");
             router.push(`/client/review/${transaction.post_id}`);
           } catch (err) {
@@ -156,9 +178,12 @@ const ClientHistory = () => {
         },
         onClose: async () => {
           try {
-            await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`, {
-              transactionId: transaction.trans_id,
-            });
+            await axios.put(
+              `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
+              {
+                transactionId: transaction.trans_id,
+              }
+            );
             alert("Payment popup closed. Transaction marked as completed.");
             router.push(`/client/review/${transaction.post_id}`);
           } catch (err) {
@@ -271,28 +296,32 @@ const ClientHistory = () => {
                       <Box component="td">{transaction.end_date}</Box>
                       <Box component="td">{transaction.trans_status}</Box>
                       <Box component="td">
-                      <Button
+                        <Button
                           type="button"
                           variant="contained"
                           color="primary"
                           sx={{
                             backgroundColor: "#1A2AAA",
-                            '&:hover': { backgroundColor: "#1230EE" },
+                            "&:hover": { backgroundColor: "#1230EE" },
                           }}
                           onClick={() => handleViewPost(transaction.post_id)}
                         >
                           View Post
                         </Button>
-                        {["pending", "in-progress"].includes(transaction.trans_status) && (
+                        {["pending", "in-progress"].includes(
+                          transaction.trans_status
+                        ) && (
                           <Button
                             type="button"
                             variant="contained"
                             color="primary"
                             sx={{
                               backgroundColor: "#1A2AAA",
-                              '&:hover': { backgroundColor: "#1230EE" },
+                              "&:hover": { backgroundColor: "#1230EE" },
                             }}
-                            onClick={() => openCancelDialog(transaction.trans_id)}
+                            onClick={() =>
+                              openCancelDialog(transaction.trans_id)
+                            }
                           >
                             Cancel
                           </Button>
@@ -309,6 +338,24 @@ const ClientHistory = () => {
                             onClick={() => handlePayTransaction(transaction)}
                           >
                             Pay Now
+                          </Button>
+                        )}
+                        {transaction.trans_status === "paid" && (
+                          <Button
+                            type="button"
+                            variant="contained"
+                            color="secondary"
+                            sx={{
+                              backgroundColor: "#28A745",
+                              "&:hover": { backgroundColor: "#218838" },
+                            }}
+                            onClick={() =>
+                              router.push(
+                                `/client/review/${transaction.post_id}`
+                              )
+                            }
+                          >
+                            Review
                           </Button>
                         )}
                       </Box>
@@ -344,7 +391,9 @@ const ClientHistory = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={closeCancelDialog}>Nevermind</Button>
-          <Button onClick={handleCancelTransaction} disabled={!cancelReason}>Confirm</Button>
+          <Button onClick={handleCancelTransaction} disabled={!cancelReason}>
+            Confirm
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
