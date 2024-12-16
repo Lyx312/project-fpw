@@ -118,11 +118,11 @@ const FreelancerPostsPage: React.FC = () => {
                       <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
                         {post.title}
                       </Typography>
-                      <Typography variant="body2" color="textSecondary" paragraph>
+                      <Typography variant="body2" color="textSecondary" component={"p"} gutterBottom>
                         {post.description}
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                        <strong>Price:</strong> ${post.price.toLocaleString()}
+                        <strong>Price:</strong> Rp{post.price.toLocaleString()}
                       </Typography>
                       <Typography variant="body2" sx={{ color: "#777" }}>
                         <strong>Categories:</strong> {post.categories.join(", ")}

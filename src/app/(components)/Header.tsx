@@ -15,6 +15,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HistoryIcon from "@mui/icons-material/History";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleIcon from "@mui/icons-material/People";
+import AssignmentIcon from "@mui/icons-material/Assignment"; // Import the new icon
 import Image from "next/image";
 import { getCurrUser, logout } from "@/utils/utils";
 
@@ -101,6 +102,13 @@ const Header = () => {
                 <HistoryIcon />
               </IconButton>
             </Link>
+            {currUser.role === "freelancer" && (
+              <Link href="/freelancer/posts" color="inherit">
+                <IconButton color="inherit">
+                  <AssignmentIcon /> {/* Use the new icon here */}
+                </IconButton>
+              </Link>
+            )}
             {currUser.role === "client" && (
               <Link href="/profile" color="inherit">
                 <IconButton color="inherit">
