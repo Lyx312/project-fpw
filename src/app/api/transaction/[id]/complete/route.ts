@@ -32,9 +32,14 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
       return NextResponse.json({ message: 'Transaction not found' }, { status: 404 });
     }
 
-    // Find the post by post_id to get the client email
-    const post = await Post.findOne({ post_id: userTrans.post_id });
+    // update post status to available
+    const post = await Post.findOneAndUpdate(
+      { post_id: userTrans.post_id },
+      { post_status: 'available' },
+      { new: true, session }
+    );
 
+    // Send email to the client
     if (post) {
       const clientEmail = userTrans.email;
       const subject = 'Freelancer Completed Your Job - Freelance Hub';

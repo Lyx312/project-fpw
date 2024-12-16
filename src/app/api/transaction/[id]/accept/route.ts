@@ -32,8 +32,12 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
       return NextResponse.json({ message: 'Transaction not found' }, { status: 404 });
     }
 
-    // Find the post by post_id to get the client email
-    const post = await Post.findOne({ post_id: userTrans.post_id });
+    // update post status to unavailable
+    const post = await Post.findOneAndUpdate(
+      { post_id: userTrans.post_id },
+      { post_status: 'unavailable' },
+      { new: true, session }
+    );
 
     if (post) {
       const clientEmail = userTrans.email;

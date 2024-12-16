@@ -31,29 +31,34 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
         const postResponse = await axios.get(`/api/posts/${id}`);
         setPost(postResponse.data);
 
-        const user = await getCurrUser();
-        setCurrUser(user);
-
-        if (user) {
-          // Fetch transactions
-          const transactionsResponse = await axios.get(`/api/transaction?post_id=${id}&email=${user.email}`);
-          const transactionsData = transactionsResponse.data;
-          console.log(transactionsData);
-          
-          // check if theres a transaction with status pending, in-progress, or completed
-          const hasActiveTransaction = transactionsData.some(
-            (transaction: any) =>
-              transaction.trans_status === "pending" ||
-              transaction.trans_status === "in-progress" ||
-              transaction.trans_status === "completed"
-          );
-
-          if (hasActiveTransaction) {
-            // Handle the case where there is an active transaction
-            console.log("There is an active transaction");
-            setActiveTransaction(true);
+        if (postResponse.data.status === "unavailable") {
+          setActiveTransaction(true);
+        } else {
+          const user = await getCurrUser();
+          setCurrUser(user);
+  
+          if (user) {
+            // Fetch transactions
+            const transactionsResponse = await axios.get(`/api/transaction?post_id=${id}&email=${user.email}`);
+            const transactionsData = transactionsResponse.data;
+            console.log(transactionsData);
+            
+            // check if theres a transaction with status pending, in-progress, or completed
+            const hasActiveTransaction = transactionsData.some(
+              (transaction: any) =>
+                transaction.trans_status === "pending" ||
+                transaction.trans_status === "in-progress" ||
+                transaction.trans_status === "completed"
+            );
+  
+            if (hasActiveTransaction) {
+              // Handle the case where there is an active transaction
+              console.log("There is an active transaction");
+              setActiveTransaction(true);
+            }
           }
         }
+        
 
         // Fetch reviews
         const reviewsResponse = await axios.get(`/api/review?id=${id}`);
@@ -206,6 +211,21 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
             {reviews.length > 0
               ? `Based on ${reviews.length} reviews`
               : "No reviews yet"}
+          </Typography>
+        </Box>
+
+        <Box sx={{ display: "flex", alignItems: "center", marginY: "1rem" }}>
+          <Box
+            sx={{
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              backgroundColor: post.status === "available" ? "green" : "red",
+              marginRight: "0.5rem",
+            }}
+          />
+          <Typography variant="subtitle2" color="text.secondary">
+            {post.status.toLocaleString()}
           </Typography>
         </Box>
 

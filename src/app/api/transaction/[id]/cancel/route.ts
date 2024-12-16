@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import User_trans from '@/models/user_transModel';
 import sendEmail, { emailTemplate } from '@/emails/mailer';
+import Post from '@/models/postModel';
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   const { id } = await params;
@@ -38,6 +39,20 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
       return NextResponse.json({ message: 'Transaction not found' }, { status: 404 });
     }
 
+    // update post status to available
+    const post = await Post.findOneAndUpdate(
+      { post_id: userTrans.post_id },
+      { post_status: 'available' },
+      { new: true, session }
+    );
+
+    if (!post) {
+      await session.abortTransaction();
+      session.endSession();
+      return NextResponse.json({ message: 'Post not found' }, { status: 404 });
+    }
+
+    // Send email to the user
     const email = userTrans.email; // Assuming the email is stored in the userTrans document
     const subject = 'Transaction Cancelled';
     const text = `Your transaction has been cancelled by the ${type}. Reason: ${reason}`;
