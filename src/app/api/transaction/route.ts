@@ -4,6 +4,7 @@ import User_trans from '@/models/user_transModel';
 import Post from '@/models/postModel';
 import sendEmail, { emailTemplate } from '@/emails/mailer';
 import mongoose from 'mongoose';
+import User from '@/models/userModel';
 
 export async function GET(req: Request) {
   await connectDB();
@@ -18,6 +19,7 @@ export async function GET(req: Request) {
     const end_date = searchParams.get('end_date');
     const min_price = searchParams.get('min_price');
     const max_price = searchParams.get('max_price');
+    const status = searchParams.get('status');
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query: any = {};
@@ -30,14 +32,52 @@ export async function GET(req: Request) {
     if (end_date) query.end_date = { $lte: new Date(end_date) };
     if (min_price) query.price = { $gte: parseFloat(min_price) };
     if (max_price) query.price = { ...query.price, $lte: parseFloat(max_price) };
+    if (status) query.trans_status = status;
 
     const transactions = await User_trans.find(query);
 
-    return NextResponse.json(transactions, { status: 200 });
+    const enhancedTransactions = await Promise.all(
+      transactions.map(async (transaction) => {
+        const post = await Post.findOne({post_id: transaction.post_id});
+        const user = await User.findOne({email: post.post_email});
+        const userName = user ? `${user.first_name} ${user.last_name}` : "Unknown User";
+        return {
+          ...transaction.toObject(),
+          user_name: userName,
+          start_date: formatDate(transaction.start_date),
+          end_date: formatDate(transaction.end_date),
+          post_title: post?.post_title || 'Unknown Post',
+        };
+      })
+    );
+
+    const statusOrder = ['completed', 'in-progress', 'pending', 'paid', 'cancelled'];
+
+    // Sort transactions based on trans_status
+    enhancedTransactions.sort((a, b) => {
+      const statusA = statusOrder.indexOf(a.trans_status.toLowerCase());
+      const statusB = statusOrder.indexOf(b.trans_status.toLowerCase());
+      return statusA - statusB;
+    });
+
+    return NextResponse.json(enhancedTransactions, { status: 200 });
   } catch (error) {
     return NextResponse.json({ message: 'Error fetching transactions', error: error }, { status: 500 });
   }
 }
+
+function formatDate(dateString: string): string {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+  };
+  return new Date(dateString).toLocaleString("en-US", options);
+}
+
 
 export async function POST(req: Request) {
   await connectDB();

@@ -2,20 +2,25 @@
 import { useRouter } from "next/navigation";
 import { getCurrUser } from "@/utils/utils";
 import {
+  Box,
   Button,
   CircularProgress,
   Container,
   Grid,
+  Paper,
   TextField,
   Typography,
+  IconButton
 } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import Header from "@/app/(components)/Header";
+import Footer from "@/app/(components)/Footer";
+import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
 
 interface ReviewPageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 interface User {
@@ -28,32 +33,47 @@ interface User {
 }
 
 const PostReviewPage: React.FC<ReviewPageProps> = ({ params }) => {
-  const { id } = params;
+  const unwrappedParams = React.use(params); // Unwrap the params Promise
+  const { id } = unwrappedParams; // Access the `id` property
   const router = useRouter();
 
-  const [reviewRating, setReviewRating] = useState("");
+  const [reviewRating, setReviewRating] = useState(0);
   const [reviewDescription, setReviewDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [currUser, setCurrUser] = useState<User | null>(null);
+  const [postTitle, setPostTitle] = useState<string>("");
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserAndPost = async () => {
+      setLoading(true);
       try {
+        // Fetch the current user
         const user = await getCurrUser();
         if (user) {
           setCurrUser(user as unknown as User);
         }
+
+        // Fetch the post details
+        const postResponse = await axios.get(`/api/posts/${id}`);
+        const post = postResponse.data;
+
+        if (post?.title) {
+          setPostTitle(post.title);
+        } else {
+          setPostTitle("Unknown Post");
+        }
       } catch (error) {
-        console.error("Error fetching user or posts:", error);
+        console.error("Error fetching user or post details:", error);
+        setError("Failed to fetch post details.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUser();
-  }, []);
+    fetchUserAndPost();
+  }, [id]);
 
   const handleSubmit = async () => {
     setError("");
@@ -82,7 +102,7 @@ const PostReviewPage: React.FC<ReviewPageProps> = ({ params }) => {
         email: currUser?.email, // Email user dari context atau session
       });
       setSuccess("Review submitted successfully!");
-      setReviewRating("");
+      setReviewRating(0);
       setReviewDescription("");
     } catch (error) {
       console.error("Error:", error);
@@ -94,45 +114,97 @@ const PostReviewPage: React.FC<ReviewPageProps> = ({ params }) => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Typography variant="h4" gutterBottom>
-        Add Review for ID: {id}
-      </Typography>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <TextField
-            label="Review Rating (1-5)"
-            type="number"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={reviewRating}
-            onChange={(e) => setReviewRating(e.target.value)}
-          />
-        </Grid>
+    <Box sx={{ backgroundColor: "#001F3F", minHeight: "100vh", color: "#fff" }}>
+      <Header />
+      <Container sx={{ paddingY: 4 }}>
+        <Paper
+          sx={{
+            backgroundColor: "#2B3B4B",
+            padding: 4,
+            borderRadius: 2,
+            color: "#fff",
+            boxShadow: 3,
+          }}
+        >
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+            {postTitle || "Loading..."}
+          </Typography>
+          <Grid container spacing={3}>
+          <Grid item xs={12}>
+        <Typography variant="h6" sx={{ color: "#fff", marginBottom: 1 }}>
+          Review Rating
+        </Typography>
+        <StarRating rating={reviewRating} setRating={setReviewRating} />
+      </Grid>
+      <Grid item xs={12}>
+        <Typography variant="h6" sx={{ color: "#fff", marginBottom: 1 }}>
+          Review Description
+        </Typography>
         <TextField
-          label="Review Description"
+          label="Write your review"
           fullWidth
           multiline
           rows={4}
           margin="normal"
           value={reviewDescription}
           onChange={(e) => setReviewDescription(e.target.value)}
+          InputProps={{
+            sx: { backgroundColor: "#1E2E3E", color: "#fff" },
+          }}
+          InputLabelProps={{ style: { color: "#fff" } }}
         />
       </Grid>
-      <Grid container justifyContent="flex-end" marginTop={2}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSubmit}
-          disabled={loading}
+          </Grid>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: 3 }}>
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "#1A2AAA",
+                "&:hover": { backgroundColor: "#1230EE" },
+              }}
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} color="inherit" /> : "Submit"}
+            </Button>
+          </Box>
+          {error && (
+            <Typography color="error" sx={{ marginTop: 2 }}>
+              {error}
+            </Typography>
+          )}
+          {success && (
+            <Typography color="success" sx={{ marginTop: 2 }}>
+              {success}
+            </Typography>
+          )}
+        </Paper>
+      </Container>
+      <Footer />
+    </Box>
+  );
+};
+
+const StarRating: React.FC<{ rating: number; setRating: (rating: number) => void }> = ({ rating, setRating }) => {
+  const [hover, setHover] = useState<number | null>(null);
+
+  return (
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <IconButton
+          key={star}
+          onClick={() => setRating(star)}
+          onMouseEnter={() => setHover(star)}
+          onMouseLeave={() => setHover(null)}
+          sx={{ color: "#FFD700" }} // Gold color for stars
         >
-          {loading ? <CircularProgress size={24} /> : "Submit"}
-        </Button>
-      </Grid>
-      {error && <Typography color="error">{error}</Typography>}
-      {success && <Typography color="primary">{success}</Typography>}
-    </Container>
+          {hover !== null ? (star <= hover ? <StarIcon /> : <StarBorderIcon />) : star <= rating ? <StarIcon /> : <StarBorderIcon />}
+        </IconButton>
+      ))}
+      <Typography variant="body2" sx={{ marginLeft: 2, color: "#fff" }}>
+        {hover !== null ? hover : rating} / 5
+      </Typography>
+    </Box>
   );
 };
 

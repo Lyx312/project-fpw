@@ -201,26 +201,61 @@ const Page: React.FC = () => {
               gap: 2,
             }}
           >
-            <Typography sx={{ width: "70px", textAlign: "left" }}>
-              {filters.minPrice.toLocaleString("en-US")}
-            </Typography>
-            <Slider
-              value={[filters.minPrice, filters.maxPrice]}
-              onChange={(_, newValue) => {
-                if (Array.isArray(newValue)) {
-                  handleFilterChange("minPrice", Math.round(newValue[0]));
-                  handleFilterChange("maxPrice", Math.round(newValue[1]));
-                }
+            <TextField
+              type="number"
+              value={filters.minPrice}
+              onChange={(e) => handleFilterChange("minPrice", Math.max(0, Math.min(Number(e.target.value), filters.maxPrice)))}
+              inputProps={{
+                min: 0,
+                max: 10000000,
+                step: 1,
+                style: { color: colors.text, borderColor: colors.text }
               }}
-              valueLabelDisplay="auto"
-              min={0}
-              max={10000000}
-              step={1}
-              sx={{ flex: 1 }}
+              InputLabelProps={{
+                style: { color: colors.text },
+              }}
+              sx={{ width: "125px",
+                "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: colors.text,
+                },
+                "&:hover fieldset": {
+                  borderColor: colors.accent,
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: colors.text,
+                },
+              },
+            }}
             />
-            <Typography sx={{ width: "80px", textAlign: "left" }}>
-              {filters.maxPrice.toLocaleString("en-US")}
-            </Typography>
+            <Typography>to</Typography>
+            <TextField
+              type="number"
+              value={filters.maxPrice}
+              onChange={(e) => handleFilterChange("maxPrice", Math.max(filters.minPrice, Math.min(Number(e.target.value), 10000000)))}
+              inputProps={{
+                min: 0,
+                max: 10000000,
+                step: 1,
+                style: { color: colors.text, borderColor: colors.text }
+              }}
+              InputLabelProps={{
+                style: { color: colors.text },
+              }}
+              sx={{ width: "125px",
+                "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: colors.text,
+                },
+                "&:hover fieldset": {
+                  borderColor: colors.accent,
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: colors.text,
+                },
+              },
+            }}
+            />
           </Box>
           <Typography>Category</Typography>
           <TextField

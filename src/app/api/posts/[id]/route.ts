@@ -81,7 +81,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     { status: 500 }
     );
   }
-  }
+}
 
 export async function PUT(req: Request, context: { params: { id: string } }) {
   try {

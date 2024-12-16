@@ -2,7 +2,19 @@
 'use client'
 import Header from "@/app/(components)/Header";
 import { getCurrUser } from "@/utils/utils";
-import { Box, Typography, Paper, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
+import { Box,
+  Typography,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  ButtonGroup,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  TextField } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Loading from "@/app/(pages)/loading";
@@ -30,6 +42,7 @@ declare global {
 const ClientHistory = () => {
   const [currUser, setCurrUser] = useState<User | null>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [filterStatus, setFilterStatus] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [snapLoaded, setSnapLoaded] = useState(false);
@@ -85,7 +98,7 @@ const ClientHistory = () => {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction`,
         {
-          params: { email: currUser.email },
+          params: { email: currUser.email, status: filterStatus },
         }
       );
       setTransactions(response.data);
@@ -193,8 +206,8 @@ const ClientHistory = () => {
     if (currUser) {
       fetchUserTransaction();
     }
-  }, [currUser]);
-
+  }, [currUser, filterStatus]);
+  
   if (loading) {
     return <Loading />;
   }
@@ -219,6 +232,22 @@ const ClientHistory = () => {
     <Box sx={{ backgroundColor: "#1A2A3A", minHeight: "100vh" }}>
       <Header />
       <Box sx={{ padding: 3 }}>
+      <ButtonGroup
+          variant="contained"
+          fullWidth
+          sx={{
+            width: "100%",
+            display: "flex",
+            marginBottom: 1,
+          }}
+        >
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("")}>All</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("pending")}>Pending</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("in-progress")}>In Progress</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("completed")}>Completed</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("paid")}>Paid</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("cancelled")}>Cancelled</Button>
+        </ButtonGroup>
         {transactions.length > 0 ? (
           <Box>
             <Typography
@@ -227,96 +256,71 @@ const ClientHistory = () => {
             >
               Transaction History
             </Typography>
-            <Paper sx={{ overflow: "hidden", backgroundColor: "#2B3B4B" }}>
-              <Box
-                component="table"
-                sx={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  color: "#fff",
-                  "& th, td": {
-                    padding: "10px 15px",
-                    border: "1px solid #444",
-                  },
-                  "& th": {
-                    backgroundColor: "#3B4A5D",
-                    fontWeight: 600,
-                  },
-                  "& tr:nth-of-type(odd)": {
-                    backgroundColor: "#1E2E3E",
-                  },
-                  "& tr:hover": {
-                    backgroundColor: "#35495e",
-                  },
-                }}
-              >
-                <Box component="thead">
-                  <Box component="tr">
-                    <Box component="th">Email</Box>
-                    <Box component="th">Post ID</Box>
-                    <Box component="th">Price</Box>
-                    <Box component="th">Start Date</Box>
-                    <Box component="th">End Date</Box>
-                    <Box component="th">Transaction Status</Box>
-                    <Box component="th">Action</Box>
-                  </Box>
-                </Box>
-                <Box component="tbody">
-                  {transactions.map((transaction, index) => (
-                    <Box component="tr" key={index}>
-                      <Box component="td">{transaction.email}</Box>
-                      <Box component="td">{transaction.post_id}</Box>
-                      <Box component="td">{transaction.price}</Box>
-                      <Box component="td">{transaction.start_date}</Box>
-                      <Box component="td">{transaction.end_date}</Box>
-                      <Box component="td">{transaction.trans_status}</Box>
-                      <Box component="td">
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                gap: 2,
+              }}
+            >
+              {transactions.map((transaction, index) => (
+                <Card
+                  key={index}
+                  sx={{ backgroundColor: "#2B3B4B", color: "#fff" }}
+                >
+                  <CardContent>
+                    <Typography>Freelancer: {transaction.user_name}</Typography>
+                    <Typography>Post Title: {transaction.post_title}</Typography>
+                    <Typography>Price: {transaction.price}</Typography>
+                    <Typography>Start Date: {transaction.start_date}</Typography>
+                    <Typography>End Date: {transaction.end_date}</Typography>
+                    <Typography>Status: {transaction.trans_status}</Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button
+                      type="button"
+                      variant="contained"
+                      color="primary"
+                      sx={{
+                        backgroundColor: "#1A2AAA",
+                        "&:hover": { backgroundColor: "#1230EE" },
+                      }}
+                      onClick={() => handleViewPost(transaction.post_id)}
+                    >
+                      View Post
+                    </Button>
+                    {transaction.trans_status === "pending" && (
                       <Button
-                          type="button"
-                          variant="contained"
-                          color="primary"
-                          sx={{
-                            backgroundColor: "#1A2AAA",
-                            '&:hover': { backgroundColor: "#1230EE" },
-                          }}
-                          onClick={() => handleViewPost(transaction.post_id)}
-                        >
-                          View Post
-                        </Button>
-                        {["pending", "in-progress"].includes(transaction.trans_status) && (
-                          <Button
-                            type="button"
-                            variant="contained"
-                            color="primary"
-                            sx={{
-                              backgroundColor: "#1A2AAA",
-                              '&:hover': { backgroundColor: "#1230EE" },
-                            }}
-                            onClick={() => openCancelDialog(transaction.trans_id)}
-                          >
-                            Cancel
-                          </Button>
-                        )}
-                        {transaction.trans_status === "completed" && (
-                          <Button
-                            type="button"
-                            variant="contained"
-                            color="primary"
-                            sx={{
-                              backgroundColor: "#1A2AAA",
-                              "&:hover": { backgroundColor: "#1230EE" },
-                            }}
-                            onClick={() => handlePayTransaction(transaction)}
-                          >
-                            Pay Now
-                          </Button>
-                        )}
-                      </Box>
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-            </Paper>
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                          backgroundColor: "#1A2AAA",
+                          "&:hover": { backgroundColor: "#1230EE" },
+                        }}
+                        onClick={() => openCancelDialog(transaction.trans_id)}
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                    {transaction.trans_status === "completed" && (
+                      <Button
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                          backgroundColor: "#1A2AAA",
+                          "&:hover": { backgroundColor: "#1230EE" },
+                        }}
+                        onClick={() => handlePayTransaction(transaction)}
+                      >
+                        Pay now
+                      </Button>
+                    )}
+                  </CardActions>
+                </Card>
+              ))}
+            </Box>
           </Box>
         ) : (
           <Typography variant="h6" sx={{ color: "#fff" }}>
@@ -344,7 +348,9 @@ const ClientHistory = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={closeCancelDialog}>Nevermind</Button>
-          <Button onClick={handleCancelTransaction} disabled={!cancelReason}>Confirm</Button>
+          <Button onClick={handleCancelTransaction} disabled={!cancelReason}>
+            Confirm
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
