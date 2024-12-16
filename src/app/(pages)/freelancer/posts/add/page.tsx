@@ -14,6 +14,8 @@ import {
   Chip,
   Box,
   FormControl,
+  Alert,
+  Snackbar,
 } from "@mui/material";
 import { getCurrUser } from "@/utils/utils";
 import axios from "axios";
@@ -32,16 +34,19 @@ interface Category {
   category_name: string;
 }
 
-
 const AddPostPage: React.FC = () => {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState<number | "">("");
   const [categories, setCategories] = useState<string[]>([]);
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [currUser, setCurrUser] = useState<User | null>(null);
+  const [alert, setAlert] = useState<{ open: boolean; message: string }>({
+    open: false,
+    message: "",
+  });
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -60,14 +65,13 @@ const AddPostPage: React.FC = () => {
     fetchUser();
   }, []);
 
-  // Fetch categories on component mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await fetch("/api/category");
         const data = await response.json();
         if (response.ok) {
-          setAllCategories(data.data); // Assuming response contains data field
+          setAllCategories(data.data);
         } else {
           console.error("Failed to fetch categories");
         }
@@ -78,8 +82,27 @@ const AddPostPage: React.FC = () => {
     fetchCategories();
   }, []);
 
-  // Handle form submission
   const handleSubmit = async () => {
+    if (!title.trim()) {
+      setAlert({ open: true, message: "Title is required." });
+      return;
+    }
+    if (!description.trim()) {
+      setAlert({ open: true, message: "Description is required." });
+      return;
+    }
+    if (price === "" || price <= 0) {
+      setAlert({ open: true, message: "Price must be greater than 0." });
+      return;
+    }
+    if (categories.length === 0) {
+      setAlert({
+        open: true,
+        message: "At least one category must be selected.",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await axios.post("/api/posts", {
@@ -93,34 +116,47 @@ const AddPostPage: React.FC = () => {
       if (response.status === 200) {
         router.push("/freelancer/posts");
       } else {
-        console.error("Failed to create post");
+        setAlert({ open: true, message: "Failed to create post." });
       }
     } catch (error) {
       console.error("Error:", error);
+      setAlert({
+        open: true,
+        message: "An error occurred while creating the post.",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Add item to list
-  const addToList = (item: string, list: string[], setList: React.Dispatch<React.SetStateAction<string[]>>) => {
+  const addToList = (
+    item: string,
+    list: string[],
+    setList: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
     if (item && !list.includes(item)) {
       setList([...list, item]);
     }
   };
 
-  // Remove item from list
-  const removeFromList = (item: string, list: string[], setList: React.Dispatch<React.SetStateAction<string[]>>) => {
+  const removeFromList = (
+    item: string,
+    list: string[],
+    setList: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
     setList(list.filter((i) => i !== item));
   };
 
   return (
     <Container maxWidth="sm" sx={{ padding: "2rem" }}>
-      <Typography variant="h4" gutterBottom sx={{ color: "#4B6CB7", fontWeight: "bold" }}>
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ color: "#4B6CB7", fontWeight: "bold" }}
+      >
         Add New Post
       </Typography>
       <Grid container spacing={3}>
-        {/* Title Field */}
         <Grid item xs={12}>
           <TextField
             label="Title"
@@ -143,7 +179,6 @@ const AddPostPage: React.FC = () => {
           />
         </Grid>
 
-        {/* Description Field */}
         <Grid item xs={12}>
           <TextField
             label="Description"
@@ -168,7 +203,6 @@ const AddPostPage: React.FC = () => {
           />
         </Grid>
 
-        {/* Price Field */}
         <Grid item xs={12}>
           <TextField
             label="Price"
@@ -192,9 +226,12 @@ const AddPostPage: React.FC = () => {
           />
         </Grid>
 
-        {/* Categories Selection */}
         <Grid item xs={12}>
-          <Typography variant="subtitle1" gutterBottom sx={{ color: "#4B6CB7" }}>
+          <Typography
+            variant="subtitle1"
+            gutterBottom
+            sx={{ color: "#4B6CB7" }}
+          >
             Categories
           </Typography>
           <FormControl fullWidth>
@@ -228,19 +265,24 @@ const AddPostPage: React.FC = () => {
             {categories.map((category) => (
               <Chip
                 key={category}
-                label={allCategories.find((cat) => cat.category_id === Number(category))?.category_name}
-                onDelete={() => removeFromList(category, categories, setCategories)}
+                label={
+                  allCategories.find(
+                    (cat) => cat.category_id === Number(category)
+                  )?.category_name
+                }
+                onDelete={() =>
+                  removeFromList(category, categories, setCategories)
+                }
                 sx={{
                   backgroundColor: "#4B6CB7",
                   color: "white",
-                  '&:hover': { backgroundColor: "#3A5B8D" },
+                  "&:hover": { backgroundColor: "#3A5B8D" },
                 }}
               />
             ))}
           </Box>
         </Grid>
 
-        {/* Submit Button */}
         <Grid item xs={12}>
           <Button
             variant="contained"
@@ -256,10 +298,27 @@ const AddPostPage: React.FC = () => {
               },
             }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Submit"}
+            {loading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Submit"
+            )}
           </Button>
         </Grid>
       </Grid>
+      <Snackbar
+        open={alert.open}
+        autoHideDuration={4000}
+        onClose={() => setAlert({ open: false, message: "" })}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          severity="error"
+          onClose={() => setAlert({ open: false, message: "" })}
+        >
+          {alert.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
