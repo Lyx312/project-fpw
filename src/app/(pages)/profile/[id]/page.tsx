@@ -90,6 +90,15 @@ const FreelancerProfile = () => {
     }
   }, [freelancer]);
 
+  const colorPalette = {
+    darkBlue: "#001F3F",
+    mediumBlue: "#3A6D8C",
+    lightBlue: "#6A9AB0",
+    beige: "#EAD8B1",
+    gradientCard: "linear-gradient(135deg, #3A6D8C, #6A9AB0)",
+    gradientButton: "linear-gradient(45deg, #3A6D8C, #6A9AB0)",
+  };
+
   return (
     <Box sx={{ backgroundColor: "#1A2A3A", minHeight: "100vh" }}>
       <Header />
@@ -181,12 +190,22 @@ const FreelancerProfile = () => {
                   <Grid item xs={12} md={6} key={post.id}>
                     <Card
                       sx={{
-                        height: 200,
+                        height: 280,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-evenly",
+                        textDecoration: "none",
                         borderRadius: "16px",
-                        boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
-                        transition: "transform 0.3s",
-                        "&:hover": { transform: "translateY(-10px)" },
-                        cursor: "pointer",
+                        boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.2)",
+                        background: colorPalette.gradientCard,
+                        color: "white",
+                        padding: 2,
+                        transition: "transform 0.3s, box-shadow 0.3s",
+                        "&:hover": {
+                          transform: "translateY(-10px)",
+                          boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.4)",
+                          cursor: "pointer",
+                        },
                       }}
                       onClick={() =>
                         (window.location.href = `/posts/detail/${post.id}`)
@@ -195,23 +214,39 @@ const FreelancerProfile = () => {
                       <CardContent>
                         <Typography
                           variant="h6"
-                          sx={{ fontWeight: "bold", textAlign: "center" }}
+                          sx={{
+                            fontWeight: "bold",
+                            textAlign: "center",
+                            textShadow: "1px 1px 4px rgba(0, 0, 0, 0.7)",
+                            mb: 2,
+                          }}
                         >
                           {post.title}
                         </Typography>
                         <Typography
                           variant="body2"
-                          sx={{ textAlign: "center", mt: 1, color: "gray" }}
+                          sx={{
+                            textAlign: "center",
+                            color: "rgba(240, 240, 240, 0.9)",
+                            fontStyle: "italic",
+                            fontSize: "1.1rem",
+                            mb: 2,
+                          }}
                         >
                           {post.description}
                         </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{ textAlign: "center", mt: 1, color: "gray" }}
-                        >
-                          Rating: {post.averageRating}
-                        </Typography>
                       </CardContent>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          textAlign: "center",
+                          color: "#FFD700",
+                          fontWeight: "bold",
+                          mt: 2,
+                        }}
+                      >
+                        Rating: {post.averageRating}
+                      </Typography>
                     </Card>
                   </Grid>
                 ))}

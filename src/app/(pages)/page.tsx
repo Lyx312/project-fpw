@@ -17,6 +17,7 @@ import Header from "../(components)/Header";
 import Footer from "../(components)/Footer";
 import axios from "axios";
 import { getCurrUser } from "@/utils/utils";
+import { useRouter } from "next/navigation";
 
 const LandingPage = () => {
   interface Category {
@@ -34,6 +35,7 @@ const LandingPage = () => {
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [serviceByRating, setServiceByRating] = useState<Service[]>([]);
   const [recommendedCategories, setRecommendedCategories] = useState<Category[]>([]);
+  const router = useRouter();
 
   const fetchCategories = async () => {
     try {
@@ -100,7 +102,12 @@ const LandingPage = () => {
     mediumBlue: "#3A6D8C",
     lightBlue: "#6A9AB0",
     beige: "#EAD8B1",
+    gradientCard: "linear-gradient(135deg, #3A6D8C, #6A9AB0)",
     gradientButton: "linear-gradient(45deg, #3A6D8C, #6A9AB0)",
+  };
+
+  const handleCardClick = (id: number) => {
+    router.push(`/posts/detail/${id}`);
   };
 
   return (
@@ -169,44 +176,79 @@ const LandingPage = () => {
       {/* Professional Services Section */}
       <Box sx={{ backgroundColor: colorPalette.beige, py: 10 }}>
         <Container maxWidth="lg">
-          <Typography variant="h4" align="center" sx={{ fontWeight: "bold" }}>
+          <Typography
+            variant="h4"
+            align="center"
+            sx={{
+              fontWeight: "bold",
+              color: colorPalette.darkBlue,
+              textShadow: "1px 1px 4px rgba(0, 0, 0, 0.3)",
+              mb: 4,
+            }}
+          >
             Find the Professional Services
           </Typography>
           <Grid container spacing={4} sx={{ mt: 4 }}>
             {serviceByRating.slice(0, 3).map((item, index) => (
               <Grid item xs={12} sm={4} key={index}>
-                <Button href={"/posts/detail/" + item.id}>
-                  <Card
+                <Card
+                  sx={{
+                    height: 280,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-evenly",
+                    textDecoration: "none",
+                    borderRadius: "16px",
+                    boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.2)",
+                    background: colorPalette.gradientCard,
+                    color: "white",
+                    padding: 2,
+                    transition: "transform 0.3s, box-shadow 0.3s",
+                    "&:hover": {
+                      transform: "translateY(-10px)",
+                      boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.4)",
+                      cursor: "pointer",
+                    },
+                  }}
+                  onClick={() => handleCardClick(item.id)}
+                >
+                  <CardContent>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        textShadow: "1px 1px 4px rgba(0, 0, 0, 0.7)",
+                        mb: 2,
+                      }}
+                    >
+                      {item.title}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        textAlign: "center",
+                        color: "rgba(240, 240, 240, 0.9)",
+                        fontStyle: "italic",
+                        fontSize: "1.1rem",
+                        mb: 2,
+                      }}
+                    >
+                      {item.description}
+                    </Typography>
+                  </CardContent>
+                  <Typography
+                    variant="body2"
                     sx={{
-                      height: 250,
-                      borderRadius: "16px",
-                      boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
-                      transition: "transform 0.3s",
-                      "&:hover": { transform: "translateY(-10px)" },
+                      textAlign: "center",
+                      color: "#FFD700",
+                      fontWeight: "bold",
+                      mt: 2,
                     }}
                   >
-                    <CardContent>
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: "bold", textAlign: "center" }}
-                      >
-                        {item.title}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ textAlign: "center", mt: 1, color: "gray" }}
-                      >
-                        {item.description}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ textAlign: "center", mt: 1, color: "gray" }}
-                      >
-                        Rating : {item.averageRating}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Button>
+                    Rating: {item.averageRating}
+                  </Typography>
+                </Card>
               </Grid>
             ))}
           </Grid>
@@ -246,33 +288,33 @@ const LandingPage = () => {
       {
         recommendedCategories.length > 0 && (
 
-        <Box sx={{ py: 10, backgroundColor: colorPalette.lightBlue }}>
-          <Container maxWidth="lg">
-            <Typography variant="h4" align="center" sx={{ fontWeight: "bold" }} gutterBottom>
-              Personalized Recommendations
-            </Typography>
-            <Grid container spacing={2} justifyContent="center">
-              {recommendedCategories.slice(0, 9).map((category, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    sx={{
-                      py: 1.5,
-                      borderRadius: "30px",
-                      bgcolor: colorPalette.darkBlue,
-                      color: "white",
-                      fontWeight: "bold",
-                      "&:hover": { bgcolor: colorPalette.mediumBlue },
-                    }}
-                  >
-                    {category.category_name}
-                  </Button>
-                </Grid>
-              ))}
-            </Grid>
-          </Container>
-        </Box>
+          <Box sx={{ py: 10, backgroundColor: colorPalette.lightBlue }}>
+            <Container maxWidth="lg">
+              <Typography variant="h4" align="center" sx={{ fontWeight: "bold" }} gutterBottom>
+                Personalized Recommendations
+              </Typography>
+              <Grid container spacing={2} justifyContent="center">
+                {recommendedCategories.slice(0, 9).map((category, index) => (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      sx={{
+                        py: 1.5,
+                        borderRadius: "30px",
+                        bgcolor: colorPalette.darkBlue,
+                        color: "white",
+                        fontWeight: "bold",
+                        "&:hover": { bgcolor: colorPalette.mediumBlue },
+                      }}
+                    >
+                      {category.category_name}
+                    </Button>
+                  </Grid>
+                ))}
+              </Grid>
+            </Container>
+          </Box>
         )
       }
 
