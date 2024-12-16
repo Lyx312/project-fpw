@@ -11,7 +11,7 @@ export async function GET() {
     await connectDB();
 
     // Fetch countries from MongoDB
-    const countries = await Country.find();
+    const countries = await Country.find().sort({ country_name: 1 });
 
     // Return countries in JSON format
     return NextResponse.json({ message: 'Countries fetched successfully', data: countries });

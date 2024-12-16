@@ -47,7 +47,6 @@ interface Post {
 
 const FreelancerProfile = () => {
   const [freelancer, setFreelancer] = useState<User | null>(null);
-  const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const { id } = useParams<{ id: string }>();
 
@@ -68,21 +67,10 @@ const FreelancerProfile = () => {
     }
   };
 
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/category`
-      );
-      setAllCategories(response.data.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
   const fetchPosts = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts?user_id=${freelancer?._id}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts?freelancerId=${freelancer?.email}`
       );
       setPosts(response.data.data);
     } catch (error) {
@@ -93,7 +81,6 @@ const FreelancerProfile = () => {
   useEffect(() => {
     if (id) {
       fetchFreelancer();
-      fetchCategories();
     }
   }, [id]);
 
@@ -175,10 +162,7 @@ const FreelancerProfile = () => {
                 {freelancer.categories?.map((category) => (
                   <Chip
                     key={category._id}
-                    label={
-                      allCategories.find((cat) => cat._id === category._id)
-                        ?.category_name
-                    }
+                    label={category.category_name}
                     sx={{ backgroundColor: "#6accf7" }}
                   />
                 ))}

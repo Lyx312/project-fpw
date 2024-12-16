@@ -176,7 +176,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
         </Typography>
 
         <Typography variant="h6" fontWeight="bold" gutterBottom>
-          Price: {post.price.toLocaleString()} Tokens
+          Price: Rp{post.price.toLocaleString()}
         </Typography>
 
         <Box sx={{ marginY: "1rem" }}>

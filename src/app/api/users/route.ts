@@ -1,35 +1,53 @@
 import connectDB from '@/config/database';
+import Country from '@/models/countryModel';
 import User from '@/models/userModel';
 
-export async function GET(req: Request) {
+export async function GET(request: Request) {
     await connectDB();
 
-    try {
-        const { searchParams } = new URL(req.url);
-        const name = searchParams.get('name'); // Filter by name
-        const country = searchParams.get('country'); // Filter by country
+    const url = new URL(request.url);
+    const role = url.searchParams.get('role');
+    const nameOrEmail = url.searchParams.get('nameOrEmail');
+    const categories = url.searchParams.get('categories');
+    const country = url.searchParams.get('country');
 
-        // Build the query object dynamically
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    try {
         const query: any = {};
 
-        if (name) {
-            // Match name in either first_name or last_name
+        if (role) {
+            query.role = role;
+        }
+
+        if (nameOrEmail) {
             query.$or = [
-                { first_name: { $regex: name, $options: 'i' } },
-                { last_name: { $regex: name, $options: 'i' } },
+                { name: new RegExp(nameOrEmail, 'i') },
+                { email: new RegExp(nameOrEmail, 'i') }
             ];
         }
 
-        if (country) {
-            // Add country filter
-            query.country = { $regex: country, $options: 'i' };
+        if (categories) {
+            query.categories = { $in: categories.split(',') };
         }
 
-        // Fetch users based on the query
-        const users = await User.find(query);
-        return Response.json(users, { status: 200 });
+        if (country) {
+            query.country_id = country;
+        }
+
+        const users = await User.find(query).populate('categories').exec();
+        const countries = await Country.find();
+
+        // modify user object
+        const usersObj = users.map(user => {
+            const userObj = user.toObject();
+            delete userObj.password;
+            const country = countries.find(c => c.country_id === user.country_id);
+            userObj.country_name = country ? country.country_name : null;
+            return userObj;
+        });
+
+        return Response.json(usersObj, { status: 200 });
     } catch (error) {
+        console.log(error);
         return Response.json({ message: 'Error fetching users', error: error }, { status: 500 });
     }
 }

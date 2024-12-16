@@ -13,7 +13,7 @@ export async function GET(req: Request) {
 
     // Fetch categories with optional filtering
     const query = name ? { category_name: { $regex: name, $options: 'i' } } : {};
-    const categories = await Category.find(query);
+    const categories = await Category.find(query).sort({ category_name: 1 });;
 
     // Return countries in JSON format
     return NextResponse.json({ message: 'Countries fetched successfully', data: categories });

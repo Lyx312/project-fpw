@@ -14,6 +14,7 @@ import WorkIcon from "@mui/icons-material/Work";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HistoryIcon from "@mui/icons-material/History";
 import HomeIcon from "@mui/icons-material/Home";
+import PeopleIcon from "@mui/icons-material/People";
 import Image from "next/image";
 import { getCurrUser, logout } from "@/utils/utils";
 
@@ -100,6 +101,13 @@ const Header = () => {
                 <HistoryIcon />
               </IconButton>
             </Link>
+            {currUser.role === "client" && (
+              <Link href="/profile" color="inherit">
+                <IconButton color="inherit">
+                  <PeopleIcon />
+                </IconButton>
+              </Link>
+            )}
           </>
         ) : null}
         <IconButton color="inherit" onClick={handlePopoverOpen}>

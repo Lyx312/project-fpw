@@ -39,7 +39,13 @@ export async function GET(req: Request) {
         // Ensure "admin" is excluded even if roles array is empty
         query.role = { $ne: "admin" };
       }
-      console.log(roles);
+      // console.log(roles);
+
+      // Only fetch users with is_approved set to true or null
+      query.is_approved = { $ne: false };
+
+      // only fetch users that are is_email_verified
+      query.is_email_verified = { $ne: false };
 
       // Fetch users based on the query
       const users = await User.find(query);
