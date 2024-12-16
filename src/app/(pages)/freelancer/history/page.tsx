@@ -3,7 +3,12 @@
 
 import Header from "@/app/(components)/Header";
 import { getCurrUser } from "@/utils/utils";
-import { Box, Typography, Paper, Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
+import { Box,
+  Typography,
+  Card,
+  CardContent,
+  CardActions,
+  Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Loading from "@/app/(pages)/loading";
@@ -174,131 +179,111 @@ const FreelancerHistoryPage = () => {
           variant="contained"
           fullWidth
           sx={{
-            width: '100%',
-            display: 'flex',
-            marginBottom: 1
+            width: "100%",
+            display: "flex",
+            marginBottom: 1,
           }}
         >
-          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('')}>All</Button>
-          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('pending')}>Pending</Button>
-          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('in-progress')}>In Progress</Button>
-          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('completed')}>Completed</Button>
-          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('paid')}>Paid</Button>
-          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus('cancelled')}>Cancelled</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("")}>All</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("pending")}>Pending</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("in-progress")}>In Progress</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("completed")}>Completed</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("paid")}>Paid</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("cancelled")}>Cancelled</Button>
         </ButtonGroup>
 
         {transactions.length > 0 ? (
           <Box>
-            <Typography variant="h5" sx={{ marginBottom: 2, fontWeight: 600, color: "#fff" }}>
+            <Typography
+              variant="h5"
+              sx={{ marginBottom: 2, fontWeight: 600, color: "#fff" }}
+            >
               Transaction History
             </Typography>
-            <Paper sx={{ overflow: "hidden", backgroundColor: "#2B3B4B" }}>
-              <Box
-                component="table"
-                sx={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  color: "#fff",
-                  "& th, td": {
-                    padding: "10px 15px",
-                    border: "1px solid #444",
-                  },
-                  "& th": {
-                    backgroundColor: "#3B4A5D",
-                    fontWeight: 600,
-                  },
-                  "& tr:nth-of-type(odd)": {
-                    backgroundColor: "#1E2E3E",
-                  },
-                  "& tr:hover": {
-                    backgroundColor: "#35495e",
-                  },
-                }}
-              >
-                <Box component="thead">
-                  <Box component="tr">
-                    <Box component="th">Email</Box>
-                    <Box component="th">Post ID</Box>
-                    <Box component="th">Price</Box>
-                    <Box component="th">Start Date</Box>
-                    <Box component="th">End Date</Box>
-                    <Box component="th">Transaction Status</Box>
-                    <Box component="th">Action</Box>
-                  </Box>
-                </Box>
-                <Box component="tbody">
-                  {transactions.map((transaction, index) => (
-                    <Box component="tr" key={index}>
-                      <Box component="td">{transaction.email}</Box>
-                      <Box component="td">{transaction.post_id}</Box>
-                      <Box component="td">{transaction.price}</Box>
-                      <Box component="td">{transaction.start_date}</Box>
-                      <Box component="td">{transaction.end_date}</Box>
-                      <Box component="td">{transaction.trans_status}</Box>
-                      <Box component="td">
-                        <Button
-                          type="button"
-                          variant="contained"
-                          color="primary"
-                          sx={{
-                            backgroundColor: "#1A2AAA",
-                            '&:hover': { backgroundColor: "#1230EE" },
-                          }}
-                          onClick={() => handleViewPost(transaction.post_id)}
-                        >
-                          View Post
-                        </Button>
-                        {(transaction.trans_status === "pending") && (
-                          <Button
-                            type="button"
-                            variant="contained"
-                            color="primary"
-                            sx={{
-                              backgroundColor: "#1A2AAA",
-                              '&:hover': { backgroundColor: "#1230EE" },
-                            }}
-                            onClick={() => handleAcceptTransaction(transaction.trans_id)}
-                          >
-                            Accept
-                          </Button>
-                        )}
-                        {["pending", "in-progress"].includes(transaction.trans_status) && (
-                          <Button
-                            type="button"
-                            variant="contained"
-                            color="primary"
-                            sx={{
-                              backgroundColor: "#1A2AAA",
-                              '&:hover': { backgroundColor: "#1230EE" },
-                            }}
-                            onClick={() => openCancelDialog(transaction.trans_id)}
-                          >
-                            Cancel
-                          </Button>
-                        )}
-                        {(transaction.trans_status === "in-progress") && (
-                          <Button
-                            type="button"
-                            variant="contained"
-                            color="primary"
-                            sx={{
-                              backgroundColor: "#1A2AAA",
-                              '&:hover': { backgroundColor: "#1230EE" },
-                            }}
-                            onClick={() => handleCompleteTransaction(transaction.trans_id)}
-                          >
-                            Complete
-                          </Button>
-                        )}
-                      </Box>
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-            </Paper>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                gap: 2,
+              }}
+            >
+              {transactions.map((transaction, index) => (
+                <Card
+                  key={index}
+                  sx={{ backgroundColor: "#2B3B4B", color: "#fff" }}
+                >
+                  <CardContent>
+                    <Typography>Client: {transaction.user_name}</Typography>
+                    <Typography>Post Title: {transaction.post_title}</Typography>
+                    <Typography>Price: {transaction.price}</Typography>
+                    <Typography>Start Date: {transaction.start_date}</Typography>
+                    <Typography>End Date: {transaction.end_date}</Typography>
+                    <Typography>Status: {transaction.trans_status}</Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button
+                      type="button"
+                      variant="contained"
+                      color="primary"
+                      sx={{
+                        backgroundColor: "#1A2AAA",
+                        "&:hover": { backgroundColor: "#1230EE" },
+                      }}
+                      onClick={() => handleViewPost(transaction.post_id)}
+                    >
+                      View Post
+                    </Button>
+                    {transaction.trans_status === "pending" && (
+                      <Button
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                          backgroundColor: "#1A2AAA",
+                          "&:hover": { backgroundColor: "#1230EE" },
+                        }}
+                        onClick={() => handleAcceptTransaction(transaction.trans_id)}
+                      >
+                        Accept
+                      </Button>
+                    )}
+                    {["pending", "in-progress"].includes(transaction.trans_status) && (
+                      <Button
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                          backgroundColor: "#1A2AAA",
+                          "&:hover": { backgroundColor: "#1230EE" },
+                        }}
+                        onClick={() => openCancelDialog(transaction.trans_id)}
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                    {transaction.trans_status === "in-progress" && (
+                      <Button
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                          backgroundColor: "#1A2AAA",
+                          "&:hover": { backgroundColor: "#1230EE" },
+                        }}
+                        onClick={() => handleCompleteTransaction(transaction.trans_id)}
+                      >
+                        Complete
+                      </Button>
+                    )}
+                  </CardActions>
+                </Card>
+              ))}
+            </Box>
           </Box>
         ) : (
-          <Typography variant="h6" sx={{ color: "#fff" }}>No transactions available</Typography>
+          <Typography variant="h6" sx={{ color: "#fff" }}>
+            No transactions available
+          </Typography>
         )}
       </Box>
 
@@ -321,7 +306,9 @@ const FreelancerHistoryPage = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={closeCancelDialog}>Nevermind</Button>
-          <Button onClick={handleCancelTransaction} disabled={!cancelReason}>Confirm</Button>
+          <Button onClick={handleCancelTransaction} disabled={!cancelReason}>
+            Confirm
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
