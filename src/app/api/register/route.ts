@@ -57,7 +57,8 @@ export async function POST(req: Request) {
             email_token: token,
             cv_path: role === 'freelancer' ? `${cv_path}` : null,
             categories: role === 'freelancer' && Array.isArray(categories) ? categories : [],
-            is_approved: role === 'freelancer' ? false : null
+            is_approved: role === 'freelancer' ? false : null,
+            status: role === 'freelancer' ? 'Available' : null
         });
 
         await newUser.save({ session });

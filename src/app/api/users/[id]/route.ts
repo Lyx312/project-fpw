@@ -4,6 +4,32 @@ import Joi from "joi";
 import bcrypt from "bcrypt";
 import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+import Country from "@/models/countryModel";
+
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  await connectDB();
+  const { id } = await params;
+
+  if (!id) {
+    return NextResponse.json({ message: 'Email query parameter is required' }, { status: 400 });
+  }
+
+  try {
+    const user = await User.findById(id).populate('categories').exec();
+    if (!user) {
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    }
+    const userObj = user.toObject();
+    const country = await Country.findOne({ country_id: user.country_id }).select('country_name').exec();
+    userObj.country_name = country ? country.country_name : null;
+    console.log(userObj);
+    
+    return NextResponse.json(userObj, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ message: 'Internal server error', error }, { status: 500 });
+  }
+}
 
 const updateUserSchema = Joi.object({
   country_id: Joi.string().optional().messages({
@@ -59,8 +85,6 @@ const updateUserSchema = Joi.object({
   'object.and': '{#presentWithLabels} is provided without its required peers {#missingWithLabels}',
 });
 
-
-// Update user endpoint logic
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   await connectDB();
   const {
@@ -79,9 +103,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   } = await request.json();
   const { id } = await params;
 
-  console.log({ country_id, old_password, new_password, confirm_password, first_name, last_name, phone, gender, status });
+  // console.log({ country_id, old_password, new_password, confirm_password, first_name, last_name, phone, gender, status });
 
-  // Validate request body
   const { error } = updateUserSchema.validate({
     country_id,
     old_password: old_password=='' ? undefined : old_password,
@@ -104,7 +127,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       return Response.json({ message: 'User not found' }, { status: 404 });
     }
 
-    // Check if old password is correct
     if (old_password) {
       const isPasswordCorrect = await bcrypt.compare(old_password, user.password);
       if (!isPasswordCorrect) {
@@ -129,14 +151,12 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
     await user.save();
 
-    // Update the cookie without extending the expiry
     const cookieStore = await cookies();
     const existingCookie = cookieStore.get('userToken');
     if (existingCookie) {
       const jwtSecret = new TextEncoder().encode(process.env.JWT_SECRET);
 
       const exp = await jwtVerify(existingCookie.value, jwtSecret).then((result) => result.payload.exp);
-      // console.log(exp);
 
       if (exp) {
         const token = await new SignJWT({ ...user.toJSON() })

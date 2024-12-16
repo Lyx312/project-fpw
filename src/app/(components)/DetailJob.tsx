@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Chip, Button, Grid, Alert, Rating } from "@mui/material";
+import { Box, Typography, Chip, Button, Grid, Alert, Rating, Avatar } from "@mui/material";
 import { getCurrUser } from "@/utils/utils";
 import { useRouter } from "next/navigation";
 import Loading from "../(pages)/loading";
@@ -141,9 +141,34 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
           <Typography variant="h4" fontWeight="bold" gutterBottom>
             {post.title}
           </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            {`By: ${post.postMaker}`}
-          </Typography>
+          <Box
+            sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+            onClick={() => router.push(`/profile/${post.postMaker._id}`)}
+          >
+            <Avatar src={post.postMaker.pfp_path} alt={post.postMaker.name} sx={{ marginRight: "1rem" }} />
+            <Box>
+              <Typography variant="subtitle1" color="text.secondary">
+                {post.postMaker.name}
+              </Typography>
+              <Typography variant="subtitle2" color="text.secondary">
+                {post.postMaker.email}
+              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box
+                  sx={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: "50%",
+                    backgroundColor: post.postMaker.status === "Available" ? "green" : "red",
+                    marginRight: "0.5rem",
+                  }}
+                />
+                <Typography variant="subtitle2" color="text.secondary">
+                  {post.postMaker.status}
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
         </Box>
 
         <Typography variant="body1" paragraph>
