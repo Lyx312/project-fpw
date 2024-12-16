@@ -152,7 +152,7 @@ const Header = () => {
                   Welcome, {currUser.first_name + " " + currUser.last_name || "User"}!
                 </Typography>
                 <Typography variant="body2" align="center">
-                  <Link href="/profile" underline="hover">
+                  <Link href="/my-profile" underline="hover">
                     Go to Profile
                   </Link>
                   <br />
