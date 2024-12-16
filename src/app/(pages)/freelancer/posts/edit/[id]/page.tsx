@@ -15,6 +15,8 @@ import {
   Box,
   FormControl,
   InputLabel,
+  Alert,
+  Snackbar,
 } from "@mui/material";
 import axios from "axios";
 import Loading from "@/app/(pages)/loading";
@@ -40,6 +42,10 @@ const EditPostPage: React.FC = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [postStatus, setPostStatus] = useState<string>("available");
+  const [alert, setAlert] = useState<{ open: boolean; message: string }>({
+    open: false,
+    message: "",
+  });
 
   // Add item to list
   const addToList = (
@@ -94,6 +100,26 @@ const EditPostPage: React.FC = () => {
   }, [id]);
 
   const handleUpdate = async () => {
+    if (!post?.title.trim()) {
+      setAlert({ open: true, message: "Title is required." });
+      return;
+    }
+    if (!post?.description.trim()) {
+      setAlert({ open: true, message: "Description is required." });
+      return;
+    }
+    if (post.price === undefined || post.price <= 0) {
+      setAlert({ open: true, message: "Price must be greater than 0." });
+      return;
+    }
+    if (categories.length === 0) {
+      setAlert({
+        open: true,
+        message: "At least one category must be selected.",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await axios.put(`/api/posts/${id}`, {
@@ -105,10 +131,14 @@ const EditPostPage: React.FC = () => {
       if (response.status === 200) {
         router.push("/freelancer/posts");
       } else {
-        console.error("Failed to update post");
+        setAlert({ open: true, message: "Failed to update post." });
       }
     } catch (error) {
       console.error("Error updating post:", error);
+      setAlert({
+        open: true,
+        message: "An error occurred while updating the post.",
+      });
     } finally {
       setLoading(false);
     }
@@ -119,7 +149,11 @@ const EditPostPage: React.FC = () => {
 
   return (
     <Container maxWidth="sm" sx={{ padding: "2rem" }}>
-      <Typography variant="h4" gutterBottom sx={{ color: "#4B6CB7", fontWeight: "bold" }}>
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ color: "#4B6CB7", fontWeight: "bold" }}
+      >
         Edit Post
       </Typography>
       <Grid container spacing={3}>
@@ -130,7 +164,9 @@ const EditPostPage: React.FC = () => {
             fullWidth
             value={post.title}
             onChange={(e) =>
-              setPost((prev) => (prev ? { ...prev, title: e.target.value } : null))
+              setPost((prev) =>
+                prev ? { ...prev, title: e.target.value } : null
+              )
             }
             sx={{
               "& .MuiInputLabel-root": {
@@ -207,7 +243,11 @@ const EditPostPage: React.FC = () => {
 
         {/* Categories Selection */}
         <Grid item xs={12}>
-          <Typography variant="subtitle1" gutterBottom sx={{ color: "#4B6CB7" }}>
+          <Typography
+            variant="subtitle1"
+            gutterBottom
+            sx={{ color: "#4B6CB7" }}
+          >
             Categories
           </Typography>
           <FormControl fullWidth>
@@ -245,11 +285,13 @@ const EditPostPage: React.FC = () => {
                   allCategories.find((cat) => cat.category_id === category)
                     ?.category_name
                 }
-                onDelete={() => removeFromList(category, categories, setCategories)}
+                onDelete={() =>
+                  removeFromList(category, categories, setCategories)
+                }
                 sx={{
                   backgroundColor: "#4B6CB7",
                   color: "white",
-                  '&:hover': { backgroundColor: "#3A5B8D" },
+                  "&:hover": { backgroundColor: "#3A5B8D" },
                 }}
               />
             ))}
@@ -288,10 +330,27 @@ const EditPostPage: React.FC = () => {
               },
             }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Update"}
+            {loading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Update"
+            )}
           </Button>
         </Grid>
       </Grid>
+      <Snackbar
+        open={alert.open}
+        autoHideDuration={4000}
+        onClose={() => setAlert({ open: false, message: "" })}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          severity="error"
+          onClose={() => setAlert({ open: false, message: "" })}
+        >
+          {alert.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
