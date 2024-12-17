@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     const transactionDetails = {
       transaction_details: {
-        order_id: `TRANS-${transaction.trans_id}`,
+        order_id: `TRANS-${transaction._id}`,
         gross_amount: transaction.price,
       },
       customer_details: {
