@@ -19,6 +19,8 @@ import {
 } from "@mui/material";
 import { getCurrUser } from "@/utils/utils";
 import axios from "axios";
+import Header from "@/app/(components)/Header";
+import Footer from "@/app/(components)/Footer";
 
 interface User {
   id: string;
@@ -148,178 +150,186 @@ const AddPostPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ padding: "2rem" }}>
-      <Typography
-        variant="h4"
-        gutterBottom
-        sx={{ color: "#4B6CB7", fontWeight: "bold" }}
-      >
-        Add New Post
-      </Typography>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <TextField
-            label="Title"
-            fullWidth
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            sx={{
-              "& .MuiInputLabel-root": {
-                color: "#4B6CB7",
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#4B6CB7",
-                },
-                "&:hover fieldset": {
-                  borderColor: "#3A5B8D",
-                },
-              },
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={12}>
-          <TextField
-            label="Description"
-            fullWidth
-            multiline
-            rows={4}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            sx={{
-              "& .MuiInputLabel-root": {
-                color: "#4B6CB7",
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#4B6CB7",
-                },
-                "&:hover fieldset": {
-                  borderColor: "#3A5B8D",
-                },
-              },
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={12}>
-          <TextField
-            label="Price"
-            type="number"
-            fullWidth
-            value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
-            sx={{
-              "& .MuiInputLabel-root": {
-                color: "#4B6CB7",
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#4B6CB7",
-                },
-                "&:hover fieldset": {
-                  borderColor: "#3A5B8D",
-                },
-              },
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={12}>
-          <Typography
-            variant="subtitle1"
-            gutterBottom
-            sx={{ color: "#4B6CB7" }}
-          >
-            Categories
-          </Typography>
-          <FormControl fullWidth>
-            <Select
-              value=""
-              displayEmpty
-              onChange={(e) => {
-                addToList(e.target.value as string, categories, setCategories);
-              }}
+    <>
+      <Header />
+      <Container maxWidth="sm" sx={{ padding: "2rem" }}>
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{ color: "#4B6CB7", fontWeight: "bold" }}
+        >
+          Add New Post
+        </Typography>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <TextField
+              label="Title"
+              fullWidth
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderColor: "#4B6CB7",
-                  borderRadius: "8px",
+                "& .MuiInputLabel-root": {
+                  color: "#4B6CB7",
                 },
-                "&:hover .MuiOutlinedInput-root": {
-                  borderColor: "#3A5B8D",
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#4B6CB7",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#3A5B8D",
+                  },
+                },
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextField
+              label="Description"
+              fullWidth
+              multiline
+              rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              sx={{
+                "& .MuiInputLabel-root": {
+                  color: "#4B6CB7",
+                },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#4B6CB7",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#3A5B8D",
+                  },
+                },
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextField
+              label="Price"
+              type="number"
+              fullWidth
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value))}
+              sx={{
+                "& .MuiInputLabel-root": {
+                  color: "#4B6CB7",
+                },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#4B6CB7",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#3A5B8D",
+                  },
+                },
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+              sx={{ color: "#4B6CB7" }}
+            >
+              Categories
+            </Typography>
+            <FormControl fullWidth>
+              <Select
+                value=""
+                displayEmpty
+                onChange={(e) => {
+                  addToList(
+                    e.target.value as string,
+                    categories,
+                    setCategories
+                  );
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderColor: "#4B6CB7",
+                    borderRadius: "8px",
+                  },
+                  "&:hover .MuiOutlinedInput-root": {
+                    borderColor: "#3A5B8D",
+                  },
+                }}
+              >
+                <MenuItem value="" disabled>
+                  Select a category
+                </MenuItem>
+                {allCategories.map((cat) => (
+                  <MenuItem key={cat.category_id} value={cat.category_id}>
+                    {cat.category_name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Box mt={2} display="flex" flexWrap="wrap" gap={1}>
+              {categories.map((category) => (
+                <Chip
+                  key={category}
+                  label={
+                    allCategories.find(
+                      (cat) => cat.category_id === Number(category)
+                    )?.category_name
+                  }
+                  onDelete={() =>
+                    removeFromList(category, categories, setCategories)
+                  }
+                  sx={{
+                    backgroundColor: "#4B6CB7",
+                    color: "white",
+                    "&:hover": { backgroundColor: "#3A5B8D" },
+                  }}
+                />
+              ))}
+            </Box>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSubmit}
+              disabled={loading}
+              sx={{
+                width: "100%",
+                padding: "1rem",
+                backgroundColor: "#4B6CB7",
+                "&:hover": {
+                  backgroundColor: "#3A5B8D",
                 },
               }}
             >
-              <MenuItem value="" disabled>
-                Select a category
-              </MenuItem>
-              {allCategories.map((cat) => (
-                <MenuItem key={cat.category_id} value={cat.category_id}>
-                  {cat.category_name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Box mt={2} display="flex" flexWrap="wrap" gap={1}>
-            {categories.map((category) => (
-              <Chip
-                key={category}
-                label={
-                  allCategories.find(
-                    (cat) => cat.category_id === Number(category)
-                  )?.category_name
-                }
-                onDelete={() =>
-                  removeFromList(category, categories, setCategories)
-                }
-                sx={{
-                  backgroundColor: "#4B6CB7",
-                  color: "white",
-                  "&:hover": { backgroundColor: "#3A5B8D" },
-                }}
-              />
-            ))}
-          </Box>
+              {loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Submit"
+              )}
+            </Button>
+          </Grid>
         </Grid>
-
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-            disabled={loading}
-            sx={{
-              width: "100%",
-              padding: "1rem",
-              backgroundColor: "#4B6CB7",
-              "&:hover": {
-                backgroundColor: "#3A5B8D",
-              },
-            }}
-          >
-            {loading ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Submit"
-            )}
-          </Button>
-        </Grid>
-      </Grid>
-      <Snackbar
-        open={alert.open}
-        autoHideDuration={4000}
-        onClose={() => setAlert({ open: false, message: "" })}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          severity="error"
+        <Snackbar
+          open={alert.open}
+          autoHideDuration={4000}
           onClose={() => setAlert({ open: false, message: "" })}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
-          {alert.message}
-        </Alert>
-      </Snackbar>
-    </Container>
+          <Alert
+            severity="error"
+            onClose={() => setAlert({ open: false, message: "" })}
+          >
+            {alert.message}
+          </Alert>
+        </Snackbar>
+      </Container>
+      <Footer />
+    </>
   );
 };
 
