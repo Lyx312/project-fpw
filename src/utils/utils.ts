@@ -12,7 +12,7 @@ export const getCurrUser = async () => {
     }
     const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
     // console.log(payload);
-    
+
     return payload;
   } catch (error) {
     console.error("Error verifying token:", error);

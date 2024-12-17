@@ -78,6 +78,8 @@ const FreelancerHistoryPage = () => {
           params: { userEmail: currUser.email, status: filterStatus },
         }
       );
+      console.log(response.data);
+      
       setTransactions(response.data);
     } catch (err) {
       console.error("Error fetching transactions:", err);
@@ -140,6 +142,19 @@ const FreelancerHistoryPage = () => {
     setCancelReason("");
     setTransactionToCancel(null);
   };
+
+  function formatDate(dateString: string): string {
+    if (!dateString) return "N/A";
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "UTC",
+    };
+    return new Date(dateString).toLocaleString("en-US", options);
+  }
 
   useEffect(() => {
     fetchUser();
@@ -216,8 +231,8 @@ const FreelancerHistoryPage = () => {
                     <Typography>Client: {transaction.user_name}</Typography>
                     <Typography>Post Title: {transaction.post_title}</Typography>
                     <Typography>Price: {transaction.price}</Typography>
-                    <Typography>Start Date: {transaction.start_date}</Typography>
-                    <Typography>End Date: {transaction.end_date}</Typography>
+                    <Typography>Start Date: {formatDate(transaction.start_date)}</Typography>
+                    <Typography>End Date: {formatDate(transaction.end_date)}</Typography>
                     <Typography>Status: {transaction.trans_status}</Typography>
                   </CardContent>
                   <CardActions>

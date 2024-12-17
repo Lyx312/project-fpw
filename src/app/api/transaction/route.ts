@@ -44,8 +44,6 @@ export async function GET(req: Request) {
         return {
           ...transaction.toObject(),
           user_name: userName,
-          start_date: formatDate(transaction.start_date),
-          end_date: formatDate(transaction.end_date),
           post_title: post?.post_title || 'Unknown Post',
         };
       })
@@ -66,17 +64,7 @@ export async function GET(req: Request) {
   }
 }
 
-function formatDate(dateString: string): string {
-  const options: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "UTC",
-  };
-  return new Date(dateString).toLocaleString("en-US", options);
-}
+
 
 
 export async function POST(req: Request) {

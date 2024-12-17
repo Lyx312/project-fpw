@@ -27,7 +27,7 @@ const sendEmail = async (to: string, subject: string, text: string, html: string
 
     // Setup email data
     const mailOptions = {
-        from: `"Freelancer Hub" <${process.env.EMAIL_USER}>`,
+        from: `"Freelance Hub" <${process.env.EMAIL_USER}>`,
         to: to,
         subject: subject,
         text: text,

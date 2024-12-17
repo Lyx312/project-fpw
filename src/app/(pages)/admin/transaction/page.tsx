@@ -57,6 +57,8 @@ const TransactionPage = () => {
       const response = await fetch(`/api/transaction?${query}`);
       if (response.ok) {
         const data = await response.json();
+        console.log(data);
+        
         setTransactions(data);
       } else {
         console.error('Error fetching transactions');
