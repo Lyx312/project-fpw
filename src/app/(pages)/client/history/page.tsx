@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import Header from "@/app/(components)/Header";
+import ReviewModal from "@/app/(components)/ReviewModal";
 import { getCurrUser } from "@/utils/utils";
 import { Box,
   Typography,
@@ -52,6 +53,9 @@ const ClientHistory = () => {
     null
   );
   const router = useRouter();
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewPostId, setReviewPostId] = useState<string>("");
+  const [reviewPostTitle, setReviewPostTitle] = useState<string>("");
 
   // Utility to load Snap.js dynamically
   const loadSnapScript = async () => {
@@ -156,10 +160,6 @@ const ClientHistory = () => {
       // Proceed with the payment using the snap token
       window.snap.pay(snapToken, {
         onSuccess: async (result: any) => {
-          alert("Payment successful!");
-          await fetchUserTransaction();
-        },
-        onPending: async () => {
           try {
             await axios.put(
               `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
@@ -167,31 +167,25 @@ const ClientHistory = () => {
                 transactionId: transaction.trans_id,
               }
             );
-            alert("Payment popup closed. Transaction marked as completed.");
-            router.push(`/client/review/${transaction.post_id}`);
+            alert("Payment successful!");
+            setReviewPostId(transaction.post_id);
+            setReviewPostTitle(transaction.post_title);
+            setReviewModalOpen(true);
+            fetchUserTransaction();
           } catch (err) {
             console.error("Error marking transaction as completed:", err);
             alert("Failed to mark transaction as completed after popup close.");
           }
+        },
+        onPending: async () => {
+          alert("Payment is pending. Please complete the payment to proceed.");
         },
         onError: (error: any) => {
           console.error("Payment error:", error);
           alert("Payment failed. Please try again.");
         },
         onClose: async () => {
-          try {
-            await axios.put(
-              `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
-              {
-                transactionId: transaction.trans_id,
-              }
-            );
-            alert("Payment popup closed. Transaction marked as completed.");
-            router.push(`/client/review/${transaction.post_id}`);
-          } catch (err) {
-            console.error("Error marking transaction as completed:", err);
-            alert("Failed to mark transaction as completed after popup close.");
-          }
+          alert("Payment popup was closed. Transaction is not completed.");
         },
       });
     } catch (err) {
@@ -283,6 +277,14 @@ const ClientHistory = () => {
             >
               Transaction History
             </Typography>
+            <ReviewModal
+              open={reviewModalOpen}
+              onClose={() => setReviewModalOpen(false)}
+              postId={reviewPostId}
+              postTitle={reviewPostTitle}
+              email={currUser?.email ?? ''}
+              onSubmitSuccess={() => fetchUserTransaction()}
+            />;
             <Box
               sx={{
                 display: "grid",
