@@ -95,7 +95,6 @@ const FreelancerHistoryPage = () => {
           params: { userEmail: currUser.email, status: filterStatus },
         }
       );
-<<<<<<< HEAD
       const transactionsWithCategories = response.data;
 
       // Fetch post details for each transaction and add categories to each transaction
@@ -118,7 +117,7 @@ const FreelancerHistoryPage = () => {
 
       // Update categories state
       const allCategories = transactionsWithCategories.flatMap(
-        (transaction) => transaction.categories
+        (transaction: any) => transaction.categories
       );
       setCategories((prevCategories) => {
         const uniqueCategories = new Set([...prevCategories, ...allCategories]);
@@ -127,11 +126,6 @@ const FreelancerHistoryPage = () => {
 
       // Initialize filteredTransactions to all transactions initially
       setFilteredTransactions(transactionsWithCategories);
-=======
-      console.log(response.data);
-      
-      setTransactions(response.data);
->>>>>>> 725f141d0d3fdeaa168aa19e0e9ea237f3500329
     } catch (err) {
       console.error("Error fetching transactions:", err);
       setError("Failed to fetch transactions");
