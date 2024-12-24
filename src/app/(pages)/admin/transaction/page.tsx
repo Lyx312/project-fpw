@@ -47,6 +47,7 @@ const TransactionPage = () => {
     end_date: '',
     min_price: '',
     max_price: '',
+    role: 'admin'
   });
   const [loading, setLoading] = useState(false);
 

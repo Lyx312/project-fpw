@@ -20,6 +20,7 @@ export async function GET(req: Request) {
     const min_price = searchParams.get('min_price');
     const max_price = searchParams.get('max_price');
     const status = searchParams.get('status');
+    const role = searchParams.get('role');
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query: any = {};
@@ -49,14 +50,17 @@ export async function GET(req: Request) {
       })
     );
 
-    const statusOrder = ['completed', 'in-progress', 'pending', 'paid', 'cancelled'];
-
     // Sort transactions based on trans_status
-    enhancedTransactions.sort((a, b) => {
-      const statusA = statusOrder.indexOf(a.trans_status.toLowerCase());
-      const statusB = statusOrder.indexOf(b.trans_status.toLowerCase());
-      return statusA - statusB;
-    });
+    if (role != 'admin') {
+        const statusOrder = ['completed', 'in-progress', 'pending', 'paid', 'cancelled'];
+        
+        enhancedTransactions.sort((a, b) => {
+        const statusA = statusOrder.indexOf(a.trans_status.toLowerCase());
+        const statusB = statusOrder.indexOf(b.trans_status.toLowerCase());
+        return statusA - statusB;
+      });
+    }
+    
 
     return NextResponse.json(enhancedTransactions, { status: 200 });
   } catch (error) {
