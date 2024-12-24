@@ -117,7 +117,7 @@ const FreelancerHistoryPage = () => {
 
       // Update categories state
       const allCategories = transactionsWithCategories.flatMap(
-        (transaction: any) => transaction.categories
+        (transaction) => transaction.categories
       );
       setCategories((prevCategories) => {
         const uniqueCategories = new Set([...prevCategories, ...allCategories]);
@@ -141,7 +141,7 @@ const FreelancerHistoryPage = () => {
       return response.data;
     } catch (error) {
       console.error("Error fetching Post", error);
-      setError && setError("Failed to fetch Post");
+      setError("Failed to fetch Post");
     }
   };
 
@@ -248,7 +248,6 @@ const FreelancerHistoryPage = () => {
                     <Typography>Price: Rp. {transaction.price.toLocaleString("id-ID")}</Typography>
                     <Typography>Start Date: {formatDate(transaction.start_date)}</Typography>
                     <Typography>End Date: {formatDate(transaction.end_date)}</Typography>
->>>>>>> 725f141d0d3fdeaa168aa19e0e9ea237f3500329
                     <Typography>Status: {transaction.trans_status}</Typography>
                   </CardContent>
                   <CardActions>

@@ -43,15 +43,6 @@ const colors = {
 const TransactionPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filters, setFilters] = useState({
-<<<<<<< HEAD
-    trans_id: "",
-    email: "",
-    trans_status: "",
-    start_date: "",
-    end_date: "",
-    min_price: "",
-    max_price: "",
-=======
     trans_id: '',
     email: '',
     trans_status: '',
@@ -60,7 +51,6 @@ const TransactionPage = () => {
     min_price: '',
     max_price: '',
     role: 'admin'
->>>>>>> 725f141d0d3fdeaa168aa19e0e9ea237f3500329
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,28 +62,9 @@ const TransactionPage = () => {
       const response = await fetch(`/api/transaction?${query}`);
       if (response.ok) {
         const data = await response.json();
-<<<<<<< HEAD
-        const transactionsWithCategories = data;
-
-        for (const transaction of transactionsWithCategories) {
-          if (transaction.post_id) {
-            const postDetail = await fetchUserPost(transaction.post_id);
-            if (postDetail) {
-              transaction.categories = postDetail.categories || [];
-            }
-          }
-        }
-
-        // Group transactions by categories
-        const groupedByCategory = groupTransactionsByCategory(
-          transactionsWithCategories
-        );
-        setTransactions(groupedByCategory);
-=======
         console.log(data);
         
         setTransactions(data);
->>>>>>> 725f141d0d3fdeaa168aa19e0e9ea237f3500329
       } else {
         console.error("Error fetching transactions");
       }
@@ -112,7 +83,7 @@ const TransactionPage = () => {
       return response.data;
     } catch (error) {
       console.error("Error fetching Post", error);
-      setError && setError("Failed to fetch Post");
+      setError("Failed to fetch Post");
     }
   };
 
@@ -244,90 +215,56 @@ const TransactionPage = () => {
               No transactions found.
             </Typography>
           ) : (
-            Object.entries(transactions).map(
-              ([category, categoryTransactions]) => (
-                <Box key={category} sx={{ mb: 4 }}>
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    Category: {category}
-                  </Typography>
-                  <TableContainer>
-                    <Table
-                      sx={{ minWidth: 650 }}
-                      aria-label="transactions table"
-                    >
-                      <TableHead>
-                        <TableRow>
-                          {[
-                            "Transaction ID",
-                            "Email",
-                            "Post ID",
-                            "Price",
-                            "Start Date",
-                            "End Date",
-                            "Status",
-                            "Created At",
-                            "Updated At",
-                            "Deleted At",
-                            "Categories",
-                          ].map((header, index) => (
-                            <TableCell key={index} sx={{ fontWeight: "bold" }}>
-                              {header}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {categoryTransactions.map((transaction) => (
-                          <TableRow key={transaction.trans_id}>
-                            <TableCell>{transaction.trans_id}</TableCell>
-                            <TableCell>{transaction.email}</TableCell>
-                            <TableCell>{transaction.post_id}</TableCell>
-                            <TableCell>{transaction.price}</TableCell>
-                            <TableCell>
-                              {transaction.start_date
-                                ? new Date(
-                                    transaction.start_date
-                                  ).toLocaleDateString()
-                                : "N/A"}
-                            </TableCell>
-                            <TableCell>
-                              {transaction.end_date
-                                ? new Date(
-                                    transaction.end_date
-                                  ).toLocaleDateString()
-                                : "N/A"}
-                            </TableCell>
-                            <TableCell>{transaction.trans_status}</TableCell>
-                            <TableCell>
-                              {new Date(
-                                transaction.createdAt
-                              ).toLocaleDateString()}
-                            </TableCell>
-                            <TableCell>
-                              {transaction.updatedAt
-                                ? new Date(
-                                    transaction.updatedAt
-                                  ).toLocaleDateString()
-                                : "N/A"}
-                            </TableCell>
-                            <TableCell>
-                              {transaction.deletedAt
-                                ? new Date(
-                                    transaction.deletedAt
-                                  ).toLocaleDateString()
-                                : "N/A"}
-                            </TableCell>
-                            <TableCell>
-                              {transaction.categories.join(", ")}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Box>
-              )
-            )
+            <TableContainer>
+              <Table sx={{ minWidth: 650 }} aria-label="transactions table">
+                <TableHead>
+                  <TableRow>
+                    {[
+                      'Transaction ID',
+                      'Email',
+                      'Post ID',
+                      'Price',
+                      'Start Date',
+                      'End Date',
+                      'Status',
+                      'Created At',
+                      'Updated At',
+                      'Deleted At',
+                    ].map((header, index) => (
+                      <TableCell key={index} sx={{ fontWeight: 'bold' }}>
+                        {header}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {transactions.map((transaction) => (
+                    <TableRow key={transaction.trans_id}>
+                      <TableCell>{transaction.trans_id}</TableCell>
+                      <TableCell>{transaction.email}</TableCell>
+                      <TableCell>{transaction.post_id}</TableCell>
+                      <TableCell>{transaction.price}</TableCell>
+                      <TableCell>{transaction.start_date ? new Date(transaction.start_date).toLocaleDateString() : "N/A"}</TableCell>
+                      <TableCell>{transaction.end_date ? new Date(transaction.end_date).toLocaleDateString() : "N/A"}</TableCell>
+                      <TableCell>{transaction.trans_status}</TableCell>
+                      <TableCell>
+                        {new Date(transaction.createdAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        {transaction.updatedAt
+                          ? new Date(transaction.updatedAt).toLocaleDateString()
+                          : 'N/A'}
+                      </TableCell>
+                      <TableCell>
+                        {transaction.deletedAt
+                          ? new Date(transaction.deletedAt).toLocaleDateString()
+                          : 'N/A'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           )}
         </Paper>
       </Container>
