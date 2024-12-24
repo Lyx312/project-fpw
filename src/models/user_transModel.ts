@@ -22,7 +22,7 @@ const User_transSchema: Schema = new Schema(
         price: { type: Number, required: true, min: 0 },
         start_date: { type: Date, default: null },
         end_date: { type: Date, default: null },
-        trans_status: { type: String, enum: ["pending", "in-progress", "completed", "paid", "cancelled"], default: "pending" },
+        trans_status: { type: String, enum: ["pending", "in-progress", "completed", "paid", "cancelled", "failed"], default: "pending" },
         cancelled_reason: { type: String, default: null },
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date, default: null },

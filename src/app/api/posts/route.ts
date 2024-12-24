@@ -105,17 +105,22 @@ export async function GET(req: Request) {
     // Map response to include full name of the post maker, category list, and average rating
     return NextResponse.json({
       message: "Posts fetched successfully",
-      data: posts.map((post) => ({
-        id: post.post_id,
-        title: post.post_title,
-        description: post.post_description,
-        price: post.post_price,
-        categories: categoryMap[post.post_id] || "Uncategorized", // Join categories with a comma
-        postMaker: `${post.post_email.first_name} ${post.post_email.last_name}`,
-        createdAt: post.createdAt,
-        averageRating: ratingMap[post.post_id] || 0, // Add the average rating to the response
-      })),
-    });
+      data: posts
+        .filter((post) => {
+          const averageRating = ratingMap[post.post_id] || 0; // Default to 0 if no rating exists
+          return averageRating >= minRating && averageRating <= maxRating;
+        })
+        .map((post) => ({
+          id: post.post_id,
+          title: post.post_title,
+          description: post.post_description,
+          price: post.post_price,
+          categories: categoryMap[post.post_id] || "Uncategorized", // Join categories with a comma
+          postMaker: `${post.post_email.first_name} ${post.post_email.last_name}`,
+          createdAt: post.createdAt,
+          averageRating: ratingMap[post.post_id] || 0, // Add the average rating to the response
+        })),
+    });    
   } catch (error: any) {
     console.error("Error fetching posts:", error);
     return NextResponse.json(

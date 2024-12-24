@@ -268,6 +268,7 @@ const ClientHistory = () => {
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("completed")}>Completed</Button>
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("paid")}>Paid</Button>
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("cancelled")}>Cancelled</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("failed")}>Failed</Button>
         </ButtonGroup>
         {transactions.length > 0 ? (
           <Box>
@@ -300,7 +301,7 @@ const ClientHistory = () => {
                   <CardContent>
                     <Typography>Freelancer: {transaction.user_name}</Typography>
                     <Typography>Post Title: {transaction.post_title}</Typography>
-                    <Typography>Price: {transaction.price}</Typography>
+                    <Typography>Price: Rp. {transaction.price.toLocaleString("id-ID")}</Typography>
                     <Typography>Start Date: {formatDate(transaction.start_date)}</Typography>
                     <Typography>End Date: {formatDate(transaction.end_date)}</Typography>
                     <Typography>Status: {transaction.trans_status}</Typography>

@@ -21,6 +21,7 @@ interface Transaction {
   email: string;
   post_id: number;
   price: number;
+  category: string;
   start_date: string;
   end_date: string;
   trans_status: string;
@@ -189,6 +190,7 @@ const TransactionPage = () => {
                       'Email',
                       'Post ID',
                       'Price',
+                      'Category',
                       'Start Date',
                       'End Date',
                       'Status',
@@ -209,6 +211,7 @@ const TransactionPage = () => {
                       <TableCell>{transaction.email}</TableCell>
                       <TableCell>{transaction.post_id}</TableCell>
                       <TableCell>{transaction.price}</TableCell>
+                      <TableCell>{transaction.category}</TableCell>
                       <TableCell>{transaction.start_date ? new Date(transaction.start_date).toLocaleDateString() : "N/A"}</TableCell>
                       <TableCell>{transaction.end_date ? new Date(transaction.end_date).toLocaleDateString() : "N/A"}</TableCell>
                       <TableCell>{transaction.trans_status}</TableCell>

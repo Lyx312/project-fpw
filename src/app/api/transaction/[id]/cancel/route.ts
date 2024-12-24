@@ -24,16 +24,29 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   session.startTransaction();
 
   try {
-    const userTrans = await User_trans.findOneAndUpdate(
-      { trans_id: id },
-      { 
-        trans_status: 'cancelled',
-        cancelled_reason: reason
-      },
-      { new: true, session }
-    );
+    const trans = await User_trans.findOne({ trans_id: id });
+    if (trans.start_date == null) {
+        const userTrans = await User_trans.findOneAndUpdate(
+        { trans_id: id },
+        { 
+          trans_status: 'cancelled',
+          cancelled_reason: reason
+        },
+        { new: true, session }
+      );
+    }
+    else{
+      const userTrans = await User_trans.findOneAndUpdate(
+        { trans_id: id },
+        { 
+          trans_status: 'failed',
+          cancelled_reason: reason
+        },
+        { new: true, session }
+      );
+    }
 
-    if (!userTrans) {
+    if (!trans) {
       await session.abortTransaction();
       session.endSession();
       return NextResponse.json({ message: 'Transaction not found' }, { status: 404 });
@@ -41,7 +54,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
     // update post status to available
     const post = await Post.findOneAndUpdate(
-      { post_id: userTrans.post_id },
+      { post_id: trans.post_id },
       { post_status: 'available' },
       { new: true, session }
     );
@@ -53,7 +66,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     }
 
     // Send email to the user
-    const email = userTrans.email; // Assuming the email is stored in the userTrans document
+    const email = trans.email; // Assuming the email is stored in the userTrans document
     const subject = 'Transaction Cancelled';
     const text = `Your transaction has been cancelled by the ${type}. Reason: ${reason}`;
     const html = emailTemplate('Transaction Cancelled', `Your transaction has been cancelled by the ${type}. Reason: ${reason}`);
@@ -69,7 +82,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     await session.commitTransaction();
     session.endSession();
 
-    return NextResponse.json(userTrans, { status: 200 });
+    return NextResponse.json(trans, { status: 200 });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();

@@ -5,6 +5,8 @@ import Post from '@/models/postModel';
 import sendEmail, { emailTemplate } from '@/emails/mailer';
 import mongoose from 'mongoose';
 import User from '@/models/userModel';
+import Category from '@/models/categoryModel';
+import Post_category from '@/models/post_categoryModel';
 
 export async function GET(req: Request) {
   await connectDB();
@@ -41,18 +43,31 @@ export async function GET(req: Request) {
       transactions.map(async (transaction) => {
         const post = await Post.findOne({post_id: transaction.post_id});
         const user = await User.findOne({email: post.post_email});
+        const categoryTrans = await Post_category.find({ post_id: { $in: [transaction.post_id] } });
+        const categoryIds = categoryTrans.map(category => category.category_id);
+        const categoryId = await Category.find({ category_id: { $in: categoryIds } });
+        const categoryNames = categoryId.map(category => category.category_name).join(', ') || 'No Categories';
         const userName = user ? `${user.first_name} ${user.last_name}` : "Unknown User";
         return {
           ...transaction.toObject(),
           user_name: userName,
           post_title: post?.post_title || 'Unknown Post',
+          category: categoryNames
         };
       })
     );
 
+    const sortedTransactions = enhancedTransactions.sort((a, b) => {
+      const categoryA = a.category.toLowerCase();
+      const categoryB = b.category.toLowerCase();
+      if (categoryA < categoryB) return -1;
+      if (categoryA > categoryB) return 1;
+      return 0;
+    });
+
     // Sort transactions based on trans_status
     if (role != 'admin') {
-        const statusOrder = ['completed', 'in-progress', 'pending', 'paid', 'cancelled'];
+        const statusOrder = ['completed', 'in-progress', 'pending', 'paid', 'cancelled', 'failed'];
         
         enhancedTransactions.sort((a, b) => {
         const statusA = statusOrder.indexOf(a.trans_status.toLowerCase());
@@ -62,7 +77,7 @@ export async function GET(req: Request) {
     }
     
 
-    return NextResponse.json(enhancedTransactions, { status: 200 });
+    return NextResponse.json(sortedTransactions, { status: 200 });
   } catch (error) {
     return NextResponse.json({ message: 'Error fetching transactions', error: error }, { status: 500 });
   }
