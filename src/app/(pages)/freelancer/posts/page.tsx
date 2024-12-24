@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useEffect, useState } from "react";
 import {
   Typography,
@@ -75,9 +75,7 @@ const FreelancerPostsPage: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <Loading />
-    );
+    return <Loading />;
   }
 
   return (
@@ -85,7 +83,11 @@ const FreelancerPostsPage: React.FC = () => {
       <Header />
       {currUser ? (
         <Box sx={{ padding: "2rem" }}>
-          <Typography variant="h4" gutterBottom sx={{ color: "#4B6CB7", fontWeight: "bold" }}>
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{ color: "#4B6CB7", fontWeight: "bold" }}
+          >
             Posts by {currUser.first_name} {currUser.last_name}
           </Typography>
           <Button
@@ -95,7 +97,7 @@ const FreelancerPostsPage: React.FC = () => {
             sx={{
               marginBottom: "1rem",
               backgroundColor: "#4B6CB7",
-              '&:hover': { backgroundColor: "#3A5B8D" },
+              "&:hover": { backgroundColor: "#3A5B8D" },
               padding: "0.8rem 2rem",
             }}
           >
@@ -115,27 +117,42 @@ const FreelancerPostsPage: React.FC = () => {
                     onClick={() => handleEditPost(post.id)}
                   >
                     <CardContent>
-                      <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
+                      <Typography
+                        variant="h6"
+                        sx={{ fontWeight: "bold", color: "#333" }}
+                      >
                         {post.title}
                       </Typography>
-                      <Typography variant="body2" color="textSecondary" component={"p"} gutterBottom>
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        component={"p"}
+                        gutterBottom
+                      >
                         {post.description}
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                         <strong>Price:</strong> Rp{post.price.toLocaleString()}
                       </Typography>
                       <Typography variant="body2" sx={{ color: "#777" }}>
-                        <strong>Categories:</strong> {post.categories.join(", ")}
+                        <strong>Categories:</strong>{" "}
+                        {post.categories.join(", ")}
                       </Typography>
                       <Typography variant="body2" color="textSecondary">
-                        <strong>Created At:</strong> {new Date(post.createdAt).toLocaleDateString()}
+                        <strong>Created At:</strong>{" "}
+                        {new Date(post.createdAt).toLocaleDateString()}
                       </Typography>
                     </CardContent>
                   </Card>
                 </Grid>
               ))
             ) : (
-              <Typography variant="h6" color="textSecondary" align="center" sx={{ width: "100%" }}>
+              <Typography
+                variant="h6"
+                color="textSecondary"
+                align="center"
+                sx={{ width: "100%" }}
+              >
                 No posts found for this user.
               </Typography>
             )}
