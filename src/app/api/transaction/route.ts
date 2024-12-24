@@ -20,6 +20,7 @@ export async function GET(req: Request) {
     const min_price = searchParams.get('min_price');
     const max_price = searchParams.get('max_price');
     const status = searchParams.get('status');
+    const role = searchParams.get('role');
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query: any = {};
@@ -44,21 +45,22 @@ export async function GET(req: Request) {
         return {
           ...transaction.toObject(),
           user_name: userName,
-          start_date: formatDate(transaction.start_date),
-          end_date: formatDate(transaction.end_date),
           post_title: post?.post_title || 'Unknown Post',
         };
       })
     );
 
-    const statusOrder = ['completed', 'in-progress', 'pending', 'paid', 'cancelled'];
-
     // Sort transactions based on trans_status
-    enhancedTransactions.sort((a, b) => {
-      const statusA = statusOrder.indexOf(a.trans_status.toLowerCase());
-      const statusB = statusOrder.indexOf(b.trans_status.toLowerCase());
-      return statusA - statusB;
-    });
+    if (role != 'admin') {
+        const statusOrder = ['completed', 'in-progress', 'pending', 'paid', 'cancelled'];
+        
+        enhancedTransactions.sort((a, b) => {
+        const statusA = statusOrder.indexOf(a.trans_status.toLowerCase());
+        const statusB = statusOrder.indexOf(b.trans_status.toLowerCase());
+        return statusA - statusB;
+      });
+    }
+    
 
     return NextResponse.json(enhancedTransactions, { status: 200 });
   } catch (error) {
@@ -66,17 +68,7 @@ export async function GET(req: Request) {
   }
 }
 
-function formatDate(dateString: string): string {
-  const options: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "UTC",
-  };
-  return new Date(dateString).toLocaleString("en-US", options);
-}
+
 
 
 export async function POST(req: Request) {

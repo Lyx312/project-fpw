@@ -42,6 +42,7 @@ const colors = {
 const TransactionPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filters, setFilters] = useState({
+<<<<<<< HEAD
     trans_id: "",
     email: "",
     trans_status: "",
@@ -49,6 +50,16 @@ const TransactionPage = () => {
     end_date: "",
     min_price: "",
     max_price: "",
+=======
+    trans_id: '',
+    email: '',
+    trans_status: '',
+    start_date: '',
+    end_date: '',
+    min_price: '',
+    max_price: '',
+    role: 'admin'
+>>>>>>> 725f141d0d3fdeaa168aa19e0e9ea237f3500329
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,6 +71,7 @@ const TransactionPage = () => {
       const response = await fetch(`/api/transaction?${query}`);
       if (response.ok) {
         const data = await response.json();
+<<<<<<< HEAD
         const transactionsWithCategories = data;
 
         for (const transaction of transactionsWithCategories) {
@@ -76,6 +88,11 @@ const TransactionPage = () => {
           transactionsWithCategories
         );
         setTransactions(groupedByCategory);
+=======
+        console.log(data);
+        
+        setTransactions(data);
+>>>>>>> 725f141d0d3fdeaa168aa19e0e9ea237f3500329
       } else {
         console.error("Error fetching transactions");
       }

@@ -41,8 +41,6 @@ export async function GET(req: Request) {
       return {
         ...transaction._doc, // Spread existing transaction fields
         post_title: postMap[transaction.post_id] || "Unknown Title", // Add post_title
-        start_date: formatDate(transaction.start_date), // Format start_date
-        end_date: formatDate(transaction.end_date), // Format end_date
         user_name: userName, // Add user name
       };
     }));
@@ -65,17 +63,4 @@ export async function GET(req: Request) {
     // Return an empty array if there's an error
     return new Response(JSON.stringify([]), { status: 200 });
   }
-}
-
-// Helper function to format date
-function formatDate(dateString: string): string {
-  const options: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "UTC",
-  };
-  return new Date(dateString).toLocaleString("en-US", options);
 }

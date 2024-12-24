@@ -95,6 +95,7 @@ const FreelancerHistoryPage = () => {
           params: { userEmail: currUser.email, status: filterStatus },
         }
       );
+<<<<<<< HEAD
       const transactionsWithCategories = response.data;
 
       // Fetch post details for each transaction and add categories to each transaction
@@ -126,6 +127,11 @@ const FreelancerHistoryPage = () => {
 
       // Initialize filteredTransactions to all transactions initially
       setFilteredTransactions(transactionsWithCategories);
+=======
+      console.log(response.data);
+      
+      setTransactions(response.data);
+>>>>>>> 725f141d0d3fdeaa168aa19e0e9ea237f3500329
     } catch (err) {
       console.error("Error fetching transactions:", err);
       setError("Failed to fetch transactions");
@@ -156,6 +162,19 @@ const FreelancerHistoryPage = () => {
 
     setFilteredTransactions(filtered);
   };
+
+  function formatDate(dateString: string): string {
+    if (!dateString) return "N/A";
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "UTC",
+    };
+    return new Date(dateString).toLocaleString("en-US", options);
+  }
 
   useEffect(() => {
     fetchUser();
@@ -249,10 +268,15 @@ const FreelancerHistoryPage = () => {
                       Post Title: {transaction.post_title}
                     </Typography>
                     <Typography>Price: {transaction.price}</Typography>
+<<<<<<< HEAD
                     <Typography>
                       Start Date: {transaction.start_date}
                     </Typography>
                     <Typography>End Date: {transaction.end_date}</Typography>
+=======
+                    <Typography>Start Date: {formatDate(transaction.start_date)}</Typography>
+                    <Typography>End Date: {formatDate(transaction.end_date)}</Typography>
+>>>>>>> 725f141d0d3fdeaa168aa19e0e9ea237f3500329
                     <Typography>Status: {transaction.trans_status}</Typography>
                   </CardContent>
                   <CardActions>

@@ -58,7 +58,7 @@ export async function DELETE(request: Request, context: { params: { id: string }
 
     await sendEmail(
       application.email,
-      'Application Declined - Freelancer Hub',
+      'Application Declined - Freelance Hub',
       'Your application has been declined.',
       emailTemplate('Application Declined', 'Your application as a freelancer has been declined.')
     );
