@@ -3,24 +3,12 @@
 
 import Header from "@/app/(components)/Header";
 import { getCurrUser } from "@/utils/utils";
-import {
-  Box,
+import { Box,
   Typography,
   Card,
   CardContent,
   CardActions,
-  Button,
-  ButtonGroup,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  TextField,
-  List,
-  ListItem,
-  ListItemText,
-} from "@mui/material";
+  Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Loading from "@/app/(pages)/loading";
@@ -42,18 +30,12 @@ interface User {
 const FreelancerHistoryPage = () => {
   const [currUser, setCurrUser] = useState<User | null>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
-  const [postDetails, setPostDetails] = useState<{ [key: string]: any }>({});
-  const [categories, setCategories] = useState<string[]>([]);
-  const [filteredTransactions, setFilteredTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // Track selected category
   const [openDialog, setOpenDialog] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
-  const [transactionToCancel, setTransactionToCancel] = useState<string | null>(
-    null
-  );
+  const [transactionToCancel, setTransactionToCancel] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -88,6 +70,7 @@ const FreelancerHistoryPage = () => {
 
   const fetchUserTransaction = async () => {
     if (!currUser?.email) return;
+
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/freelancer`,
@@ -95,66 +78,84 @@ const FreelancerHistoryPage = () => {
           params: { userEmail: currUser.email, status: filterStatus },
         }
       );
-      const transactionsWithCategories = response.data;
-
-      // Fetch post details for each transaction and add categories to each transaction
-      for (const transaction of transactionsWithCategories) {
-        if (transaction.post_id && !postDetails[transaction.post_id]) {
-          const postDetail = await fetchUserPost(transaction.post_id);
-          if (postDetail) {
-            // Include the categories from the post details into each transaction
-            transaction.categories = postDetail.categories || [];
-
-            setPostDetails((prevDetails) => ({
-              ...prevDetails,
-              [transaction.post_id]: postDetail,
-            }));
-          }
-        }
-      }
-
-      setTransactions(transactionsWithCategories);
-
-      // Update categories state
-      const allCategories = transactionsWithCategories.flatMap(
-        (transaction) => transaction.categories
-      );
-      setCategories((prevCategories) => {
-        const uniqueCategories = new Set([...prevCategories, ...allCategories]);
-        return Array.from(uniqueCategories);
-      });
-
-      // Initialize filteredTransactions to all transactions initially
-      setFilteredTransactions(transactionsWithCategories);
+      console.log(response.data);
+      
+      setTransactions(response.data);
     } catch (err) {
       console.error("Error fetching transactions:", err);
       setError("Failed to fetch transactions");
     }
   };
 
-  const fetchUserPost = async (id: string) => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${id}`
-      );
+  const handleViewPost = (postId: string) => {
+    router.push(`/posts/detail/${postId}`);
+  };
 
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching Post", error);
-      setError("Failed to fetch Post");
+  const handleAcceptTransaction = async (transactionId: string) => {
+    try {
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/accept`);
+      fetchUserTransaction();
+      alert("Transaction accepted successfully");
+    } catch (err) {
+      console.error("Error accepting transaction:", err);
+      alert("Failed to accept transaction");
+      setError("Failed to accept transaction");
     }
   };
 
-  const handleCategoryClick = (category: string) => {
-    // Set the selected category to filter the transactions
-    setSelectedCategory(category);
+  const handleCancelTransaction = async () => {
+    //if (!transactionToCancel) return;
 
-    // Filter transactions based on the selected category
-    const filtered = transactions.filter((transaction) =>
-      transaction.categories.includes(category)
-    );
+    // try {
+      const trans = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}`)
 
-    setFilteredTransactions(filtered);
+      const response = await axios.get(
+        `https://api.sandbox.midtrans.com/v2/TRANS-${trans.data._id}/status`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${btoa(
+              "SB-Mid-server-YEsuH2VfHN8p4_wUbrca4fMT:"
+            )}`, // Base64 encoded auth token
+          },
+        }
+      );
+      console.log(trans.data)
+
+      // await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}/cancel`, { type: "freelancer", reason: cancelReason });
+      // fetchUserTransaction();
+      // alert("Transaction cancelled successfully");
+      // setOpenDialog(false);
+      // setCancelReason("");
+      // setTransactionToCancel(null);
+    // } catch (err) {
+    //   console.error("Error cancelling transaction:", err);
+    //   alert("Failed to cancel transaction");
+    //   setError("Failed to cancel transaction");
+    // }
+  };
+
+  const handleCompleteTransaction = async (transactionId: string) => {
+    try {
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/complete`);
+      fetchUserTransaction();
+      alert("Transaction completed successfully");
+    } catch (err) {
+      console.error("Error completing transaction:", err);
+      alert("Failed to complete transaction");
+      setError("Failed to complete transaction");
+    }
+  };
+
+  const openCancelDialog = (transactionId: string) => {
+    setTransactionToCancel(transactionId);
+    setOpenDialog(true);
+  };
+
+  const closeCancelDialog = () => {
+    setOpenDialog(false);
+    setCancelReason("");
+    setTransactionToCancel(null);
   };
 
   function formatDate(dateString: string): string {
@@ -165,7 +166,7 @@ const FreelancerHistoryPage = () => {
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-      timeZone: "UTC",
+      timeZone: "Asia/Jakarta",
     };
     return new Date(dateString).toLocaleString("en-US", options);
   }
@@ -219,10 +220,9 @@ const FreelancerHistoryPage = () => {
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("completed")}>Completed</Button>
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("paid")}>Paid</Button>
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("cancelled")}>Cancelled</Button>
-          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("failed")}>Failed</Button>
         </ButtonGroup>
 
-        {filteredTransactions.length > 0 ? (
+        {transactions.length > 0 ? (
           <Box>
             <Typography
               variant="h5"
@@ -237,7 +237,7 @@ const FreelancerHistoryPage = () => {
                 gap: 2,
               }}
             >
-              {filteredTransactions.map((transaction, index) => (
+              {transactions.map((transaction, index) => (
                 <Card
                   key={index}
                   sx={{ backgroundColor: "#2B3B4B", color: "#fff" }}
@@ -245,7 +245,8 @@ const FreelancerHistoryPage = () => {
                   <CardContent>
                     <Typography>Client: {transaction.user_name}</Typography>
                     <Typography>Post Title: {transaction.post_title}</Typography>
-                    <Typography>Price: Rp. {transaction.price.toLocaleString("id-ID")}</Typography>
+                    <Typography>Categories: {transaction.category}</Typography>
+                    <Typography>Price: {transaction.price.toLocaleString("id-ID")}</Typography>
                     <Typography>Start Date: {formatDate(transaction.start_date)}</Typography>
                     <Typography>End Date: {formatDate(transaction.end_date)}</Typography>
                     <Typography>Status: {transaction.trans_status}</Typography>
@@ -259,45 +260,55 @@ const FreelancerHistoryPage = () => {
                         backgroundColor: "#1A2AAA",
                         "&:hover": { backgroundColor: "#1230EE" },
                       }}
-                      onClick={() =>
-                        router.push(`/posts/detail/${transaction.post_id}`)
-                      }
+                      onClick={() => handleViewPost(transaction.post_id)}
                     >
                       View Post
                     </Button>
+                    {transaction.trans_status === "pending" && (
+                      <Button
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                          backgroundColor: "#1A2AAA",
+                          "&:hover": { backgroundColor: "#1230EE" },
+                        }}
+                        onClick={() => handleAcceptTransaction(transaction.trans_id)}
+                      >
+                        Accept
+                      </Button>
+                    )}
+                    {["pending", "in-progress"].includes(transaction.trans_status) && (
+                      <Button
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                          backgroundColor: "#1A2AAA",
+                          "&:hover": { backgroundColor: "#1230EE" },
+                        }}
+                        onClick={() => openCancelDialog(transaction.trans_id)}
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                    {transaction.trans_status === "in-progress" && (
+                      <Button
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                          backgroundColor: "#1A2AAA",
+                          "&:hover": { backgroundColor: "#1230EE" },
+                        }}
+                        onClick={() => handleCompleteTransaction(transaction.trans_id)}
+                      >
+                        Complete
+                      </Button>
+                    )}
                   </CardActions>
                 </Card>
               ))}
-            </Box>
-
-            <Box sx={{ marginTop: 4 }}>
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 600, color: "#fff", marginBottom: 2 }}
-              >
-                Categories
-              </Typography>
-              {categories.length > 0 ? (
-                <List>
-                  {categories.map((category, idx) => (
-                    <ListItem
-                      key={idx}
-                      sx={{
-                        backgroundColor: "#2B3B4B",
-                        marginBottom: 1,
-                        cursor: "pointer", // Make it look clickable
-                      }}
-                      onClick={() => handleCategoryClick(category)} // Click handler for category
-                    >
-                      <ListItemText primary={category} sx={{ color: "#fff" }} />
-                    </ListItem>
-                  ))}
-                </List>
-              ) : (
-                <Typography sx={{ color: "#fff" }}>
-                  No categories available
-                </Typography>
-              )}
             </Box>
           </Box>
         ) : (
@@ -306,6 +317,31 @@ const FreelancerHistoryPage = () => {
           </Typography>
         )}
       </Box>
+
+      <Dialog open={openDialog} onClose={closeCancelDialog}>
+        <DialogTitle>Cancel Transaction</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please provide a reason for cancelling the transaction.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Reason"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeCancelDialog}>Nevermind</Button>
+          <Button onClick={handleCancelTransaction} disabled={!cancelReason}>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

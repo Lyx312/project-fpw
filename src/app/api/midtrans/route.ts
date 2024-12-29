@@ -21,15 +21,16 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const { transactionId } = await req.json();
-
     if (!transactionId) {
       return NextResponse.json({ error: "Missing transaction ID" }, { status: 400 });
     }
 
     const transaction = await User_trans.findOne({ trans_id: transactionId });
-    if (!transaction || transaction.trans_status !== "completed") {
+    if (!transaction) {
       return NextResponse.json({ error: "Invalid or non-payable transaction" }, { status: 400 });
     }
+
+    console.log(transaction)
 
     const transactionDetails = {
       transaction_details: {

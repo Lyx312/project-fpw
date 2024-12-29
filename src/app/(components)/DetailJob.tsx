@@ -12,6 +12,12 @@ interface DetailJobProps {
   id: string;
 }
 
+declare global {
+  interface Window {
+    snap: any; // Adding snap to the global Window interface
+  }
+}
+
 const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
   const [post, setPost] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
@@ -19,8 +25,23 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
   const [currUser, setCurrUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [snapLoaded, setSnapLoaded] = useState(false);
 
   const router = useRouter();
+
+  // Utility to load Snap.js dynamically
+  const loadSnapScript = async () => {
+    if (!snapLoaded) {
+      const script = document.createElement("script");
+      script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
+      script.setAttribute(
+        "data-client-key",
+        process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!
+      );
+      script.onload = () => setSnapLoaded(true);
+      document.body.appendChild(script);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,6 +94,10 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
     fetchData();
   }, [id]);
 
+  useEffect(() => {
+    loadSnapScript();
+  }, []);
+
   // Calculate average rating
   const averageRating =
     reviews.length > 0
@@ -99,8 +124,53 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
       });
 
       if (response.status === 201) {
-        alert("Successfully hired freelancer. Please wait for the freelancer to accept");
-        setActiveTransaction(true);
+        try {
+          const { data } = await axios.post(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
+            {
+              transactionId: response.data.savedUserTrans.trans_id,
+            }
+          );
+    
+          const snapToken = data.token;
+    
+          if (!snapLoaded) {
+            alert("Payment gateway not fully loaded. Please wait and try again.");
+            return;
+          }
+    
+          // Proceed with the payment using the snap token
+          window.snap.pay(snapToken, {
+            onSuccess: async (result: any) => {
+              try {
+                await axios.put(
+                  `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
+                  {
+                    transactionId: response.data.savedUserTrans.trans_id,
+                  }
+                );
+                alert("Successfully hired freelancer. Please wait for the freelancer to accept");
+                setActiveTransaction(true);
+              } catch (err) {
+                console.error("Error marking transaction as completed:", err);
+                alert("Failed to mark transaction as completed after popup close.");
+              }
+            },
+            onPending: async () => {
+              alert("Payment is pending. Please complete the payment to proceed.");
+            },
+            onError: (error: any) => {
+              console.error("Payment error:", error);
+              alert("Payment failed. Please try again.");
+            },
+            onClose: async () => {
+              alert("Payment popup was closed. Transaction is not completed.");
+            },
+          });
+        } catch (err) {
+          console.error("Error initiating payment:", err);
+          alert("Failed to start payment process. Please try again.");
+        }
       } else {
         alert("Failed to hire freelancer");
       }

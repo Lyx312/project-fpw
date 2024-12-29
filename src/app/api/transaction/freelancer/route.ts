@@ -4,6 +4,8 @@ import Post from '@/models/postModel';
 import connectDB from '../../../../config/database';
 import User_trans from '../../../../models/user_transModel';
 import User from '../../../../models/userModel'; // Import User model to access first_name and last_name
+import Post_category from '@/models/post_categoryModel';
+import Category from '@/models/categoryModel';
 
 export async function GET(req: Request) {
   await connectDB();
@@ -37,11 +39,16 @@ export async function GET(req: Request) {
       // Fetch user details by user_id
       const user = await User.findOne({email: transaction.email}); // Assuming transaction has a user_id field
       const userName = user ? `${user.first_name} ${user.last_name}` : "Unknown User"; // Combine first_name and last_name
-
+      const categoryTrans = await Post_category.find({ post_id: { $in: [transaction.post_id] } });
+      const categoryIds = categoryTrans.map(category => category.category_id);
+      const categoryId = await Category.find({ category_id: { $in: categoryIds } });
+      const categoryNames = categoryId.map(category => category.category_name).join(', ') || 'No Categories';
+      
       return {
         ...transaction._doc, // Spread existing transaction fields
         post_title: postMap[transaction.post_id] || "Unknown Title", // Add post_title
         user_name: userName, // Add user name
+        category: categoryNames
       };
     }));
 

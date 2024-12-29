@@ -213,7 +213,7 @@ const ClientHistory = () => {
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-      timeZone: "UTC",
+      timeZone: "Asia/Jakarta",
     };
     return new Date(dateString).toLocaleString("en-US", options);
   }
@@ -301,6 +301,7 @@ const ClientHistory = () => {
                   <CardContent>
                     <Typography>Freelancer: {transaction.user_name}</Typography>
                     <Typography>Post Title: {transaction.post_title}</Typography>
+                    <Typography>Categories: {transaction.category}</Typography>
                     <Typography>Price: Rp. {transaction.price.toLocaleString("id-ID")}</Typography>
                     <Typography>Start Date: {formatDate(transaction.start_date)}</Typography>
                     <Typography>End Date: {formatDate(transaction.end_date)}</Typography>
