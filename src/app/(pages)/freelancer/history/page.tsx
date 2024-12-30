@@ -104,35 +104,32 @@ const FreelancerHistoryPage = () => {
   };
 
   const handleCancelTransaction = async () => {
-    //if (!transactionToCancel) return;
+    if (!transactionToCancel) return;
 
-    // try {
+    try {
+
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}/cancel`, { type: "freelancer", reason: cancelReason });
       const trans = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}`)
 
-      const response = await axios.get(
-        `https://api.sandbox.midtrans.com/v2/TRANS-${trans.data._id}/status`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Basic ${btoa(
-              "SB-Mid-server-YEsuH2VfHN8p4_wUbrca4fMT:"
-            )}`, // Base64 encoded auth token
-          },
-        }
-      );
+      const response = await axios.put(
+                        `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
+                        {
+                          transactionId: trans.data.trans_id,
+                          status: "refund"
+                        }
+                      );
       console.log(trans.data)
-
-      // await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}/cancel`, { type: "freelancer", reason: cancelReason });
-      // fetchUserTransaction();
-      // alert("Transaction cancelled successfully");
-      // setOpenDialog(false);
-      // setCancelReason("");
-      // setTransactionToCancel(null);
-    // } catch (err) {
-    //   console.error("Error cancelling transaction:", err);
-    //   alert("Failed to cancel transaction");
-    //   setError("Failed to cancel transaction");
-    // }
+      console.log(response.data)
+      fetchUserTransaction();
+      alert("Transaction cancelled successfully");
+      setOpenDialog(false);
+      setCancelReason("");
+      setTransactionToCancel(null);
+    } catch (err) {
+      console.error("Error cancelling transaction:", err);
+      alert("Failed to cancel transaction");
+      setError("Failed to cancel transaction");
+    }
   };
 
   const handleCompleteTransaction = async (transactionId: string) => {

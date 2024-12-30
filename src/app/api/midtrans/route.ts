@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     await connectDB();
-    const { transactionId } = await req.json();
+    const { transactionId, status } = await req.json();
 
     if (!transactionId) {
       return NextResponse.json({ error: "Missing transaction ID" }, { status: 400 });
@@ -71,44 +71,49 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
     }
 
-    const orderId = `TRANS-${transaction.trans_id}`;
+   if (status === "refund") {
+    const orderId = `TRANS-${transaction._id}`;
     console.log("Order ID being sent to Midtrans:", orderId);
 
-    // // Step 1: Check transaction status from Midtrans
-    // const getTransIdResponse = await fetch(`https://api.sandbox.midtrans.com/v2/${orderId}/status`, {
-    //   method: "GET",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     Authorization: `Basic ${Buffer.from(serverKey + ":").toString("base64")}`,
-    //   },
-    // });
+    const getTransIdResponse = await fetch(`https://api.sandbox.midtrans.com/v2/${orderId}/status`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${Buffer.from(serverKey + ":").toString("base64")}`,
+      },
+    });
 
-    // const getTransId = await getTransIdResponse.json();
-    // console.log("Midtrans response:", getTransId);
+    const getTransId = await getTransIdResponse.json();
+    console.log("Midtrans response:", getTransId);
 
-    // if (getTransId.transaction_status === "pending") {
-    //   // Step 2: Simulate approval if the transaction is pending
-    //   const url = `https://api.sandbox.midtrans.com/v2/${getTransId.transaction_id}/approve`;
-    //   const response = await fetch(url, {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: `Basic ${Buffer.from(serverKey + ":").toString("base64")}`,
-    //     },
-    //   });
+ 
+      // Step 2: Simulate approval if the transaction is pending
+      const url = `https://api.sandbox.midtrans.com/v2/${getTransId.transaction_id}/refund/online/direct`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${Buffer.from(serverKey + ":").toString("base64")}`,
+        },
+        body: JSON.stringify({
+          "refund_key": `REFUND-${getTransId.transaction_id}`,
+          "amount": getTransId.gross_amount,
+          "reason": "Canceled by freelancer"
+        })
+      });
 
-    //   if (!response.ok) {
-    //     const errorData = await response.json();
-    //     console.error("Midtrans API error:", errorData);
-    //     return NextResponse.json({ error: "Failed to approve transaction in Midtrans" }, { status: 500 });
-    //   }
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Midtrans API error:", errorData);
+        return NextResponse.json({ error: "Failed to refund transaction in Midtrans" }, { status: 500 });
+      }
 
-    //   console.log("Midtrans approval response:", await response.json());
-    // }
+      console.log("Midtrans approval response:", await response.json());
+    }
 
     // Step 3: Update transaction status in the database to 'paid'
-    transaction.trans_status = "paid";
-    await transaction.save();
+    // transaction.trans_status = "paid";
+    // await transaction.save();
 
     return NextResponse.json({
       message: "Transaction status updated to 'paid' in database and Midtrans",

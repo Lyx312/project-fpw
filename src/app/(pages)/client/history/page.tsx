@@ -143,51 +143,51 @@ const ClientHistory = () => {
 
   const handlePayTransaction = async (transaction: any) => {
     try {
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
-        {
-          transactionId: transaction.trans_id,
-        }
-      );
+      setReviewPostId(transaction.post_id);
+      setReviewPostTitle(transaction.post_title);
+      setReviewModalOpen(true);
+      // const { data } = await axios.post(
+      //   `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
+      //   {
+      //     transactionId: transaction.trans_id,
+      //   }
+      // );
 
-      const snapToken = data.token;
+      // const snapToken = data.token;
 
-      if (!snapLoaded) {
-        alert("Payment gateway not fully loaded. Please wait and try again.");
-        return;
-      }
+      // if (!snapLoaded) {
+      //   alert("Payment gateway not fully loaded. Please wait and try again.");
+      //   return;
+      // }
 
-      // Proceed with the payment using the snap token
-      window.snap.pay(snapToken, {
-        onSuccess: async (result: any) => {
-          try {
-            await axios.put(
-              `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
-              {
-                transactionId: transaction.trans_id,
-              }
-            );
-            alert("Payment successful!");
-            setReviewPostId(transaction.post_id);
-            setReviewPostTitle(transaction.post_title);
-            setReviewModalOpen(true);
-            fetchUserTransaction();
-          } catch (err) {
-            console.error("Error marking transaction as completed:", err);
-            alert("Failed to mark transaction as completed after popup close.");
-          }
-        },
-        onPending: async () => {
-          alert("Payment is pending. Please complete the payment to proceed.");
-        },
-        onError: (error: any) => {
-          console.error("Payment error:", error);
-          alert("Payment failed. Please try again.");
-        },
-        onClose: async () => {
-          alert("Payment popup was closed. Transaction is not completed.");
-        },
-      });
+      // // Proceed with the payment using the snap token
+      // window.snap.pay(snapToken, {
+      //   onSuccess: async (result: any) => {
+      //     try {
+      //       await axios.put(
+      //         `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
+      //         {
+      //           transactionId: transaction.trans_id,
+      //         }
+      //       );
+      //       alert("Payment successful!");
+      //       fetchUserTransaction();
+      //     } catch (err) {
+      //       console.error("Error marking transaction as completed:", err);
+      //       alert("Failed to mark transaction as completed after popup close.");
+      //     }
+      //   },
+      //   onPending: async () => {
+      //     alert("Payment is pending. Please complete the payment to proceed.");
+      //   },
+      //   onError: (error: any) => {
+      //     console.error("Payment error:", error);
+      //     alert("Payment failed. Please try again.");
+      //   },
+      //   onClose: async () => {
+      //     alert("Payment popup was closed. Transaction is not completed.");
+      //   },
+      // });
     } catch (err) {
       console.error("Error initiating payment:", err);
       alert("Failed to start payment process. Please try again.");
