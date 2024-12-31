@@ -12,7 +12,16 @@ import {
   CircularProgress,
   Alert,
   TextField,
+  Grid
 } from '@mui/material';
+
+const colors = {
+  primary: "#001F3F",
+  secondary: "#3A6D8C",
+  accent: "#6A9AB0",
+  text: "#EAD8B1",
+  background: "#f5f5f5",
+};
 
 interface Country {
   country_id: string;
@@ -85,13 +94,13 @@ const CountryManager: React.FC = () => {
   }, []);
 
   return (
-    <Box p={3}>
-      <Typography variant="h4" gutterBottom>
+    <Box p={3} sx={{ backgroundColor: colors.primary, minHeight: '100vh', color: colors.text }}>
+      <Typography variant="h4" gutterBottom sx={{ color: colors.text, textAlign: 'center' }}>
         Country Manager
       </Typography>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert severity="error" sx={{ mb: 2, backgroundColor: colors.accent, color: colors.text }}>
           {error}
         </Alert>
       )}
@@ -103,6 +112,9 @@ const CountryManager: React.FC = () => {
           display: 'grid',
           gap: 2,
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          backgroundColor: colors.accent,
+          padding: 2,
+          borderRadius: '5px'
         }}
       >
         {[
@@ -120,6 +132,7 @@ const CountryManager: React.FC = () => {
             value={filters[field.key as keyof typeof filters]}
             onChange={(e) => handleFilterChange(field.key, field.type === 'number' ? Number(e.target.value) : e.target.value)}
             variant="outlined"
+            sx={{ borderRadius: '5px' }}
           />
         ))}
       </Box>
@@ -127,34 +140,42 @@ const CountryManager: React.FC = () => {
       {/* Action Button */}
       <Button
         variant="contained"
-        color="primary"
         onClick={insertCountries}
         disabled={loading}
-        sx={{ mb: 2 }}
-        startIcon={loading ? <CircularProgress size={20} /> : null}
+        sx={{
+          mb: 2,
+          backgroundColor: colors.accent,
+          color: "white",
+          '&:hover': { backgroundColor: colors.secondary },
+        }}
+        startIcon={loading ? <CircularProgress size={20} sx={{ color: colors.text }} /> : null}
       >
         {loading ? 'Processing...' : 'Fetch and Insert from API'}
       </Button>
 
-      <Divider sx={{ mb: 2 }} />
+      <Divider sx={{ mb: 2, borderColor: colors.accent }} />
 
       {/* Country List */}
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" gutterBottom sx={{ color: colors.text }}>
         Countries in Database
       </Typography>
 
       {loading ? (
-        <CircularProgress sx={{ display: 'block', mt: 2 }} />
+        <CircularProgress sx={{ display: 'block', mt: 2, color: colors.secondary }} />
       ) : countries.length > 0 ? (
-        <List>
-          {countries.map((country) => (
-            <ListItem key={country.country_id}>
-              {country.country_name} ({country.country_id})
-            </ListItem>
-          ))}
+        <List sx={{ backgroundColor: "white", borderRadius: '8px' }}>
+          <Grid container spacing={2}>
+            {countries.map((country, index) => (
+              <Grid item xs={4} key={country.country_id}>
+                <ListItem sx={{ color: "black", display: 'flex', justifyContent: 'center' }}>
+                  {country.country_name} ({country.country_id})
+                </ListItem>
+              </Grid>
+            ))}
+          </Grid>
         </List>
       ) : (
-        <Typography variant="body1" color="textSecondary">
+        <Typography variant="body1" sx={{ color: colors.text }}>
           No countries found.
         </Typography>
       )}

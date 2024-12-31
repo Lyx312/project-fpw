@@ -168,9 +168,15 @@ const Header = () => {
                   Welcome, {currUser.first_name + " " + currUser.last_name || "User"}!
                 </Typography>
                 <Typography variant="body2" align="center">
-                  <Link href="/my-profile" underline="hover">
-                    Go to Profile
-                  </Link>
+                {currUser.role !== "admin" ? (
+                    <Link href="/my-profile" underline="hover">
+                      Go to Profile
+                    </Link>
+                ) : (
+                    <Link href="/admin" underline="hover">
+                      Go to Admin Dashboard
+                    </Link>
+                )}
                   <br />
                   <Link href="/login" underline="hover" onClick={logout}>
                     Logout

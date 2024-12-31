@@ -57,13 +57,13 @@ export async function GET(req: Request) {
       })
     );
 
-    const sortedTransactions = enhancedTransactions.sort((a, b) => {
-      const categoryA = a.category.toLowerCase();
-      const categoryB = b.category.toLowerCase();
-      if (categoryA < categoryB) return -1;
-      if (categoryA > categoryB) return 1;
-      return 0;
-    });
+    // const sortedTransactions = enhancedTransactions.sort((a, b) => {
+    //   const categoryA = a.category.toLowerCase();
+    //   const categoryB = b.category.toLowerCase();
+    //   if (categoryA < categoryB) return -1;
+    //   if (categoryA > categoryB) return 1;
+    //   return 0;
+    // });
 
     // Sort transactions based on trans_status
     if (role != 'admin') {
@@ -77,7 +77,7 @@ export async function GET(req: Request) {
     }
     
 
-    return NextResponse.json(sortedTransactions, { status: 200 });
+    return NextResponse.json(enhancedTransactions, { status: 200 });
   } catch (error) {
     return NextResponse.json({ message: 'Error fetching transactions', error: error }, { status: 500 });
   }

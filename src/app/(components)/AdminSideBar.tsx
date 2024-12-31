@@ -33,7 +33,9 @@ const AdminSideBar = () => {
       }}
     >
       <Typography variant="h6" component="div" sx={{ marginBottom: 2 }}>
-        <Image src="/assets/images/logo.png" alt="Logo" width={180} height={80} />
+        <Link href="/">
+          <Image src="/assets/images/logo.png" alt="Logo" width={180} height={80} />
+        </Link>
       </Typography>
 
       <List>

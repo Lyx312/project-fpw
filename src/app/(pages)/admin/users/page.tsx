@@ -19,6 +19,12 @@ import {
   InputLabel,
   FormControl,
   Button,
+  Link,
+  Dialog,
+  DialogContentText,
+  DialogContent,
+  DialogActions,
+  DialogTitle
 } from '@mui/material';
 import axios from 'axios';
 
@@ -30,6 +36,7 @@ interface User {
   country_name: string;
   role: string;
   is_banned: boolean;
+  banned_reason: string | null;
 }
 
 interface Country {
@@ -53,6 +60,12 @@ const AdminUsersPage = () => {
   const [nameFilter, setNameFilter] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
+  const [openDialog, setOpenDialog] = useState(false);
+  const [banReason, setBanReason] = useState("");
+  const [banned, setBanned] = useState(false);
+  const [banUser, setBanUser] = useState<string | null>(
+    null
+  );
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -85,6 +98,19 @@ const AdminUsersPage = () => {
     }
   };
 
+  const openCancelDialog = (user: User) => {
+    setBanUser(user._id);
+    setBanned(user.is_banned);
+    setOpenDialog(true);
+  };
+
+  const closeCancelDialog = () => {
+    setOpenDialog(false);
+    setBanReason("");
+    setBanUser(null);
+    setBanned(false);
+  };
+
   useEffect(() => {
     fetchUsers();
     fetchCountries();
@@ -94,9 +120,27 @@ const AdminUsersPage = () => {
     fetchUsers();
   }, [nameFilter, countryFilter, roleFilter]);
 
-  const handleBanUnban = async (user: User) => {
+  const handleBanUnban = async () => {
+    if (!banUser) return;
     try {
-      await axios.put(`/api/users/${user._id}/ban`);
+      if (banned) {
+        await axios.put(`/api/users/${banUser}/ban`, {reason: null });
+      }
+      else{
+        await axios.put(`/api/users/${banUser}/ban`, {reason: banReason });
+      }
+      fetchUsers();
+      setOpenDialog(false);
+      setBanReason("");
+      setBanUser(null);
+    } catch (err) {
+      console.error('Error banning/unbanning user:', err);
+    }
+  };
+
+  const handleUnban = async (user: User) => {
+    try {
+        await axios.put(`/api/users/${user._id}/ban`);
       fetchUsers();
     } catch (err) {
       console.error('Error banning/unbanning user:', err);
@@ -218,24 +262,40 @@ const AdminUsersPage = () => {
                     <TableCell>Country</TableCell>
                     <TableCell>Role</TableCell>
                     <TableCell align="center">Actions</TableCell>
+                    <TableCell align="center">Banned Reason</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {users.map((user) => (
                     <TableRow key={user.email}>
-                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        <Link href={`/profile/${user._id}`} sx={{ textDecoration: 'none', color: 'inherit' }}>
+                          <Typography variant="body2" sx={{ cursor: 'pointer'}}>
+                            {user.email}
+                          </Typography>
+                        </Link>
+                      </TableCell>
                       <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
                       <TableCell>{user.country_name}</TableCell>
                       <TableCell>{user.role}</TableCell>
                       <TableCell align="center">
-                        <Button
-                          variant="contained"
-                          color={user.is_banned ? 'success' : 'error'}
-                          onClick={() => handleBanUnban(user)}
-                        >
-                          {user.is_banned ? 'Unban' : 'Ban'}
-                        </Button>
+                      <Button
+                        variant="contained"
+                        color={user.is_banned ? 'error' : 'success'}
+                        onClick={() => {
+                          if (user.is_banned) {
+                            handleUnban(user);
+                          } else {
+                            openCancelDialog(user);
+                          }
+                        }}
+                      >
+                        {user.is_banned ? 'Unban' : 'Ban'}
+                      </Button>
                       </TableCell>
+                      <TableCell align="center">{user.banned_reason
+                          ? user.banned_reason
+                          : '-'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -244,6 +304,30 @@ const AdminUsersPage = () => {
           )}
         </Paper>
       </Container>
+      <Dialog open={openDialog} onClose={closeCancelDialog}>
+        <DialogTitle>Ban User</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please provide a reason for banning this user.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Reason"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={banReason}
+            onChange={(e) => setBanReason(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeCancelDialog}>Nevermind</Button>
+          <Button onClick={handleBanUnban} disabled={!banReason}>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

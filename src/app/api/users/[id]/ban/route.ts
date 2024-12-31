@@ -18,6 +18,13 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       return Response.json({ message: 'User not found' }, { status: 404 });
     }
 
+    if (!user.is_banned) {
+      const { reason } = await request.json();
+      user.banned_reason = reason;
+    }
+    else if (user.is_banned) {
+      user.banned_reason = null;
+    }
     user.is_banned = !user.is_banned;
     await user.save({ session });
 

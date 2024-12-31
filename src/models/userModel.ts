@@ -12,6 +12,7 @@ interface IUser extends Document {
     pfp_path: string;
     gender: string;
     is_banned: boolean;
+    banned_reason: string;
     is_approved: boolean;
     status: string;
     is_email_verified: boolean;
@@ -35,6 +36,7 @@ const UserSchema: Schema = new Schema(
         pfp_path: { type: String, default: null },
         gender: { type: String, enum: ['M', 'F'], default: null },
         is_banned: { type: Boolean, default: false },
+        banned_reason: { type: String, default: null },
         is_approved: { type: Boolean, default: null },
         categories: [{ type: Schema.Types.ObjectId, ref: 'Category', default: null }],
         status: { type: String, enum: ['Available', 'Away'], default: null },

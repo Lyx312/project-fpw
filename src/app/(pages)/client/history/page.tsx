@@ -129,6 +129,17 @@ const ClientHistory = () => {
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}/cancel`,
         { type: "client", reason: cancelReason }
       );
+      const trans = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}`)
+      
+      const response = await axios.put(
+                        `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
+                        {
+                          transactionId: trans.data.trans_id,
+                          status: "refund"
+                        }
+                      );
+      console.log(trans.data)
+      console.log(response.data)
       fetchUserTransaction();
       alert("Transaction cancelled successfully");
       setOpenDialog(false);

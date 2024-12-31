@@ -21,6 +21,7 @@ interface Transaction {
   trans_id: number;
   email: string;
   post_id: number;
+  post_title: string;
   price: number;
   category: string;
   start_date: string;
@@ -222,7 +223,7 @@ const TransactionPage = () => {
                     {[
                       'Transaction ID',
                       'Email',
-                      'Post ID',
+                      'Post Title',
                       'Price',
                       'Category',
                       'Start Date',
@@ -243,7 +244,7 @@ const TransactionPage = () => {
                     <TableRow key={transaction.trans_id}>
                       <TableCell>{transaction.trans_id}</TableCell>
                       <TableCell>{transaction.email}</TableCell>
-                      <TableCell>{transaction.post_id}</TableCell>
+                      <TableCell>{transaction.post_title}</TableCell>
                       <TableCell>{transaction.price}</TableCell>
                       <TableCell>{transaction.category}</TableCell>
                       <TableCell>{transaction.start_date ? new Date(transaction.start_date).toLocaleDateString() : "N/A"}</TableCell>
