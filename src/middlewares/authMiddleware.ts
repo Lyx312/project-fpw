@@ -8,14 +8,21 @@ const PUBLIC_ROUTES = [
   "/register",
   "/assets",
   "/posts",
+  "/profile",
+  "/pfp",
+]
+
+const USER_ROUTES = [
+  "/my-profile",
+  "/chat",
 ]
 
 const CLIENT_ROUTES = [
-  "/detail",
+  "/client",
 ]
 
 const FREELANCER_ROUTES = [
-  "",
+  "/freelancer",
 ]
 
 const ADMIN_ROUTES = [
@@ -27,15 +34,15 @@ const ADMIN_ROUTES = [
   "/admin/application/:id" //not sure if this is how it's written here
 ]
 
-const isPublicRoute = (url: URL) => {
-  return PUBLIC_ROUTES.find((route) => url.pathname.startsWith(route)) || url.pathname == "/";
+const checkRoute = (ROUTES: Array<string>, url: URL) => {
+  return ROUTES.find((route) => url.pathname.startsWith(route));
 }
 
 export async function authMiddleware(request: NextRequest) {
   const { nextUrl } = request;
 
-  if (isPublicRoute(nextUrl)) {
-    console.log('public route');
+  if (checkRoute(PUBLIC_ROUTES, nextUrl) || nextUrl.pathname == '/') {
+    // console.log('public route');
     return NextResponse.next();
   }
 
@@ -51,7 +58,26 @@ export async function authMiddleware(request: NextRequest) {
     if (!jwtSecret) {
       throw new Error('JWT_SECRET is not defined');
     }
-    await jwtVerify(token, jwtSecret);
+    const { payload } = await jwtVerify(token, jwtSecret);
+
+    if (checkRoute(USER_ROUTES, nextUrl)) {
+      return NextResponse.next();
+    }
+
+    if (payload.role === 'admin') {
+      if (!ADMIN_ROUTES.find((route) => nextUrl.pathname.startsWith(route))) {
+        return NextResponse.redirect(new URL('/login', nextUrl));
+      }
+    } else if (payload.role === 'client') {
+      if (!CLIENT_ROUTES.find((route) => nextUrl.pathname.startsWith(route))) {
+        return NextResponse.redirect(new URL('/login', nextUrl));
+      }
+    } else if (payload.role === 'freelancer') {
+      if (!FREELANCER_ROUTES.find((route) => nextUrl.pathname.startsWith(route))) {
+        return NextResponse.redirect(new URL('/login', nextUrl));
+      }
+    }
+
   } catch (error) {
     console.log(error);
     return NextResponse.redirect(new URL('/login', nextUrl));

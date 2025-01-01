@@ -51,6 +51,7 @@ export async function GET(req: Request) {
         return {
           ...transaction.toObject(),
           user_name: userName,
+          user_id: user?._id,
           post_title: post?.post_title || 'Unknown Post',
           category: categoryNames
         };
@@ -120,10 +121,10 @@ export async function POST(req: Request) {
     if (post) {
       const freelancerEmail = post.post_email;
       const subject = 'Client Request to Hire - Freelance Hub';
-      const text = `A client has requested to hire you for the post titled "${post.post_title}" on Freelance Hub. Please review the request and choose to accept or decline.`;
+      const text = `A client has requested to hire you for the post titled "${post.post_title}" on Freelance Hub. Please review the request and choose to accept or decline. You can review the request at the following link: http://localhost:3000/freelancer/history`;
       const html = emailTemplate(
-        'Client Request to Hire - Freelance Hub',
-        `A client has requested to hire you for the post titled "<strong>${post.post_title}</strong>" on Freelance Hub. Please review the request and choose to accept or decline.`
+      'Client Request to Hire - Freelance Hub',
+      `A client has requested to hire you for the post titled "<strong>${post.post_title}</strong>" on Freelance Hub. Please review the request and choose to accept or decline. You can review the request at the following link: <a href="http://localhost:3000/freelancer/history">Review Request</a>`
       );
 
       // Send email to the freelancer

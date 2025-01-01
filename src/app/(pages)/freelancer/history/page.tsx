@@ -8,11 +8,12 @@ import { Box,
   Card,
   CardContent,
   CardActions,
-  Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
+  Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, IconButton } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Loading from "@/app/(pages)/loading";
 import { useRouter } from "next/navigation";
+import ChatIcon from "@mui/icons-material/Chat";
 
 interface User {
   _id: string;
@@ -237,7 +238,10 @@ const FreelancerHistoryPage = () => {
               {transactions.map((transaction, index) => (
                 <Card
                   key={index}
-                  sx={{ backgroundColor: "#2B3B4B", color: "#fff" }}
+                  sx={{ 
+                  backgroundColor: transaction.trans_status === "pending" ? "#FF3333" : "#2B3B4B", 
+                  color: "#fff" 
+                  }}
                 >
                   <CardContent>
                     <Typography>Client: {transaction.user_name}</Typography>
@@ -303,6 +307,22 @@ const FreelancerHistoryPage = () => {
                         Complete
                       </Button>
                     )}
+                    <IconButton
+                      sx={{ 
+                      marginLeft: "auto", 
+                      backgroundColor: "#1A2AAA", 
+                      color: "#fff", 
+                      "&:hover": { backgroundColor: "#1230EE" },
+                      borderRadius: "8px",
+                      padding: "0.5rem 1rem"
+                      }}
+                      onClick={() => router.push(`/chat/${transaction.user_id}`)}
+                    >
+                      <ChatIcon sx={{ marginRight: "0.5rem" }} />
+                      <Typography variant="button" color="inherit">
+                      Chat
+                      </Typography>
+                    </IconButton>
                   </CardActions>
                 </Card>
               ))}

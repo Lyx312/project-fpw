@@ -79,7 +79,7 @@ const Header = () => {
 
         <Link href="/" color="inherit">
           <IconButton color="inherit">
-            <HomeIcon/>
+            <HomeIcon />
           </IconButton>
         </Link>
 
@@ -88,6 +88,13 @@ const Header = () => {
             <WorkIcon />
           </IconButton>
         </Link>
+
+        <Link href="/profile" color="inherit">
+          <IconButton color="inherit">
+            <PeopleIcon />
+          </IconButton>
+        </Link>
+
         {currUser && currUser.role !== "admin" ? (
           <>
             <Link
@@ -109,13 +116,7 @@ const Header = () => {
                 </IconButton>
               </Link>
             )}
-            {currUser.role === "client" && (
-              <Link href="/profile" color="inherit">
-                <IconButton color="inherit">
-                  <PeopleIcon />
-                </IconButton>
-              </Link>
-            )}
+
           </>
         ) : null}
         <IconButton color="inherit" onClick={handlePopoverOpen}>
@@ -168,15 +169,15 @@ const Header = () => {
                   Welcome, {currUser.first_name + " " + currUser.last_name || "User"}!
                 </Typography>
                 <Typography variant="body2" align="center">
-                {currUser.role !== "admin" ? (
+                  {currUser.role !== "admin" ? (
                     <Link href="/my-profile" underline="hover">
                       Go to Profile
                     </Link>
-                ) : (
+                  ) : (
                     <Link href="/admin" underline="hover">
                       Go to Admin Dashboard
                     </Link>
-                )}
+                  )}
                   <br />
                   <Link href="/login" underline="hover" onClick={logout}>
                     Logout

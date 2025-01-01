@@ -12,7 +12,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   const { id } = await params;
 
   if (!id) {
-    return NextResponse.json({ message: 'Email query parameter is required' }, { status: 400 });
+    return NextResponse.json({ message: 'Id is required' }, { status: 400 });
   }
 
   try {
@@ -23,10 +23,12 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const userObj = user.toObject();
     const country = await Country.findOne({ country_id: user.country_id }).select('country_name').exec();
     userObj.country_name = country ? country.country_name : null;
-    console.log(userObj);
+    // console.log(userObj);
     
     return NextResponse.json(userObj, { status: 200 });
   } catch (error) {
+    console.log(error);
+    
     return NextResponse.json({ message: 'Internal server error', error }, { status: 500 });
   }
 }

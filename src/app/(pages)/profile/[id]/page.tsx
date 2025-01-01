@@ -10,11 +10,14 @@ import {
   Chip,
   Card,
   CardContent,
+  IconButton,
 } from "@mui/material";
 import Footer from "@/app/(components)/Footer";
 import Header from "@/app/(components)/Header";
 import axios from "axios";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import ChatIcon from "@mui/icons-material/Chat";
+import { getCurrUser } from "@/utils/utils";
 
 interface User {
   _id: string;
@@ -46,18 +49,47 @@ interface Post {
 }
 
 interface Review {
-  review_id: number,
-  review_rating: number,
-  review_description: string,
-  post_id: number,
-  post_title: string,
+  review_id: number;
+  review_rating: number;
+  review_description: string;
+  post_id: number;
+  post_title: string;
 }
 
 const UserProfile = () => {
   const [freelancer, setFreelancer] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [currUser, setCurrUser] = useState<User | null>(null);
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+
+  const fetchUser = async () => {
+      const user = await getCurrUser();
+      if (user) {
+        const mappedUser: User = {
+          _id: user._id as string,
+          email: user.email as string,
+          first_name: user.first_name as string,
+          last_name: user.last_name as string,
+          pfp_path: user.pfp_path as string,
+          phone: user.phone as string,
+          gender: user.gender as string,
+          country_id: user.country_id as string,
+          role: user.role as string,
+          status: user.status as string,
+          categories: user.categories as Category[],
+          country_name: user.country_name as string,
+          exp: user.exp as number,
+        };
+        console.log(mappedUser);
+        
+        setCurrUser(mappedUser);
+      } else {
+        console.log("No user found");
+        setCurrUser(null);
+      }
+    };
 
   const fetchFreelancer = async () => {
     try {
@@ -105,6 +137,7 @@ const UserProfile = () => {
   }, [id]);
 
   useEffect(() => {
+    fetchUser();
     if (freelancer && freelancer.role === "freelancer") {
       fetchPosts();
     }
@@ -171,6 +204,15 @@ const UserProfile = () => {
                   <Typography variant="body2" color="textSecondary">
                     Gender: {freelancer.gender === "M" ? "Male" : "Female"}
                   </Typography>
+                  <IconButton
+                    sx={{ marginLeft: "auto" }}
+                    onClick={() => router.push(`/chat/${freelancer._id}`)}
+                  >
+                    <ChatIcon />
+                    <Typography variant="caption" color="text.secondary" sx={{ marginLeft: "0.5rem" }}>
+                      Chat
+                    </Typography>
+                  </IconButton>
                 </Grid>
               </Grid>
               <Box mt={4}>
@@ -283,7 +325,7 @@ const UserProfile = () => {
                   <Typography variant="body2" color="textSecondary">
                     Gender: {freelancer.gender === "M" ? "Male" : "Female"}
                   </Typography>
-                  <Typography variant="body2" color="textSecondary">
+                  <Typography variant="body2" color="textSecondary" component="div">
                     <Box
                       sx={{
                         width: 10,
@@ -297,6 +339,19 @@ const UserProfile = () => {
                     />
                     {freelancer.status}
                   </Typography>
+                  {
+                    currUser && currUser.role === "client" && (
+                    <IconButton
+                      sx={{ marginLeft: "auto" }}
+                      onClick={() => router.push(`/chat/${freelancer._id}`)}
+                    >
+                      <ChatIcon />
+                      <Typography variant="caption" color="text.secondary" sx={{ marginLeft: "0.5rem" }}>
+                        Chat
+                      </Typography>
+                    </IconButton>
+                    )
+                  }
                 </Grid>
               </Grid>
 

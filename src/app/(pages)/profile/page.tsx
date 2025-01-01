@@ -14,11 +14,14 @@ import {
   InputLabel,
   FormControl,
   Chip,
+  IconButton,
 } from "@mui/material";
+import ChatIcon from "@mui/icons-material/Chat";
 import { useRouter } from "next/navigation";
 import Header from "@/app/(components)/Header";
 import Footer from "@/app/(components)/Footer";
 import axios from "axios";
+import { getCurrUser } from "@/utils/utils";
 
 interface User {
   _id: string;
@@ -46,11 +49,12 @@ interface Country {
   country_name: string;
 }
 
-const Page: React.FC = () => {
+const ProfilePage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [userList, setUserList] = useState<User[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
+  const [currUser, setCurrUser] = useState<User | null>(null);
   const router = useRouter();
 
   const [filters, setFilters] = useState<{
@@ -63,6 +67,31 @@ const Page: React.FC = () => {
     categories: [],
   });
 
+  const fetchUser = async () => {
+    const user = await getCurrUser();
+    if (user) {
+      const mappedUser: User = {
+        _id: user._id as string,
+        email: user.email as string,
+        first_name: user.first_name as string,
+        last_name: user.last_name as string,
+        pfp_path: user.pfp_path as string,
+        role: user.role as string,
+        status: user.status as string,
+        is_approved: user.is_approved as boolean,
+        is_email_verified: user.is_email_verified as boolean,
+        categories: user.categories as Category[],
+        country_name: user.country_name as string,
+      };
+      console.log(mappedUser);
+      
+      setCurrUser(mappedUser);
+    } else {
+      console.log("No user found");
+      setCurrUser(null);
+    }
+  };
+
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchUsers();
@@ -72,6 +101,7 @@ const Page: React.FC = () => {
   }, [filters]);
 
   useEffect(() => {
+    fetchUser();
     fetchCategories();
     fetchCountries();
   }, []);
@@ -91,7 +121,7 @@ const Page: React.FC = () => {
       response.data = response.data.filter((user: User) => user.is_approved !== false);
       // exclude users that are not is_email_verified
       response.data = response.data.filter((user: User) => user.is_email_verified !== false);
-      
+
       setUserList(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -344,6 +374,22 @@ const Page: React.FC = () => {
                       </Typography>
                     </Box>
                   </Box>
+                  {
+                    currUser && currUser.role === "client" && (
+                    <IconButton
+                      sx={{ marginLeft: "auto" }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/chat/${user._id}`);
+                      }}
+                    >
+                      <ChatIcon />
+                      <Typography variant="caption" color="text.secondary" sx={{ marginLeft: "0.5rem" }}>
+                        Chat
+                      </Typography>
+                    </IconButton>
+                    )
+                  }
                 </Box>
               </Box>
             ))
@@ -355,4 +401,4 @@ const Page: React.FC = () => {
   );
 };
 
-export default Page;
+export default ProfilePage;

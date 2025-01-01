@@ -48,6 +48,7 @@ export async function GET(req: Request) {
         ...transaction._doc, // Spread existing transaction fields
         post_title: postMap[transaction.post_id] || "Unknown Title", // Add post_title
         user_name: userName, // Add user name
+        user_id: user._id, // Add user id
         category: categoryNames
       };
     }));

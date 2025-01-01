@@ -2,11 +2,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Chip, Button, Grid, Alert, Rating, Avatar } from "@mui/material";
+import { Box, Typography, Chip, Button, Grid, Alert, Rating, Avatar, IconButton } from "@mui/material";
 import { getCurrUser } from "@/utils/utils";
 import { useRouter } from "next/navigation";
 import Loading from "../(pages)/loading";
 import axios from "axios";
+import ChatIcon from "@mui/icons-material/Chat";
 
 interface DetailJobProps {
   id: string;
@@ -151,6 +152,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
                 );
                 alert("Successfully hired freelancer. Please wait for the freelancer to accept");
                 setActiveTransaction(true);
+                console.log("Payment success:", result);
               } catch (err) {
                 console.error("Error marking transaction as completed:", err);
                 alert("Failed to mark transaction as completed after popup close.");
@@ -243,6 +245,22 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
                 </Typography>
               </Box>
             </Box>
+            {
+              currUser && currUser.role === "client" && (
+              <IconButton
+                sx={{ marginLeft: "auto" }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/chat/${post.postMaker._id}`);
+                }}
+              >
+                <ChatIcon />
+                <Typography variant="caption" color="text.secondary" sx={{ marginLeft: "0.5rem" }}>
+                  Chat
+                </Typography>
+              </IconButton>
+              )
+            }
           </Box>
         </Box>
 
