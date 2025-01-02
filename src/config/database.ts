@@ -7,6 +7,7 @@ import Country from "@/models/countryModel";
 import Post_review from "@/models/post_reviewModel";
 import Chat from "@/models/chatModel";
 import User_trans from "@/models/user_transModel";
+import Notification from "@/models/notificationModel";
 
 const connectDB = async () => {
   if (!process.env.MONGODB_URI) {
@@ -35,6 +36,7 @@ const connectDB = async () => {
     mongoose.model('Post_review', Post_review.schema);
     mongoose.model('Chat', Chat.schema);
     mongoose.model('User_trans', User_trans.schema);
+    mongoose.model('Notification', Notification.schema);
 
     return true;
   } catch (error) {

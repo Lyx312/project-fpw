@@ -1,14 +1,12 @@
+'use client';
 import { Box, Typography, Container, Grid } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-
+import { useState, useEffect } from "react";
 import {
-  Search as SearchIcon,
   QuestionMark as QuestionIcon,
   Language as LanguageIcon,
 } from "@mui/icons-material";
-
-import React from "react";
 import SocialMediaIcons from "./SocialMediaIcons";
+import axios from "axios";
 
 const footerLinks = {
   Category: ["Categories", "Projects", "Freelancers", "Membership"],
@@ -22,6 +20,30 @@ const footerLinks = {
 };
 
 const Footer = () => {
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalJobs, setTotalJobs] = useState(0);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users`
+      );
+      setTotalUsers(response.data.length-1);
+    };
+
+    const fetchJobs = async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts`
+      );
+      setTotalJobs(response.data.data.length);
+    };
+
+    fetchUsers();
+    fetchJobs();
+    
+  }, [])
+  
+
   return (
     <div>
       <Box sx={{ backgroundColor: "#87CEEB", color: "black", py: 8 }}>
@@ -59,8 +81,8 @@ const Footer = () => {
             }}
           >
             <Box>
-              <Typography>xx,xxx,xxx Registered Users</Typography>
-              <Typography>xx,xxx,xxx Total Jobs Posted</Typography>
+              <Typography>{totalUsers} Registered Users</Typography>
+              <Typography>{totalJobs} Total Jobs Posted</Typography>
             </Box>
             <SocialMediaIcons />
           </Box>

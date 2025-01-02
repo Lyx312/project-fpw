@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import User_trans from '@/models/user_transModel';
 import sendEmail, { emailTemplate } from '@/emails/mailer';
 import Post from '@/models/postModel';
+import User from '@/models/userModel';
+import Notification from '@/models/notificationModel';
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   const { id } = await params;
@@ -65,6 +67,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
       return NextResponse.json({ message: 'Post not found' }, { status: 404 });
     }
 
+    // get user details
+    const user = await User.findOne({ email: trans.email });
+
     // Send email to the user
     const email = trans.email; // Assuming the email is stored in the userTrans document
     const subject = 'Transaction Cancelled';
@@ -73,6 +78,13 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
     try {
       await sendEmail(email, subject, text, html);
+      const notification = new Notification({ 
+        userId: user._id, 
+        message: `Your transaction has been cancelled by the ${type}. Reason: ${reason}`, 
+        link: `/${type === "client" ? "freelancer" : "client"}/history`, 
+        type: "transaction" 
+      });
+      await notification.save({ session });
     } catch (emailError) {
       await session.abortTransaction();
       session.endSession();

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/config/database';
+import User from '@/models/userModel';
+import Notification from '@/models/notificationModel';
 import User_trans from '@/models/user_transModel';
 import Post from '@/models/postModel';
 import sendEmail, { emailTemplate } from '@/emails/mailer';
@@ -39,6 +41,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
       { new: true, session }
     );
 
+    // get client details
+    const client = await User.findOne({ email: userTrans.email });
+
     if (post) {
       const clientEmail = userTrans.email;
       const subject = 'Freelancer Accepted Your Job - Freelance Hub';
@@ -50,6 +55,13 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
       // Send email to the client
       await sendEmail(clientEmail, subject, text, html);
+      const notification = new Notification({ 
+        userId: client._id, 
+        message: `The freelancer has accepted your job request for the post titled ${post.post_title}`, 
+        link: "/client/history", 
+        type: "transaction" 
+      });
+      await notification.save({ session });
     }
 
     await session.commitTransaction();

@@ -154,14 +154,14 @@ const ClientHistory = () => {
     }
   };
 
-  const handlePayTransaction = async (transaction: any) => {
+  const handleReviewTransaction = async (transaction: any) => {
     try {
       setReviewPostId(transaction.post_id);
       setReviewPostTitle(transaction.post_title);
       setReviewModalOpen(true);
     } catch (err) {
-      console.error("Error initiating payment:", err);
-      alert("Failed to start payment process. Please try again.");
+      console.error("Error initiating review:", err);
+      alert("Failed to start review process. Please try again.");
     }
   };
 
@@ -314,9 +314,9 @@ const ClientHistory = () => {
                           backgroundColor: "#1A2AAA",
                           "&:hover": { backgroundColor: "#1230EE" },
                         }}
-                        onClick={() => handlePayTransaction(transaction)}
+                        onClick={() => handleReviewTransaction(transaction)}
                       >
-                        Pay now
+                        Give Review
                       </Button>
                     )}
                     <IconButton

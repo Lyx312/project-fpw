@@ -14,6 +14,7 @@ import {
   TextField,
   Button,
   LinearProgress,
+  Link,
 } from "@mui/material";
 import axios from "axios";
 
@@ -243,8 +244,20 @@ const TransactionPage = () => {
                   {transactions.map((transaction) => (
                     <TableRow key={transaction.trans_id}>
                       <TableCell>{transaction.trans_id}</TableCell>
-                      <TableCell>{transaction.email}</TableCell>
-                      <TableCell>{transaction.post_title}</TableCell>
+                      <TableCell>                        
+                        <Link href={`/profile/${transaction.user_id}`} sx={{ textDecoration: 'none', color: 'inherit' }}>
+                          <Typography variant="body2" sx={{ cursor: 'pointer'}}>
+                            {transaction.email}
+                          </Typography>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link href={`/posts/detail/${transaction.post_id}`} sx={{ textDecoration: 'none', color: 'inherit' }}>
+                          <Typography variant="body2" sx={{ cursor: 'pointer'}}>
+                            {transaction.post_title}
+                          </Typography>
+                        </Link>
+                      </TableCell>
                       <TableCell>{transaction.price}</TableCell>
                       <TableCell>{transaction.category}</TableCell>
                       <TableCell>{transaction.start_date ? new Date(transaction.start_date).toLocaleDateString() : "N/A"}</TableCell>

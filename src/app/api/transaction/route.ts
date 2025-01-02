@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import User from '@/models/userModel';
 import Category from '@/models/categoryModel';
 import Post_category from '@/models/post_categoryModel';
+import Notification from '@/models/notificationModel';
 
 export async function GET(req: Request) {
   await connectDB();
@@ -118,6 +119,9 @@ export async function POST(req: Request) {
     // Find the post by post_id to get the freelancer email
     const post = await Post.findOne({ post_id });
 
+    // Get the user_id of the freelancer
+    const user = await User.findOne({ email: post.post_email });
+
     if (post) {
       const freelancerEmail = post.post_email;
       const subject = 'Client Request to Hire - Freelance Hub';
@@ -129,6 +133,13 @@ export async function POST(req: Request) {
 
       // Send email to the freelancer
       await sendEmail(freelancerEmail, subject, text, html);
+      const notification = new Notification({ 
+        userId: user._id, 
+        message: `A client has requested to hire you for the post titled ${post.post_title}`, 
+        link: "/freelancer/history", 
+        type: "transaction" 
+      });
+      await notification.save({ session });
     }
 
     await session.commitTransaction();

@@ -247,7 +247,7 @@ const FreelancerHistoryPage = () => {
                     <Typography>Client: {transaction.user_name}</Typography>
                     <Typography>Post Title: {transaction.post_title}</Typography>
                     <Typography>Categories: {transaction.category}</Typography>
-                    <Typography>Price: {transaction.price.toLocaleString("id-ID")}</Typography>
+                    <Typography>Price: Rp. {transaction.price.toLocaleString("id-ID")}</Typography>
                     <Typography>Start Date: {formatDate(transaction.start_date)}</Typography>
                     <Typography>End Date: {formatDate(transaction.end_date)}</Typography>
                     <Typography>Status: {transaction.trans_status}</Typography>

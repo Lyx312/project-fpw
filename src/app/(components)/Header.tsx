@@ -8,6 +8,7 @@ import {
   Popover,
   Link,
   Avatar,
+  Box,
 } from "@mui/material";
 
 import WorkIcon from "@mui/icons-material/Work";
@@ -16,6 +17,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleIcon from "@mui/icons-material/People";
 import AssignmentIcon from "@mui/icons-material/Assignment"; // Import the new icon
+import Notifications from "@/app/(components)/Notifications"; // Import the Notifications component
 import Image from "next/image";
 import { getCurrUser, logout } from "@/utils/utils";
 
@@ -119,6 +121,12 @@ const Header = () => {
 
           </>
         ) : null}
+        { currUser && (
+          <Box>
+            <Notifications />
+          </Box>
+        )}
+        
         <IconButton color="inherit" onClick={handlePopoverOpen}>
           {!currUser?.pfp_path && (<AccountCircleIcon />)}
           {currUser?.pfp_path && (
