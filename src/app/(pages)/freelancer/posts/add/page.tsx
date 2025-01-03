@@ -49,6 +49,12 @@ const AddPostPage: React.FC = () => {
     open: false,
     message: "",
   });
+  const colors = {
+    primary: "#001F3F",
+    secondary: "#3A6D8C",
+    accent: "#6A9AB0",
+    text: "#EAD8B1",
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -93,8 +99,8 @@ const AddPostPage: React.FC = () => {
       setAlert({ open: true, message: "Description is required." });
       return;
     }
-    if (price === "" || price <= 0) {
-      setAlert({ open: true, message: "Price must be greater than 0." });
+    if (price === "" || price < 10000 || price > 100000000) {
+      setAlert({ open: true, message: "Price must be between Rp. 10.000 and Rp. 100.000.000." });
       return;
     }
     if (categories.length === 0) {
@@ -151,7 +157,7 @@ const AddPostPage: React.FC = () => {
 
   return (
     <>
-      <Box sx={{ backgroundColor: "#1A2A3A", minHeight: "100vh" }}>
+      <Box sx={{ backgroundColor: colors.primary, minHeight: "100vh"}}>
         <Header />
         <Container
           maxWidth="sm"
@@ -161,6 +167,7 @@ const AddPostPage: React.FC = () => {
             borderRadius: "8px",
             boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
             marginTop: "2rem",
+            marginBottom: "2rem"
           }}
         >
           <Typography

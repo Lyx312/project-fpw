@@ -48,8 +48,8 @@ const Page: React.FC = () => {
     maxRating: number;
   }>({
     name: "",
-    minPrice: 0,
-    maxPrice: 10000000,
+    minPrice: 10000,
+    maxPrice: 100000000,
     category: "",
     status: "available",
     minRating: 0,
@@ -66,7 +66,7 @@ const Page: React.FC = () => {
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [filters]);
+  }, []);
 
   const fetchCategories = async () => {
     try {
@@ -204,17 +204,17 @@ const Page: React.FC = () => {
             <TextField
               type="number"
               value={filters.minPrice}
-              onChange={(e) => handleFilterChange("minPrice", Math.max(0, Math.min(Number(e.target.value), filters.maxPrice)))}
+              onChange={(e) => handleFilterChange("minPrice", Math.max(10000, Math.min(Number(e.target.value), filters.maxPrice)))}
               inputProps={{
-                min: 0,
-                max: 10000000,
-                step: 1,
+                min: 10000,
+                max: 100000000,
+                step: 1000,
                 style: { color: colors.text, borderColor: colors.text }
               }}
               InputLabelProps={{
                 style: { color: colors.text },
               }}
-              sx={{ width: "125px",
+              sx={{ width: "130px",
                 "& .MuiOutlinedInput-root": {
                 "& fieldset": {
                   borderColor: colors.text,
@@ -232,17 +232,17 @@ const Page: React.FC = () => {
             <TextField
               type="number"
               value={filters.maxPrice}
-              onChange={(e) => handleFilterChange("maxPrice", Math.max(filters.minPrice, Math.min(Number(e.target.value), 10000000)))}
+              onChange={(e) => handleFilterChange("maxPrice", Math.max(filters.minPrice, Math.min(Number(e.target.value), 100000000)))}
               inputProps={{
-                min: 0,
-                max: 10000000,
-                step: 1,
+                min: 10000,
+                max: 100000000,
+                step: 1000,
                 style: { color: colors.text, borderColor: colors.text }
               }}
               InputLabelProps={{
                 style: { color: colors.text },
               }}
-              sx={{ width: "125px",
+              sx={{ width: "130px",
                 "& .MuiOutlinedInput-root": {
                 "& fieldset": {
                   borderColor: colors.text,
@@ -335,6 +335,23 @@ const Page: React.FC = () => {
               }}
             >
               <CircularProgress />
+            </Box>
+          ) : postList.length === 0 ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+                flexDirection: "column",
+              }}
+            >
+              <Typography variant="h5" sx={{colors:colors.primary}} gutterBottom>
+                No posts found.
+              </Typography>
+              <Typography variant="body1" sx={{colors:colors.primary}}>
+                Try adjusting your filters or check back later!
+              </Typography>
             </Box>
           ) : (
             postList.map((item) => (

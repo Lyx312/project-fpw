@@ -33,11 +33,18 @@ interface Post {
   createdAt: string;
 }
 
+
 const FreelancerPostsPage: React.FC = () => {
   const [currUser, setCurrUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const colors = {
+    primary: "#001F3F",
+    secondary: "#3A6D8C",
+    accent: "#6A9AB0",
+    text: "#EAD8B1",
+  };
 
   useEffect(() => {
     const fetchUserAndPosts = async () => {
@@ -82,11 +89,11 @@ const FreelancerPostsPage: React.FC = () => {
     <>
       <Header />
       {currUser ? (
-        <Box sx={{ padding: "2rem" }}>
+        <Box sx={{ padding: "2rem", backgroundColor: colors.primary }}>
           <Typography
             variant="h4"
             gutterBottom
-            sx={{ color: "#4B6CB7", fontWeight: "bold" }}
+            sx={{ color: colors.text, fontWeight: "bold" }}
           >
             Posts by {currUser.first_name} {currUser.last_name}
           </Typography>
@@ -99,6 +106,7 @@ const FreelancerPostsPage: React.FC = () => {
               backgroundColor: "#4B6CB7",
               "&:hover": { backgroundColor: "#3A5B8D" },
               padding: "0.8rem 2rem",
+              color: colors.text
             }}
           >
             Add Post
@@ -132,7 +140,7 @@ const FreelancerPostsPage: React.FC = () => {
                         {post.description}
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                        <strong>Price:</strong> Rp{post.price.toLocaleString()}
+                        <strong>Price:</strong> Rp. {post.price.toLocaleString("id-ID")}
                       </Typography>
                       <Typography variant="body2" sx={{ color: "#777" }}>
                         <strong>Categories:</strong>{" "}
