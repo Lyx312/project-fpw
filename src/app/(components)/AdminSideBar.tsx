@@ -16,7 +16,7 @@ import LanguageIcon from '@mui/icons-material/Language';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Link from "next/link";
 import Image from "next/image";
-import { getCurrUser, logout } from "@/utils/utils";
+import { logout } from "@/utils/utils";
 
 const AdminSideBar = () => {
   return (

@@ -69,7 +69,7 @@ export async function GET(req: Request) {
 
     // Sort transactions based on trans_status
     if (role != 'admin') {
-        const statusOrder = ['completed', 'in-progress', 'pending', 'paid', 'cancelled', 'failed'];
+        const statusOrder = ['submitted', 'in-progress', 'pending', 'completed', 'cancelled', 'failed'];
         
         enhancedTransactions.sort((a, b) => {
         const statusA = statusOrder.indexOf(a.trans_status.toLowerCase());
@@ -127,10 +127,10 @@ export async function POST(req: Request) {
     if (post) {
       const freelancerEmail = post.post_email;
       const subject = 'Client Request to Hire - Freelance Hub';
-      const text = `A client has requested to hire you for the post titled "${post.post_title}" on Freelance Hub. Please review the request and choose to accept or decline. You can review the request at the following link: http://localhost:3000/freelancer/history`;
+      const text = `A client has requested to hire you for the post titled "${post.post_title}" on Freelance Hub. Please review the request and choose to accept or decline. You can review the request at the following link: ${process.env.BASE_URL}/freelancer/history`;
       const html = emailTemplate(
       'Client Request to Hire - Freelance Hub',
-      `A client has requested to hire you for the post titled "<strong>${post.post_title}</strong>" on Freelance Hub. Please review the request and choose to accept or decline. You can review the request at the following link: <a href="http://localhost:3000/freelancer/history">Review Request</a>`
+      `A client has requested to hire you for the post titled "<strong>${post.post_title}</strong>" on Freelance Hub. Please review the request and choose to accept or decline. You can review the request at the following link: <a href="${process.env.BASE_URL}/freelancer/history">Review Request</a>`
       );
 
       // Send email to the freelancer

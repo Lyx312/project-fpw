@@ -55,7 +55,7 @@ export async function GET(req: Request) {
 
     // Sort transactions by status and then by updatedAt or createdAt
     const sortedTransactions = enrichedTransactions.sort((a, b) => {
-      const statusOrder = ["in-progress", "pending", "completed", "paid", "cancelled", "failed"];
+      const statusOrder = ["in-progress", "pending", "submitted", "completed", "cancelled", "failed"];
       const statusComparison = statusOrder.indexOf(a.trans_status) - statusOrder.indexOf(b.trans_status);
 
       if (statusComparison !== 0) return statusComparison;

@@ -1,22 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import connectDB from "@/config/database";
-import User_trans from "@/models/user_transModel";
-
-interface UserTrans {
-    _id: number;
-    trans_id: number;
-    email: string;
-    post_id: number;
-    price: number;
-    start_date: Date;
-    end_date: Date;
-    trans_status: string;
-    cancelled_reason: string;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date;
-}
+import User_trans, { IUser_trans } from "@/models/user_transModel";
 
 export async function GET(req: Request, { params }: { params: { id: number } }) {
     try {
@@ -24,7 +9,7 @@ export async function GET(req: Request, { params }: { params: { id: number } }) 
         const { id } = await params;
 
         // Find the user transaction with the given ID
-        const userTransaction = await User_trans.findOne({ trans_id: id }).lean<UserTrans>();
+        const userTransaction = await User_trans.findOne({ trans_id: id }).lean<IUser_trans>();
 
         if (!userTransaction) {
             return NextResponse.json({ message: "Transaction not found" }, { status: 404 });

@@ -127,17 +127,17 @@ const FreelancerHistoryPage = () => {
     }
   };
 
-  const handleCompleteTransaction = async (transactionId: string) => {
+  const handleSubmitTransaction = async (transactionId: string) => {
     try {
       await axios.put(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/complete`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/submit`
       );
       fetchUserTransaction();
-      alert("Transaction completed successfully");
+      alert("Transaction submitted successfully");
     } catch (err) {
-      console.error("Error completing transaction:", err);
-      alert("Failed to complete transaction");
-      setError("Failed to complete transaction");
+      console.error("Error submitted transaction:", err);
+      alert("Failed to submitted transaction");
+      setError("Failed to submitted transaction");
     }
   };
 
@@ -225,9 +225,10 @@ const FreelancerHistoryPage = () => {
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("")}>All</Button>
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("pending")}>Pending</Button>
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("in-progress")}>In Progress</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("submitted")}>Submitted</Button>
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("completed")}>Completed</Button>
-          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("paid")}>Paid</Button>
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("cancelled")}>Cancelled</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("failed")}>Failed</Button>
         </ButtonGroup>
 
         {transactions.length > 0 ? (
@@ -267,6 +268,9 @@ const FreelancerHistoryPage = () => {
                     <Typography>End Date: {formatDate(transaction.end_date)}</Typography>
                     <Typography>Deadline: {formatDate(transaction.deadline)}</Typography>
                     <Typography>Status: {transaction.trans_status}</Typography>
+                    {(transaction.trans_status === "cancelled" || transaction.trans_status === "failed") && (
+                      <Typography>{transaction.trans_status.charAt(0).toUpperCase() + transaction.trans_status.slice(1)} Reason: {transaction.cancelled_reason}</Typography>
+                    )}
                     {transaction.trans_status === 'in-progress' && transaction.start_date && transaction.deadline && (
                       <Box sx={{ width: "100%", marginTop: 2 }}>
                         <Typography variant="body2" color="white">
@@ -349,9 +353,9 @@ const FreelancerHistoryPage = () => {
                           backgroundColor: "#1A2AAA",
                           "&:hover": { backgroundColor: "#1230EE" },
                         }}
-                        onClick={() => handleCompleteTransaction(transaction.trans_id)}
+                        onClick={() => handleSubmitTransaction(transaction.trans_id)}
                       >
-                        Complete
+                        Submit
                       </Button>
                     )}
                     <IconButton

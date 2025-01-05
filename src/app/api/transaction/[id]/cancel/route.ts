@@ -27,26 +27,15 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
   try {
     const trans = await User_trans.findOne({ trans_id: id });
-    if (trans.start_date == null) {
-        const userTrans = await User_trans.findOneAndUpdate(
-        { trans_id: id },
-        { 
-          trans_status: 'cancelled',
-          cancelled_reason: reason
-        },
-        { new: true, session }
-      );
-    }
-    else{
-      const userTrans = await User_trans.findOneAndUpdate(
-        { trans_id: id },
-        { 
-          trans_status: 'failed',
-          cancelled_reason: reason
-        },
-        { new: true, session }
-      );
-    }
+    const updateStatus = trans.start_date == null ? 'cancelled' : 'failed';
+    await User_trans.findOneAndUpdate(
+      { trans_id: id },
+      { 
+      trans_status: updateStatus,
+      cancelled_reason: reason
+      },
+      { new: true, session }
+    );
 
     if (!trans) {
       await session.abortTransaction();

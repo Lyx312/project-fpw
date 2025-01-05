@@ -56,6 +56,7 @@ const ClientHistory = () => {
   );
   const router = useRouter();
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewTransId, setReviewTransId] = useState<string>("");
   const [reviewPostId, setReviewPostId] = useState<string>("");
   const [reviewPostTitle, setReviewPostTitle] = useState<string>("");
 
@@ -154,8 +155,23 @@ const ClientHistory = () => {
     }
   };
 
-  const handleReviewTransaction = async (transaction: any) => {
+  const handleRejectTransaction = async (transactionId: string) => {
     try {
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/reject`
+      );
+      fetchUserTransaction();
+      alert("Transaction rejected successfully");
+    } catch (err) {
+      console.error("Error rejecting transaction:", err);
+      alert("Failed to reject transaction");
+      setError("Failed to reject transaction");
+    }
+  };
+
+  const handleCompleteTransaction = async (transaction: any) => {
+    try {
+      setReviewTransId(transaction.trans_id);
       setReviewPostId(transaction.post_id);
       setReviewPostTitle(transaction.post_title);
       setReviewModalOpen(true);
@@ -236,8 +252,8 @@ const ClientHistory = () => {
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("")}>All</Button>
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("pending")}>Pending</Button>
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("in-progress")}>In Progress</Button>
+          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("submitted")}>Submitted</Button>
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("completed")}>Completed</Button>
-          <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("paid")}>Paid</Button>
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("cancelled")}>Cancelled</Button>
           <Button sx={{ flex: 1 }} onClick={() => setFilterStatus("failed")}>Failed</Button>
         </ButtonGroup>
@@ -252,6 +268,7 @@ const ClientHistory = () => {
             <ReviewModal
               open={reviewModalOpen}
               onClose={() => setReviewModalOpen(false)}
+              transId={reviewTransId}
               postId={reviewPostId}
               postTitle={reviewPostTitle}
               email={currUser?.email ?? ''}
@@ -281,6 +298,9 @@ const ClientHistory = () => {
                     <Typography>End Date: {formatDate(transaction.end_date)}</Typography>
                     <Typography>Deadline: {formatDate(transaction.deadline)}</Typography>
                     <Typography>Status: {transaction.trans_status}</Typography>
+                    {(transaction.trans_status === "cancelled" || transaction.trans_status === "failed") && (
+                      <Typography>{transaction.trans_status.charAt(0).toUpperCase() + transaction.trans_status.slice(1)} Reason: {transaction.cancelled_reason}</Typography>
+                    )}
                     {transaction.trans_status === 'in-progress' && transaction.start_date && transaction.deadline && (
                       <Box sx={{ width: "100%", marginTop: 2 }}>
                         <Typography variant="body2" color="white">
@@ -340,7 +360,8 @@ const ClientHistory = () => {
                         Cancel
                       </Button>
                     )}
-                    {transaction.trans_status === "completed" && (
+                    {transaction.trans_status === "submitted" && (
+                      <>
                       <Button
                         type="button"
                         variant="contained"
@@ -349,10 +370,23 @@ const ClientHistory = () => {
                           backgroundColor: "#1A2AAA",
                           "&:hover": { backgroundColor: "#1230EE" },
                         }}
-                        onClick={() => handleReviewTransaction(transaction)}
+                        onClick={() => handleRejectTransaction(transaction.trans_id)}
                       >
-                        Give Review
+                        Reject
                       </Button>
+                      <Button
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                          backgroundColor: "#1A2AAA",
+                          "&:hover": { backgroundColor: "#1230EE" },
+                        }}
+                        onClick={() => handleCompleteTransaction(transaction)}
+                      >
+                        Accept
+                      </Button>
+                      </>
                     )}
                     <IconButton
                       sx={{ 

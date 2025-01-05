@@ -89,7 +89,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
               (transaction: any) =>
                 transaction.trans_status === "pending" ||
                 transaction.trans_status === "in-progress" ||
-                transaction.trans_status === "completed"
+                transaction.trans_status === "submitted"
             );
             if (hasActiveTransaction) setActiveTransaction(true);
           }

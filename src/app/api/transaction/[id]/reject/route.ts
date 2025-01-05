@@ -22,7 +22,8 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     const userTrans = await User_trans.findOneAndUpdate(
       { trans_id: id },
       { 
-        trans_status: 'completed',
+        trans_status: 'in-progress',
+        end_date: null,
       },
       { new: true, session }
     );
@@ -34,10 +35,8 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     }
 
     // update post status to available
-    const post = await Post.findOneAndUpdate(
+    const post = await Post.findOne(
       { post_id: userTrans.post_id },
-      { post_status: 'available' },
-      { new: true, session }
     );
 
     const freelancer = await User.findOne({ email: post.post_email });
@@ -45,18 +44,18 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     // Send email to the client
     if (post) {
       const freelancerEmail = post.post_email;
-      const subject = 'Client Accepted Your Work - Freelance Hub';
-      const text = `The client has accepted your work for the post titled "${post.post_title}" on Freelance Hub.`;
+      const subject = 'Client Rejected Your Work - Freelance Hub';
+      const text = `The client has rejected your work for the post titled "${post.post_title}" on Freelance Hub. Please revise the work and resubmit.`;
       const html = emailTemplate(
-      'Client Accepted Your Work - Freelance Hub',
-      `The client has accepted your work for the post titled "<strong>${post.post_title}</strong>" on Freelance Hub.`
+      'Client Rejected Your Work - Freelance Hub',
+      `The client has rejected your work for the post titled "<strong>${post.post_title}</strong>" on Freelance Hub. Please revise the work and resubmit.`
       );
 
       // Send email to the client
       await sendEmail(freelancerEmail, subject, text, html);
       const notification = new Notification({ 
       userId: freelancer._id, 
-      message: `The client has accepted your work for the post titled ${post.post_title}.`, 
+      message: `The client has rejected your work for the post titled ${post.post_title}. Please revise the work and resubmit.`, 
       link: "/freelancer/history", 
       type: "transaction" 
       });

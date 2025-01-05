@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
-import connectDB from "../../../config/database";
+import connectDB from "@/config/database";
 import Post_review from "@/models/post_reviewModel";
 import User from "@/models/userModel";
 import Joi from "joi";

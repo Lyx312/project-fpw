@@ -19,6 +19,7 @@ import {
   interface ReviewModalProps {
     open: boolean;
     onClose: () => void;
+    transId: string;
     postId: string;
     postTitle: string;
     email: string;
@@ -28,6 +29,7 @@ import {
   const ReviewModal: React.FC<ReviewModalProps> = ({
     open,
     onClose,
+    transId,
     postId,
     postTitle,
     email,
@@ -37,7 +39,6 @@ import {
     const [reviewDescription, setReviewDescription] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
   
     const handleSubmit = async () => {
       if (!reviewRating || !reviewDescription) {
@@ -52,8 +53,9 @@ import {
           review_description: reviewDescription,
           post_id: postId,
         });
-        setSuccess("Review submitted successfully!");
-        alert("Review submitted successfully!");
+        await axios.put(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transId}/complete`
+        );
         onSubmitSuccess();
         onClose();
       } catch {

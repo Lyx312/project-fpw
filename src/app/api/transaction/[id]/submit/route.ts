@@ -22,7 +22,8 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     const userTrans = await User_trans.findOneAndUpdate(
       { trans_id: id },
       { 
-        trans_status: 'completed',
+        trans_status: 'submitted',
+        end_date: new Date()
       },
       { new: true, session }
     );
@@ -34,30 +35,29 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     }
 
     // update post status to available
-    const post = await Post.findOneAndUpdate(
+    const post = await Post.findOne(
       { post_id: userTrans.post_id },
-      { post_status: 'available' },
-      { new: true, session }
     );
 
-    const freelancer = await User.findOne({ email: post.post_email });
+    // get client details
+    const client = await User.findOne({ email: userTrans.email });
 
     // Send email to the client
     if (post) {
-      const freelancerEmail = post.post_email;
-      const subject = 'Client Accepted Your Work - Freelance Hub';
-      const text = `The client has accepted your work for the post titled "${post.post_title}" on Freelance Hub.`;
+      const clientEmail = userTrans.email;
+      const subject = 'Freelancer Submitted Their Work - Freelance Hub';
+      const text = `The freelancer has submitted their work for the post titled "${post.post_title}" on Freelance Hub. Please review the work and accept or reject it.`;
       const html = emailTemplate(
-      'Client Accepted Your Work - Freelance Hub',
-      `The client has accepted your work for the post titled "<strong>${post.post_title}</strong>" on Freelance Hub.`
+      'Freelancer Submitted Their Work - Freelance Hub',
+      `The freelancer has submitted their work for the post titled "<strong>${post.post_title}</strong>" on Freelance Hub. Please review the work and accept or reject it. <a href="${process.env.BASE_URL}/client/history">Click here to review</a>.`
       );
 
       // Send email to the client
-      await sendEmail(freelancerEmail, subject, text, html);
+      await sendEmail(clientEmail, subject, text, html);
       const notification = new Notification({ 
-      userId: freelancer._id, 
-      message: `The client has accepted your work for the post titled ${post.post_title}.`, 
-      link: "/freelancer/history", 
+      userId: client._id, 
+      message: `The freelancer has submitted their work for the post titled ${post.post_title}. Please review the work and accept or reject it.`, 
+      link: "/client/history", 
       type: "transaction" 
       });
       await notification.save({ session });
