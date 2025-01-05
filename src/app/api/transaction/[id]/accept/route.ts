@@ -12,7 +12,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   const session = await mongoose.startSession();
   session.startTransaction();
 
-  const { id } = params;
+  const { id } = await params;
 
   if (!id || isNaN(Number(id))) {
     return NextResponse.json({ message: 'Invalid transaction ID' }, { status: 400 });
@@ -23,7 +23,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
       { trans_id: id },
       { 
         trans_status: 'in-progress',
-        start_date: new Date()
+        start_date: new Date(),
       },
       { new: true, session }
     );

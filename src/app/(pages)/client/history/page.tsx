@@ -186,7 +186,7 @@ const ClientHistory = () => {
       minute: "2-digit",
       timeZone: "Asia/Jakarta",
     };
-    return new Date(dateString).toLocaleString("en-US", options);
+    return new Date(dateString).toLocaleString("en-GB", options);
   }
 
   useEffect(() => {
@@ -260,8 +260,10 @@ const ClientHistory = () => {
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
                 gap: 2,
+                gridAutoFlow: "row dense",
+                gridTemplateRows: "masonry",
+                gridTemplateColumns: "repeat(3, 1fr)"
               }}
             >
               {transactions.map((transaction, index) => (
@@ -274,9 +276,42 @@ const ClientHistory = () => {
                     <Typography>Post Title: {transaction.post_title}</Typography>
                     <Typography>Categories: {transaction.category}</Typography>
                     <Typography>Price: Rp. {transaction.price.toLocaleString("id-ID")}</Typography>
+                    <Typography>Request: {transaction.request}</Typography>
                     <Typography>Start Date: {formatDate(transaction.start_date)}</Typography>
                     <Typography>End Date: {formatDate(transaction.end_date)}</Typography>
+                    <Typography>Deadline: {formatDate(transaction.deadline)}</Typography>
                     <Typography>Status: {transaction.trans_status}</Typography>
+                    {transaction.trans_status === 'in-progress' && transaction.start_date && transaction.deadline && (
+                      <Box sx={{ width: "100%", marginTop: 2 }}>
+                        <Typography variant="body2" color="white">
+                          Progress: {Math.min(
+                            Math.round(
+                              ((new Date().getTime() - new Date(transaction.start_date).getTime()) /
+                                (new Date(transaction.deadline).getTime() - new Date(transaction.start_date).getTime())) * 100
+                            ),
+                            100
+                          )}%
+                        </Typography>
+                        <Box sx={{
+                          width: '100%',
+                          height: 10,
+                          bgcolor: '#444',
+                          borderRadius: 1,
+                          overflow: 'hidden'
+                        }}>
+                          <Box sx={{
+                            width: `${Math.min(
+                              ((new Date().getTime() - new Date(transaction.start_date).getTime()) /
+                                (new Date(transaction.deadline).getTime() - new Date(transaction.start_date).getTime())) * 100,
+                              100
+                            )}%`,
+                            height: '100%',
+                            bgcolor: '#4C50FF',
+                            transition: 'width 0.3s'
+                          }} />
+                        </Box>
+                      </Box>
+                    )}
                   </CardContent>
                   <CardActions>
                     <Button

@@ -6,10 +6,12 @@ import { getCurrUser } from "@/utils/utils";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
+import { INotification } from '@/models/notificationModel';
+
 
 const Notifications = () => {
-  const [currUser, setCurrUser] = useState<Unknown>(null);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [currUser, setCurrUser] = useState<any>(null);
+  const [notifications, setNotifications] = useState<INotification[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -34,7 +36,7 @@ const Notifications = () => {
         });
         console.log(response.data)
         setNotifications(response.data);
-        setUnreadCount(response.data.filter((n) => !n.read).length);
+        setUnreadCount(response.data.filter((n: INotification) => !n.read).length);
       }
     };
 
@@ -73,7 +75,7 @@ const Notifications = () => {
             <Typography>No notifications</Typography>
           </MenuItem>
         ) : (
-          notifications.map((notification) => (
+          notifications.map((notification: INotification) => (
             <MenuItem key={notification._id}>
               <Card 
                 sx={{ 

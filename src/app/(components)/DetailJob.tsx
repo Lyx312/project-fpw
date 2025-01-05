@@ -2,7 +2,28 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Chip, Button, Grid, Alert, Rating, Avatar, IconButton } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Chip,
+  Button,
+  Grid,
+  Alert,
+  Rating,
+  Avatar,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField
+} from "@mui/material";
+import {
+  DateTimePicker,
+  LocalizationProvider
+} from "@mui/x-date-pickers";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import moment from "moment";
 import { getCurrUser } from "@/utils/utils";
 import { useRouter } from "next/navigation";
 import Loading from "../(pages)/loading";
@@ -15,7 +36,7 @@ interface DetailJobProps {
 
 declare global {
   interface Window {
-    snap: any; // Adding snap to the global Window interface
+    snap: any;
   }
 }
 
@@ -28,9 +49,12 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
   const [error, setError] = useState("");
   const [snapLoaded, setSnapLoaded] = useState(false);
 
+  const [openHireDialog, setOpenHireDialog] = useState(false);
+  const [customRequest, setCustomRequest] = useState("");
+  const [deadline, setDeadline] = useState<moment.Moment | null>(null);
+
   const router = useRouter();
 
-  // Utility to load Snap.js dynamically
   const loadSnapScript = async () => {
     if (!snapLoaded) {
       const script = document.createElement("script");
@@ -48,8 +72,6 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
     const fetchData = async () => {
       try {
         setLoading(true);
-
-        // Fetch post details
         const postResponse = await axios.get(`/api/posts/${id}`);
         setPost(postResponse.data);
 
@@ -58,31 +80,21 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
         } else {
           const user = await getCurrUser();
           setCurrUser(user);
-  
           if (user) {
-            // Fetch transactions
-            const transactionsResponse = await axios.get(`/api/transaction?post_id=${id}&email=${user.email}`);
+            const transactionsResponse = await axios.get(
+              `/api/transaction?post_id=${id}&email=${user.email}`
+            );
             const transactionsData = transactionsResponse.data;
-            console.log(transactionsData);
-            
-            // check if theres a transaction with status pending, in-progress, or completed
             const hasActiveTransaction = transactionsData.some(
               (transaction: any) =>
                 transaction.trans_status === "pending" ||
                 transaction.trans_status === "in-progress" ||
                 transaction.trans_status === "completed"
             );
-  
-            if (hasActiveTransaction) {
-              // Handle the case where there is an active transaction
-              console.log("There is an active transaction");
-              setActiveTransaction(true);
-            }
+            if (hasActiveTransaction) setActiveTransaction(true);
           }
         }
-        
 
-        // Fetch reviews
         const reviewsResponse = await axios.get(`/api/review?id=${id}`);
         setReviews(reviewsResponse.data.data);
       } catch (err: any) {
@@ -99,29 +111,33 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
     loadSnapScript();
   }, []);
 
-  // Calculate average rating
   const averageRating =
     reviews.length > 0
-      ? reviews.reduce((acc, review) => acc + review.review_rating, 0) / reviews.length
+      ? reviews.reduce((acc, review) => acc + review.review_rating, 0) /
+        reviews.length
       : 0;
-    
-  const handleHire = async () => {
+
+  const handleConfirmHire = () => {
     if (!currUser) {
       alert("Please login first");
       router.push("/login");
       return;
     }
-
     if (currUser.role !== "client") {
       alert("Only clients can hire freelancers");
       return;
     }
+    setOpenHireDialog(true);
+  };
 
+  const handleHire = async () => {
     try {
       const response = await axios.post("/api/transaction", {
         email: currUser.email,
         post_id: id,
         price: post.price,
+        request: customRequest,
+        deadline: deadline,
       });
 
       if (response.status === 201) {
@@ -132,30 +148,23 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
               transactionId: response.data.savedUserTrans.trans_id,
             }
           );
-    
           const snapToken = data.token;
-    
           if (!snapLoaded) {
             alert("Payment gateway not fully loaded. Please wait and try again.");
             return;
           }
-    
-          // Proceed with the payment using the snap token
           window.snap.pay(snapToken, {
             onSuccess: async (result: any) => {
               try {
-                await axios.put(
-                  `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
-                  {
-                    transactionId: response.data.savedUserTrans.trans_id,
-                  }
-                );
-                alert("Successfully hired freelancer. Please wait for the freelancer to accept");
+                await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`, {
+                  transactionId: response.data.savedUserTrans.trans_id,
+                });
+                alert("Successfully hired freelancer. Please wait for acceptance.");
                 setActiveTransaction(true);
                 console.log("Payment success:", result);
               } catch (err) {
-                console.error("Error marking transaction as completed:", err);
-                alert("Failed to mark transaction as completed after popup close.");
+                console.error("Error after payment:", err);
+                alert("Failed to complete transaction after popup close.");
               }
             },
             onPending: async () => {
@@ -166,7 +175,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
               alert("Payment failed. Please try again.");
             },
             onClose: async () => {
-              alert("Payment popup was closed. Transaction is not completed.");
+              alert("Payment popup was closed. Transaction not completed.");
             },
           });
         } catch (err) {
@@ -174,18 +183,20 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
           alert("Failed to start payment process. Please try again.");
         }
       } else {
-        alert("Failed to hire freelancer");
+        alert("Failed to hire freelancer.");
       }
     } catch (error) {
       console.error("Error creating transaction:", error);
-      alert("An error occurred while hiring the freelancer");
+      alert("An error occurred while hiring the freelancer.");
+    } finally {
+      setOpenHireDialog(false);
+      setCustomRequest("");
+      setDeadline(null);
     }
   };
 
   if (loading) {
-    return (
-      <Loading />
-    );
+    return <Loading />;
   }
 
   if (error) {
@@ -201,7 +212,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
       sx={{
         width: "100%",
         paddingTop: "2rem",
-        color: 'black'
+        color: "black",
       }}
     >
       <Box
@@ -222,7 +233,11 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
             sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
             onClick={() => router.push(`/profile/${post.postMaker._id}`)}
           >
-            <Avatar src={post.postMaker.pfp_path} alt={post.postMaker.name} sx={{ marginRight: "1rem" }} />
+            <Avatar
+              src={post.postMaker.pfp_path}
+              alt={post.postMaker.name}
+              sx={{ marginRight: "1rem" }}
+            />
             <Box>
               <Typography variant="subtitle1" color="text.secondary">
                 {post.postMaker.name}
@@ -236,7 +251,8 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
                     width: 10,
                     height: 10,
                     borderRadius: "50%",
-                    backgroundColor: post.postMaker.status === "Available" ? "green" : "red",
+                    backgroundColor:
+                      post.postMaker.status === "Available" ? "green" : "red",
                     marginRight: "0.5rem",
                   }}
                 />
@@ -245,8 +261,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
                 </Typography>
               </Box>
             </Box>
-            {
-              currUser && currUser.role === "client" && (
+            {currUser && currUser.role === "client" && (
               <IconButton
                 sx={{ marginLeft: "auto" }}
                 onClick={(e) => {
@@ -255,12 +270,15 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
                 }}
               >
                 <ChatIcon />
-                <Typography variant="caption" color="text.secondary" sx={{ marginLeft: "0.5rem" }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ marginLeft: "0.5rem" }}
+                >
                   Chat
                 </Typography>
               </IconButton>
-              )
-            }
+            )}
           </Box>
         </Box>
 
@@ -289,12 +307,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
           <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
             Average Rating:
           </Typography>
-          <Rating
-            value={averageRating}
-            precision={0.1}
-            readOnly
-            sx={{ fontSize: "2rem" }}
-          />
+          <Rating value={averageRating} precision={0.1} readOnly sx={{ fontSize: "2rem" }} />
           <Typography variant="body2" color="text.secondary">
             {reviews.length > 0
               ? `Based on ${reviews.length} reviews`
@@ -323,10 +336,47 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
           fullWidth
           sx={{ marginTop: "1rem" }}
           disabled={activeTransaction}
-          onClick={handleHire}
+          onClick={handleConfirmHire}
         >
           {activeTransaction ? "There's an active transaction" : "Hire"}
         </Button>
+
+        <Dialog open={openHireDialog} onClose={() => setOpenHireDialog(false)}>
+          <DialogTitle>Request & Deadline</DialogTitle>
+            <DialogContent>
+            <TextField
+              label="Request"
+              multiline
+              rows={4}
+              value={customRequest}
+              onChange={(e) => setCustomRequest(e.target.value)}
+              fullWidth
+              sx={{ marginTop: 1, marginBottom: 2 }}
+              InputProps={{
+              inputProps: {
+                style: { resize: 'vertical' }
+              }
+              }}
+            />
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DateTimePicker
+              label="Deadline"
+              value={deadline}
+              ampm={false}
+              minDate={moment().add(1, "day")}
+              format="DD/MM/YYYY HH:mm"
+              onChange={(newValue) => setDeadline(newValue)}
+              slotProps={{ textField: { fullWidth: true } }}
+              />
+            </LocalizationProvider>
+            </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenHireDialog(false)}>Cancel</Button>
+            <Button onClick={handleHire} disabled={!customRequest || !deadline}>
+              Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Box>
   );

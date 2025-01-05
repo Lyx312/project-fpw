@@ -94,11 +94,11 @@ export async function POST(req: Request) {
   session.startTransaction();
 
   try {
-    const { email, post_id, price } = await req.json();
+    const { email, post_id, price, request, deadline } = await req.json();
 
     // Check if the required fields are present
-    if (!email || !post_id || !price) {
-      return NextResponse.json({ message: 'Email, post_id, and price is required' }, { status: 400 });
+    if (!email || !post_id || !price || !request || !deadline) {
+      return NextResponse.json({ message: 'Email, post_id, price, request, and deadline is required' }, { status: 400 });
     }
 
     // Find the last transaction
@@ -111,7 +111,9 @@ export async function POST(req: Request) {
       trans_id,
       email,
       post_id,
-      price
+      price,
+      request,
+      deadline,
     });
 
     const savedUserTrans = await newUserTrans.save({ session });

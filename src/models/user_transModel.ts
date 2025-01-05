@@ -5,8 +5,10 @@ interface IUser_trans extends Document {
     email: string;
     post_id: number;
     price: number;
+    request: string;
     start_date: Date;
     end_date: Date;
+    deadline: Date;
     trans_status: string;
     cancelled_reason: string;
     createdAt: Date;
@@ -20,8 +22,10 @@ const User_transSchema: Schema = new Schema(
         email: { type: String, ref: 'User', required: true },
         post_id: { type: Number, ref: 'Post', required: true },
         price: { type: Number, required: true, min: 0 },
+        request: { type: String, required: true },
         start_date: { type: Date, default: null },
         end_date: { type: Date, default: null },
+        deadline: { type: Date, default: null },
         trans_status: { type: String, enum: ["pending", "in-progress", "completed", "paid", "cancelled", "failed"], default: "pending" },
         cancelled_reason: { type: String, default: null },
         createdAt: { type: Date, default: Date.now },

@@ -3,12 +3,22 @@
 
 import Header from "@/app/(components)/Header";
 import { getCurrUser } from "@/utils/utils";
-import { Box,
+import {
+  Box,
   Typography,
   Card,
   CardContent,
   CardActions,
-  Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, IconButton } from "@mui/material";
+  Button,
+  ButtonGroup,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+  IconButton
+} from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Loading from "@/app/(pages)/loading";
@@ -43,7 +53,6 @@ const FreelancerHistoryPage = () => {
   const fetchUser = async () => {
     try {
       const user = await getCurrUser();
-
       if (user) {
         setCurrUser({
           _id: user._id as string,
@@ -71,7 +80,6 @@ const FreelancerHistoryPage = () => {
 
   const fetchUserTransaction = async () => {
     if (!currUser?.email) return;
-
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/freelancer`,
@@ -79,8 +87,6 @@ const FreelancerHistoryPage = () => {
           params: { userEmail: currUser.email, status: filterStatus },
         }
       );
-      console.log(response.data);
-      
       setTransactions(response.data);
     } catch (err) {
       console.error("Error fetching transactions:", err);
@@ -92,35 +98,23 @@ const FreelancerHistoryPage = () => {
     router.push(`/posts/detail/${postId}`);
   };
 
-  const handleAcceptTransaction = async (transactionId: string) => {
-    try {
-      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/accept`);
-      fetchUserTransaction();
-      alert("Transaction accepted successfully");
-    } catch (err) {
-      console.error("Error accepting transaction:", err);
-      alert("Failed to accept transaction");
-      setError("Failed to accept transaction");
-    }
-  };
-
   const handleCancelTransaction = async () => {
     if (!transactionToCancel) return;
-
     try {
-
-      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}/cancel`, { type: "freelancer", reason: cancelReason });
-      const trans = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}`)
-
-      const response = await axios.put(
-                        `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
-                        {
-                          transactionId: trans.data.trans_id,
-                          status: "refund"
-                        }
-                      );
-      console.log(trans.data)
-      console.log(response.data)
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}/cancel`,
+        {
+          type: "freelancer",
+          reason: cancelReason
+        }
+      );
+      const trans = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}`
+      );
+      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`, {
+        transactionId: trans.data.trans_id,
+        status: "refund"
+      });
       fetchUserTransaction();
       alert("Transaction cancelled successfully");
       setOpenDialog(false);
@@ -135,13 +129,29 @@ const FreelancerHistoryPage = () => {
 
   const handleCompleteTransaction = async (transactionId: string) => {
     try {
-      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/complete`);
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/complete`
+      );
       fetchUserTransaction();
       alert("Transaction completed successfully");
     } catch (err) {
       console.error("Error completing transaction:", err);
       alert("Failed to complete transaction");
       setError("Failed to complete transaction");
+    }
+  };
+
+  const handleAcceptTransaction = async (transactionId: string) => {
+    try {
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/accept`,
+      );
+      fetchUserTransaction();
+      alert("Transaction accepted successfully");
+    } catch (err) {
+      console.error("Error accepting transaction:", err);
+      alert("Failed to accept transaction");
+      setError("Failed to accept transaction");
     }
   };
 
@@ -166,7 +176,7 @@ const FreelancerHistoryPage = () => {
       minute: "2-digit",
       timeZone: "Asia/Jakarta",
     };
-    return new Date(dateString).toLocaleString("en-US", options);
+    return new Date(dateString).toLocaleString("en-GB", options);
   }
 
   useEffect(() => {
@@ -231,26 +241,63 @@ const FreelancerHistoryPage = () => {
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
                 gap: 2,
+                gridAutoFlow: "row dense",
+                gridTemplateRows: "masonry",
+                gridTemplateColumns: "repeat(3, 1fr)"
               }}
             >
               {transactions.map((transaction, index) => (
                 <Card
                   key={index}
-                  sx={{ 
-                  backgroundColor: transaction.trans_status === "pending" ? "#FF3333" : "#2B3B4B", 
-                  color: "#fff" 
+                  sx={{
+                    backgroundColor: transaction.trans_status === "pending" ? "#FF3333" : "#2B3B4B",
+                    color: "#fff"
                   }}
                 >
                   <CardContent>
                     <Typography>Client: {transaction.user_name}</Typography>
                     <Typography>Post Title: {transaction.post_title}</Typography>
                     <Typography>Categories: {transaction.category}</Typography>
-                    <Typography>Price: Rp. {transaction.price.toLocaleString("id-ID")}</Typography>
+                    <Typography>
+                      Price: Rp. {transaction.price.toLocaleString("id-ID")}
+                    </Typography>
+                    <Typography>Request: {transaction.request}</Typography>
                     <Typography>Start Date: {formatDate(transaction.start_date)}</Typography>
                     <Typography>End Date: {formatDate(transaction.end_date)}</Typography>
+                    <Typography>Deadline: {formatDate(transaction.deadline)}</Typography>
                     <Typography>Status: {transaction.trans_status}</Typography>
+                    {transaction.trans_status === 'in-progress' && transaction.start_date && transaction.deadline && (
+                      <Box sx={{ width: "100%", marginTop: 2 }}>
+                        <Typography variant="body2" color="white">
+                          Progress: {Math.min(
+                            Math.round(
+                              ((new Date().getTime() - new Date(transaction.start_date).getTime()) /
+                                (new Date(transaction.deadline).getTime() - new Date(transaction.start_date).getTime())) * 100
+                            ),
+                            100
+                          )}%
+                        </Typography>
+                        <Box sx={{
+                          width: '100%',
+                          height: 10,
+                          bgcolor: '#444',
+                          borderRadius: 1,
+                          overflow: 'hidden'
+                        }}>
+                          <Box sx={{
+                            width: `${Math.min(
+                              ((new Date().getTime() - new Date(transaction.start_date).getTime()) /
+                                (new Date(transaction.deadline).getTime() - new Date(transaction.start_date).getTime())) * 100,
+                              100
+                            )}%`,
+                            height: '100%',
+                            bgcolor: '#4C50FF',
+                            transition: 'width 0.3s'
+                          }} />
+                        </Box>
+                      </Box>
+                    )}
                   </CardContent>
                   <CardActions>
                     <Button
@@ -308,19 +355,19 @@ const FreelancerHistoryPage = () => {
                       </Button>
                     )}
                     <IconButton
-                      sx={{ 
-                      marginLeft: "auto", 
-                      backgroundColor: "#1A2AAA", 
-                      color: "#fff", 
-                      "&:hover": { backgroundColor: "#1230EE" },
-                      borderRadius: "8px",
-                      padding: "0.5rem 1rem"
+                      sx={{
+                        marginLeft: "auto",
+                        backgroundColor: "#1A2AAA",
+                        color: "#fff",
+                        "&:hover": { backgroundColor: "#1230EE" },
+                        borderRadius: "8px",
+                        padding: "0.5rem 1rem"
                       }}
                       onClick={() => router.push(`/chat/${transaction.user_id}`)}
                     >
                       <ChatIcon sx={{ marginRight: "0.5rem" }} />
                       <Typography variant="button" color="inherit">
-                      Chat
+                        Chat
                       </Typography>
                     </IconButton>
                   </CardActions>
