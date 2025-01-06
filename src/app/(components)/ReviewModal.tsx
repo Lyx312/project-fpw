@@ -56,6 +56,7 @@ import {
         await axios.put(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transId}/complete`
         );
+        alert("Transaction completed successfully. Thank you for your review!");
         onSubmitSuccess();
         onClose();
       } catch {

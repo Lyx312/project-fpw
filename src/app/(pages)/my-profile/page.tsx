@@ -20,6 +20,8 @@ import Footer from "@/app/(components)/Footer";
 import Header from "@/app/(components)/Header";
 import { getCurrUser } from "@/utils/utils";
 import axios from "axios";
+import { ICategory } from "@/models/categoryModel";
+import { ICountry } from "@/models/countryModel";
 
 interface User {
   _id: string;
@@ -36,21 +38,10 @@ interface User {
   status?: string;
 }
 
-interface Category {
-  _id: string;
-  category_id: number;
-  category_name: string;
-}
-
-interface Country {
-  country_id: string;
-  country_name: string;
-}
-
 const UserProfile = () => {
   const [currUser, setCurrUser] = useState<User | null>(null);
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [allCategories, setAllCategories] = useState<Category[]>([]);
+  const [countries, setCountries] = useState<ICountry[]>([]);
+  const [allCategories, setAllCategories] = useState<ICategory[]>([]);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",

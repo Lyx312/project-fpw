@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import User from "@/models/userModel"; 
 import Post from "@/models/postModel";
 import Category from "@/models/categoryModel";
-import Post_category from "@/models/post_categoryModel";
 import Country from "@/models/countryModel";
 import Post_review from "@/models/post_reviewModel";
 import Chat from "@/models/chatModel";
@@ -31,7 +30,6 @@ const connectDB = async () => {
     mongoose.model('User', User.schema);
     mongoose.model('Post', Post.schema);
     mongoose.model('Category', Category.schema);
-    mongoose.model('Post_category', Post_category.schema);
     mongoose.model('Country', Country.schema);
     mongoose.model('Post_review', Post_review.schema);
     mongoose.model('Chat', Chat.schema);

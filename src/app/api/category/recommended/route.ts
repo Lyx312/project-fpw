@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
-import Post_category from '@/models/post_categoryModel';
+import Post from '@/models/postModel';
 import User from '@/models/userModel';
-import UserTransaction from '@/models/user_transModel'; // Assuming you have this model
+import UserTransaction from '@/models/user_transModel';
 import connectDB from '@/config/database';
-import Category from '@/models/categoryModel';
-
+import { ICategory } from '@/models/categoryModel';
 
 export async function GET(req: Request) {
   await connectDB();
@@ -27,21 +26,29 @@ export async function GET(req: Request) {
       .sort({ createdAt: -1 })
       .limit(3)
       .exec();
-
+    
     const postIds = userTransactions.map(transaction => transaction.post_id);
     
-    // Get the categories from the category IDs
-    const post_categories = await Post_category.find({ post_id: { $in: postIds } })
-      .sort({ createdAt: -1 })
-      .limit(3)
-      .exec();
-    
-    // get the category from the category ID
-    const categoryIds = post_categories.map(category => category.category_id);
-    const categories = await Category.find({ category_id: { $in: categoryIds } })
-      .select('category_name')
+    // Get the posts from the post IDs
+    const posts = await Post.find({ post_id: { $in: postIds } })
+      .populate('post_categories')
+      .select('post_categories')
       .exec();
 
+    // Extract category names from posts
+    const categoryNames = new Set();
+    posts.forEach(post => {
+      post.post_categories.forEach((category: ICategory) => {
+      if (categoryNames.size < 9) {
+        categoryNames.add(category.category_name);
+      }
+      });
+    });
+
+    const categories = Array.from(categoryNames);
+    // console.log(categories);
+    
+    
     return NextResponse.json(categories, { status: 200 });
   } catch (error) {
     console.error(error);

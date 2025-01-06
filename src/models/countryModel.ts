@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-interface ICountry extends Document {
+export interface ICountry extends Document {
+    _id: string;
     country_id: string;
     country_name: string;
 }

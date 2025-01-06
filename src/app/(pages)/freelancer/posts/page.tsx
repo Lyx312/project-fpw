@@ -13,6 +13,7 @@ import { getCurrUser } from "@/utils/utils";
 import Header from "@/app/(components)/Header";
 import Footer from "@/app/(components)/Footer";
 import Loading from "../../loading";
+import { ICategory } from "@/models/categoryModel";
 
 interface User {
   id: string;
@@ -28,7 +29,7 @@ interface Post {
   title: string;
   description: string;
   price: number;
-  categories: string[];
+  categories: ICategory[];
   postMaker: string;
   createdAt: string;
 }
@@ -144,7 +145,7 @@ const FreelancerPostsPage: React.FC = () => {
                       </Typography>
                       <Typography variant="body2" sx={{ color: "#777" }}>
                         <strong>Categories:</strong>{" "}
-                        {post.categories.join(", ")}
+                        {Array.isArray(post.categories) ? post.categories.map((category) => category.category_name).join(", ") : "No categories"}
                       </Typography>
                       <Typography variant="body2" color="textSecondary">
                         <strong>Created At:</strong>{" "}

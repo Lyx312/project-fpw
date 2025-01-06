@@ -5,8 +5,6 @@ import Post from '@/models/postModel';
 import sendEmail, { emailTemplate } from '@/emails/mailer';
 import mongoose from 'mongoose';
 import User from '@/models/userModel';
-import Category from '@/models/categoryModel';
-import Post_category from '@/models/post_categoryModel';
 import Notification from '@/models/notificationModel';
 
 export async function GET(req: Request) {
@@ -42,12 +40,9 @@ export async function GET(req: Request) {
 
     const enhancedTransactions = await Promise.all(
       transactions.map(async (transaction) => {
-        const post = await Post.findOne({post_id: transaction.post_id});
-        const user = await User.findOne({email: post.post_email});
-        const categoryTrans = await Post_category.find({ post_id: { $in: [transaction.post_id] } });
-        const categoryIds = categoryTrans.map(category => category.category_id);
-        const categoryId = await Category.find({ category_id: { $in: categoryIds } });
-        const categoryNames = categoryId.map(category => category.category_name).join(', ') || 'No Categories';
+        const post = await Post.findOne({ post_id: transaction.post_id }).populate('post_categories');
+        const user = await User.findOne({ email: post.post_email });
+        const categoryNames = post.post_categories.map(category => category.category_name).join(', ') || 'No Categories';
         const userName = user ? `${user.first_name} ${user.last_name}` : "Unknown User";
         return {
           ...transaction.toObject(),
@@ -59,14 +54,6 @@ export async function GET(req: Request) {
       })
     );
 
-    // const sortedTransactions = enhancedTransactions.sort((a, b) => {
-    //   const categoryA = a.category.toLowerCase();
-    //   const categoryB = b.category.toLowerCase();
-    //   if (categoryA < categoryB) return -1;
-    //   if (categoryA > categoryB) return 1;
-    //   return 0;
-    // });
-
     // Sort transactions based on trans_status
     if (role != 'admin') {
         const statusOrder = ['submitted', 'in-progress', 'pending', 'completed', 'cancelled', 'failed'];
@@ -77,16 +64,12 @@ export async function GET(req: Request) {
         return statusA - statusB;
       });
     }
-    
 
     return NextResponse.json(enhancedTransactions, { status: 200 });
   } catch (error) {
     return NextResponse.json({ message: 'Error fetching transactions', error: error }, { status: 500 });
   }
 }
-
-
-
 
 export async function POST(req: Request) {
   await connectDB();

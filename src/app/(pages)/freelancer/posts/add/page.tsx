@@ -21,6 +21,7 @@ import { getCurrUser } from "@/utils/utils";
 import axios from "axios";
 import Header from "@/app/(components)/Header";
 import Footer from "@/app/(components)/Footer";
+import { ICategory } from "@/models/categoryModel";
 
 interface User {
   id: string;
@@ -31,18 +32,13 @@ interface User {
   exp: number;
 }
 
-interface Category {
-  category_id: number;
-  category_name: string;
-}
-
 const AddPostPage: React.FC = () => {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number | "">("");
   const [categories, setCategories] = useState<string[]>([]);
-  const [allCategories, setAllCategories] = useState<Category[]>([]);
+  const [allCategories, setAllCategories] = useState<ICategory[]>([]);
   const [loading, setLoading] = useState(false);
   const [currUser, setCurrUser] = useState<User | null>(null);
   const [alert, setAlert] = useState<{ open: boolean; message: string }>({
@@ -280,7 +276,7 @@ const AddPostPage: React.FC = () => {
                     Select a category
                   </MenuItem>
                   {allCategories.map((cat) => (
-                    <MenuItem key={cat.category_id} value={cat.category_id}>
+                    <MenuItem key={cat._id} value={cat._id}>
                       {cat.category_name}
                     </MenuItem>
                   ))}
@@ -292,7 +288,7 @@ const AddPostPage: React.FC = () => {
                     key={category}
                     label={
                       allCategories.find(
-                        (cat) => cat.category_id === Number(category)
+                        (cat) => cat._id === category
                       )?.category_name
                     }
                     onDelete={() =>

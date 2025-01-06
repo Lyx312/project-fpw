@@ -37,7 +37,7 @@ const Notifications = () => {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/notifications`, {
           params: { userId: currUser._id },
         });
-        console.log(response.data)
+        // console.log(response.data)
         setNotifications(response.data);
         setUnreadCount(response.data.filter((n: INotification) => !n.read).length);
       }

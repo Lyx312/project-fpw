@@ -18,13 +18,9 @@ import Footer from "../(components)/Footer";
 import axios from "axios";
 import { getCurrUser } from "@/utils/utils";
 import { useRouter } from "next/navigation";
+import { ICategory } from "@/models/categoryModel";
 
 const LandingPage = () => {
-  interface Category {
-    category_id: number;
-    category_name: string;
-  }
-
   interface Service {
     id: number;
     title: string;
@@ -32,9 +28,9 @@ const LandingPage = () => {
     averageRating: number;
   }
 
-  const [allCategories, setAllCategories] = useState<Category[]>([]);
+  const [allCategories, setAllCategories] = useState<ICategory[]>([]);
   const [serviceByRating, setServiceByRating] = useState<Service[]>([]);
-  const [recommendedCategories, setRecommendedCategories] = useState<Category[]>([]);
+  const [recommendedCategories, setRecommendedCategories] = useState<string[]>([]);
   const router = useRouter();
 
   const fetchCategories = async () => {
@@ -61,7 +57,7 @@ const LandingPage = () => {
             b.averageRating - a.averageRating
         );
 
-        console.log(sortedData);
+        // console.log(sortedData);
         setServiceByRating(sortedData);
       } else {
         console.error("Failed to fetch Service");
@@ -78,7 +74,6 @@ const LandingPage = () => {
         const response = await axios.get("/api/category/recommended", {
           params: { userId: user._id },
         });
-        console.log(response.data);
 
         if (response) {
           setRecommendedCategories(response.data);
@@ -287,7 +282,6 @@ const LandingPage = () => {
       {/* Personalized Recommendations Section */}
       {
         recommendedCategories.length > 0 && (
-
           <Box sx={{ py: 10, backgroundColor: colorPalette.lightBlue }}>
             <Container maxWidth="lg">
               <Typography variant="h4" align="center" sx={{ fontWeight: "bold" }} gutterBottom>
@@ -308,7 +302,7 @@ const LandingPage = () => {
                         "&:hover": { bgcolor: colorPalette.mediumBlue },
                       }}
                     >
-                      {category.category_name}
+                      {category}
                     </Button>
                   </Grid>
                 ))}

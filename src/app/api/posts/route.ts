@@ -3,8 +3,6 @@ import { NextResponse } from "next/server";
 import connectDB from "../../../config/database"; // Utility function for MongoDB connection
 import Post from "../../../models/postModel";
 import User from "@/models/userModel";
-import Post_category from "@/models/post_categoryModel";
-import Category from "@/models/categoryModel";
 import Post_review from "@/models/post_reviewModel";
 
 // GET: Fetch post from MongoDB
@@ -43,9 +41,7 @@ export async function GET(req: Request) {
 
     if (category) {
       // Check for posts in the specified category
-      const postCategories = await Post_category.find({ category_id: category });
-      const filteredPostIds = postCategories.map((pc) => pc.post_id);
-      query.post_id = { $in: filteredPostIds };
+      query.post_categories = category;
     }
 
     // Fetch posts with user details populated
@@ -57,28 +53,11 @@ export async function GET(req: Request) {
         foreignField: "email", // User field to match
         select: "first_name last_name", // Fields to include
       })
+      .populate('post_categories')
       .lean();
 
-    // Fetch categories for posts
+    // Fetch postsIds
     const postIds = posts.map((post) => post.post_id);
-    const postCategories = await Post_category.find({ post_id: { $in: postIds } })
-      .populate({
-        path: "category_id", // Assuming category_id links to the Category model
-        model: Category, // Reference to the Category model
-        localField: "category_id",
-        foreignField: "category_id",
-        select: "category_name", // Field to include
-      })
-      .lean();
-
-    // Map category names to posts, supporting multiple categories per post
-    const categoryMap = postCategories.reduce<Record<number, string[]>>((map, item) => {
-      if (!map[item.post_id]) {
-        map[item.post_id] = [];
-      }
-      map[item.post_id].push(item.category_id?.category_name || "Unknown");
-      return map;
-    }, {});
 
     // Fetch ratings for posts within the rating range
     const postRatings = await Post_review.aggregate([
@@ -115,7 +94,7 @@ export async function GET(req: Request) {
           title: post.post_title,
           description: post.post_description,
           price: post.post_price,
-          categories: categoryMap[post.post_id] || "Uncategorized", // Join categories with a comma
+          categories: post.post_categories || "Uncategorized", // Join categories with a comma
           postMaker: `${post.post_email.first_name} ${post.post_email.last_name}`,
           createdAt: post.createdAt,
           averageRating: ratingMap[post.post_id] || 0, // Add the average rating to the response
@@ -146,22 +125,14 @@ export async function POST(req: Request) {
     const length = (await Post.find()).length;
     // Create a new post
     const post = await Post.create({
-      post_id: length+1, // Unique post ID
+      post_id: length + 1, // Unique post ID
       post_title: title,
       post_description: description,
       post_price: price,
       post_email: email, // This links to the user
+      post_categories: categories || [], // Store categories directly in the post model
       createdAt: new Date(),
     });
-
-    // Handle categories
-    if (categories?.length > 0) {
-      const postCategories = categories.map((categoryId: string) => ({
-        post_id: post.post_id,
-        category_id: categoryId,
-      }));
-      await Post_category.insertMany(postCategories);
-    }
 
     return NextResponse.json({ message: "Post created successfully", post });
   } catch (error: any) {

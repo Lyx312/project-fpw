@@ -15,27 +15,23 @@ import { useRouter } from "next/navigation"; // Import useRouter
 import Header from "@/app/(components)/Header";
 import Footer from "@/app/(components)/Footer";
 import axios from "axios";
+import { ICategory } from "@/models/categoryModel";
 
 interface Post {
   id: number;
   title: string;
   description: string;
   price: number;
-  categories: string[];
+  categories: ICategory[];
   postMaker: string;
   createdAt: string;
   averageRating: number; // Added averageRating
 }
 
-interface Category {
-  category_id: number;
-  category_name: string;
-}
-
-const Page: React.FC = () => {
+const PostsPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [postList, setPostList] = useState<Post[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
   const router = useRouter(); // Initialize the useRouter hook
 
   const [filters, setFilters] = useState<{
@@ -70,7 +66,7 @@ const Page: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get<{ data: Category[] }>("/api/category");
+      const response = await axios.get<{ data: ICategory[] }>("/api/category");
       setCategories(response.data.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -84,6 +80,8 @@ const Page: React.FC = () => {
         params: filters,
       });
       setPostList(response.data.data);
+      // console.log(response.data.data);
+      
     } catch (error) {
       console.error("Error fetching posts:", error);
     } finally {
@@ -294,8 +292,8 @@ const Page: React.FC = () => {
             </option>
             {categories.map((cat) => (
               <option
-                key={cat.category_id}
-                value={cat.category_id}
+                key={cat._id}
+                value={cat._id}
                 style={{ color: "#000" }}
               >
                 {cat.category_name}
@@ -379,9 +377,7 @@ const Page: React.FC = () => {
                 </Typography>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   Categories:{" "}
-                  {item.categories.length > 0
-                    ? item.categories.join(", ")
-                    : "No categories available"}
+                  {Array.isArray(item.categories) ? item.categories.map((category) => category.category_name).join(", ") : "No categories available"}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   {item.description}
@@ -418,4 +414,4 @@ const Page: React.FC = () => {
   );
 };
 
-export default Page;
+export default PostsPage;

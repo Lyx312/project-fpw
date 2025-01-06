@@ -4,7 +4,6 @@ import Post from '@/models/postModel';
 import connectDB from '../../../../config/database';
 import User_trans from '../../../../models/user_transModel';
 import User from '../../../../models/userModel'; // Import User model to access first_name and last_name
-import Post_category from '@/models/post_categoryModel';
 import Category from '@/models/categoryModel';
 
 export async function GET(req: Request) {
@@ -22,7 +21,10 @@ export async function GET(req: Request) {
     // Fetch posts related to the email
     const posts = await Post.find({ post_email: userEmail });
     const postMap = posts.reduce((acc: any, post: any) => {
-      acc[post.post_id] = post.post_title;
+      acc[post.post_id] = {
+        title: post.post_title,
+        categories: post.post_categories
+      };
       return acc;
     }, {});
 
@@ -37,19 +39,20 @@ export async function GET(req: Request) {
     // Enrich transactions with post titles, format dates, and user names
     const enrichedTransactions = await Promise.all(transactions.map(async (transaction: any) => {
       // Fetch user details by user_id
-      const user = await User.findOne({email: transaction.email}); // Assuming transaction has a user_id field
+      const user = await User.findOne({ email: transaction.email }); // Assuming transaction has a user_id field
       const userName = user ? `${user.first_name} ${user.last_name}` : "Unknown User"; // Combine first_name and last_name
-      const categoryTrans = await Post_category.find({ post_id: { $in: [transaction.post_id] } });
-      const categoryIds = categoryTrans.map(category => category.category_id);
-      const categoryId = await Category.find({ category_id: { $in: categoryIds } });
-      const categoryNames = categoryId.map(category => category.category_name).join(', ') || 'No Categories';
-      
+
+      // Fetch category names from post_categories
+      const postCategories = postMap[transaction.post_id]?.categories || [];
+      const categories = await Category.find({ _id: { $in: postCategories } });
+      const categoryNames = categories.map(category => category.category_name).join(', ') || 'No Categories';
+
       return {
         ...transaction._doc, // Spread existing transaction fields
-        post_title: postMap[transaction.post_id] || "Unknown Title", // Add post_title
+        post_title: postMap[transaction.post_id]?.title || "Unknown Title", // Add post_title
         user_name: userName, // Add user name
         user_id: user._id, // Add user id
-        category: categoryNames
+        category: categoryNames // Add category names
       };
     }));
 

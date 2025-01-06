@@ -22,17 +22,13 @@ import axios from "axios";
 import Loading from "@/app/(pages)/loading";
 import Footer from "@/app/(components)/Footer";
 import Header from "@/app/(components)/Header";
-
-interface Category {
-  category_id: string;
-  category_name: string;
-}
+import { ICategory } from "@/models/categoryModel";
 
 interface Post {
   title: string;
   description: string;
   price: number;
-  categories: string[];
+  categories: ICategory[];
   post_status: string;
 }
 
@@ -40,8 +36,8 @@ const EditPostPage: React.FC = () => {
   const { id } = useParams();
   const router = useRouter();
   const [post, setPost] = useState<Post | null>(null);
-  const [allCategories, setAllCategories] = useState<Category[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [allCategories, setAllCategories] = useState<ICategory[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [postStatus, setPostStatus] = useState<string>("available");
   const [alert, setAlert] = useState<{ open: boolean; message: string }>({
@@ -57,22 +53,22 @@ const EditPostPage: React.FC = () => {
 
   // Add item to list
   const addToList = (
-    item: string,
-    list: string[],
-    setList: React.Dispatch<React.SetStateAction<string[]>>
+    item: ICategory,
+    list: ICategory[],
+    setList: React.Dispatch<React.SetStateAction<ICategory[]>>
   ) => {
-    if (item && !list.includes(item)) {
+    if (item && !list.some((i) => i._id === item._id)) {
       setList([...list, item]);
     }
   };
 
   // Remove item from list
   const removeFromList = (
-    item: string,
-    list: string[],
-    setList: React.Dispatch<React.SetStateAction<string[]>>
+    item: ICategory,
+    list: ICategory[],
+    setList: React.Dispatch<React.SetStateAction<ICategory[]>>
   ) => {
-    setList(list.filter((i) => i !== item));
+    setList(list.filter((i) => i._id !== item._id));
   };
 
   useEffect(() => {
@@ -91,7 +87,7 @@ const EditPostPage: React.FC = () => {
 
         if (postResponse.status === 200 && categoriesResponse.status === 200) {
           setPost(postData);
-          setCategories(postData.categories_id || []);
+          setCategories(postData.categories || []);
           setAllCategories(categoriesData.data || []);
           setPostStatus(postData.status || "available");
         } else {
@@ -274,11 +270,12 @@ const EditPostPage: React.FC = () => {
                   value=""
                   displayEmpty
                   onChange={(e) => {
-                    addToList(
-                      e.target.value as string,
-                      categories,
-                      setCategories
+                    const selectedCategory = allCategories.find(
+                      (cat) => cat._id === e.target.value
                     );
+                    if (selectedCategory) {
+                      addToList(selectedCategory, categories, setCategories);
+                    }
                   }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
@@ -294,7 +291,7 @@ const EditPostPage: React.FC = () => {
                     Select a category
                   </MenuItem>
                   {allCategories.map((cat) => (
-                    <MenuItem key={cat.category_id} value={cat.category_id}>
+                    <MenuItem key={cat._id} value={cat._id}>
                       {cat.category_name}
                     </MenuItem>
                   ))}
@@ -303,11 +300,8 @@ const EditPostPage: React.FC = () => {
               <Box mt={2} display="flex" flexWrap="wrap" gap={1}>
                 {categories.map((category) => (
                   <Chip
-                    key={category}
-                    label={
-                      allCategories.find((cat) => cat.category_id === category)
-                        ?.category_name
-                    }
+                    key={category._id}
+                    label={category.category_name}
                     onDelete={() =>
                       removeFromList(category, categories, setCategories)
                     }

@@ -29,6 +29,7 @@ import { useRouter } from "next/navigation";
 import Loading from "../(pages)/loading";
 import axios from "axios";
 import ChatIcon from "@mui/icons-material/Chat";
+import { ICategory } from "@/models/categoryModel";
 
 interface DetailJobProps {
   id: string;
@@ -74,6 +75,8 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
         setLoading(true);
         const postResponse = await axios.get(`/api/posts/${id}`);
         setPost(postResponse.data);
+        console.log(postResponse.data.categories);
+        
 
         if (postResponse.data.status === "unavailable") {
           setActiveTransaction(true);
@@ -295,11 +298,17 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
             Categories:
           </Typography>
           <Grid container spacing={1}>
-            {post.categories.map((category: string, index: number) => (
-              <Grid item key={index}>
-                <Chip label={category} color="primary" />
+            {Array.isArray(post.categories) && post.categories.length > 0 ? (
+              post.categories.map((category: ICategory) => (
+              <Grid item key={category._id}>
+                <Chip label={category.category_name} color="primary" />
               </Grid>
-            ))}
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+              No categories available
+              </Typography>
+            )}
           </Grid>
         </Box>
 
