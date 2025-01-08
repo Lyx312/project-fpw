@@ -160,8 +160,22 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
       const exp = await jwtVerify(existingCookie.value, jwtSecret).then((result) => result.payload.exp);
 
+      const userObj = {
+        _id: user._id,
+        email: user.email,
+        country_id: user.country_id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        role: user.role,
+        pfp_path: user.pfp_path,
+        phone: user.phone,
+        gender: user.gender,
+        categories: user.categories,
+        status: user.status,
+    };
+
       if (exp) {
-        const token = await new SignJWT({ ...user.toJSON() })
+        const token = await new SignJWT(userObj)
           .setProtectedHeader({ alg: 'HS256' })
           .setExpirationTime(Math.floor(exp))
           .sign(jwtSecret);
