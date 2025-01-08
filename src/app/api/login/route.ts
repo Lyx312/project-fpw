@@ -58,11 +58,25 @@ export async function POST(request: Request) {
 
         // check if user is banned
         if (user.is_banned) {
-            return NextResponse.json({ error: 'Your account is banned' }, { status: 401 });
+            return NextResponse.json({ error: `Your account is banned. Reaseon: ${user.banned_reason}` }, { status: 401 });
         }
 
+        const userObj = {
+            _id: user._id,
+            email: user.email,
+            country_id: user.country_id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            role: user.role,
+            pfp_path: user.pfp_path,
+            phone: user.phone,
+            gender: user.gender,
+            categories: user.categories,
+            status: user.status,
+        };
+
         // Generate JWT token
-        const token = await new SignJWT({...user.toJSON()})
+        const token = await new SignJWT(userObj)
             .setProtectedHeader({ alg: 'HS256' })
             .setExpirationTime(rememberMe ? '7d' : '1d')
             .sign(jwtSecret);
