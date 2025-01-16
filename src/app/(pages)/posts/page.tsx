@@ -53,6 +53,14 @@ const PostsPage: React.FC = () => {
   });
 
   useEffect(() => {
+    const storedName = sessionStorage.getItem("searchName") || "";
+    if (storedName) {
+      setFilters((prev) => ({ ...prev, name: storedName }));
+      sessionStorage.removeItem("searchName");
+    }
+    if (storedName != null) {
+      sessionStorage.removeItem("searchName");
+    }
     fetchCategories();
   }, []);
 
@@ -62,7 +70,7 @@ const PostsPage: React.FC = () => {
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, []);
+  }, [filters]);
 
   const fetchCategories = async () => {
     try {

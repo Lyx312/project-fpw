@@ -105,6 +105,12 @@ const LandingPage = () => {
     router.push(`/posts/detail/${id}`);
   };
 
+  const [searchValue, setSearchValue] = useState<string>("");
+  const handleSearch = () => {
+    sessionStorage.setItem("searchName", searchValue); // Store the value in sessionStorage
+    router.push("/posts");
+  };
+
   return (
     <Box sx={{ flexGrow: 1, bgcolor: colorPalette.darkBlue, color: "white" }}>
       <Header />
@@ -124,6 +130,8 @@ const LandingPage = () => {
             </Typography>
             <TextField
               fullWidth
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
               placeholder="Search for jobs or skills"
               sx={{
                 bgcolor: "white",
@@ -150,8 +158,9 @@ const LandingPage = () => {
                 borderRadius: "30px",
                 "&:hover": { opacity: 0.9 },
               }}
+              onClick={handleSearch}
             >
-              Post a Job for Free
+              Find Job Posts
             </Button>
           </Grid>
           <Grid item xs={12} md={6}>
