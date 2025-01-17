@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Freelance Hub
 
-## Getting Started
+**Freelance Hub** adalah platform yang aman dan terpercaya yang mempertemukan freelancer dengan client untuk berkolaborasi dalam berbagai proyek. Dengan sistem yang sederhana dan transparan, Freelance Hub memastikan pengalaman yang memuaskan bagi kedua belah pihak.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 📌 **Cara Kerja Freelance Hub**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Freelancer Membuat Post**  
+   Freelancer membuat post yang berisi detail layanan yang ditawarkan, termasuk deskripsi pekerjaan, harga, dan kategori.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. **Client Memilih Freelancer**  
+   Client dapat mencari freelancer sesuai kebutuhan menggunakan sistem filter. Setelah menemukan freelancer yang cocok, client dapat:
+   - Membayar harga yang telah ditetapkan freelancer.  
+   - Memberikan spesifikasi pekerjaan dan tenggat waktu.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. **Freelancer Memutuskan**  
+   Freelancer dapat:
+   - **Menerima pekerjaan** dan mulai bekerja sesuai spesifikasi yang diberikan.  
+   - **Menolak pekerjaan**, sehingga pembayaran client akan dikembalikan sepenuhnya.
 
-## Learn More
+4. **Freelancer Menyelesaikan Pekerjaan**  
+   Setelah freelancer menyelesaikan pekerjaan:
+   - Hasil kerja dikirimkan ke client.  
+   - Client dapat:
+     - **Menerima hasil kerja**, melanjutkan ke tahap pemberian review.  
+     - **Menolak hasil kerja**, meminta revisi hingga sesuai spesifikasi.
 
-To learn more about Next.js, take a look at the following resources:
+5. **Transaksi Selesai**  
+   Setelah client menerima hasil kerja:
+   - Client memberikan **rating** dan **review** kepada freelancer.  
+   - Freelancer menerima pembayaran yang sebelumnya telah dibayarkan oleh client.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🎯 **Fitur-Fitur yang Tersedia**
 
-## Deploy on Vercel
+Freelance Hub menawarkan berbagai fitur unggulan untuk mendukung transaksi yang aman dan nyaman, seperti:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 🔎 **Pencarian dan Penyaringan**
+- **Filter Post**: Berdasarkan nama, harga, dan kategori.  
+- **Filter Freelancer**: Berdasarkan nama, negara, dan kategori.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### ⚙️ **Manajemen Akun**
+- Mengubah nama, password, dan foto profil.  
+- **Freelancer**: Dapat mengatur status ketersediaan dan kategori skill.
+
+### 🛠️ **Manajemen Post untuk Freelancer**
+- Membuat post baru.  
+- Mengedit judul, deskripsi, harga, kategori, dan status post.
+
+### 💬 **Sistem Komunikasi**
+- **Chat dalam website**: Diskusi antara freelancer dan client terkait pekerjaan.  
+- **Notifikasi dalam website**: Update transaksi dan pesan baru.  
+- **Notifikasi email**: Dikirimkan melalui **Nodemailer** untuk update transaksi.
+
+### 💳 **Sistem Pembayaran**
+- Didukung oleh **Midtrans** untuk keamanan dan kenyamanan transaksi.
+
+---
+
+## 👤 **Akun-Akun Contoh**
+
+Gunakan akun berikut untuk mencoba fitur Freelance Hub:
+
+### **Admin**
+- **Email**: akunistts@gmail.com  
+- **Password**: 123123  
+
+### **Freelancer**
+- **Email**: gkendick1@gmail.com  
+- **Password**: pass123  
+
+### **Client**
+- **Email**: rsegregoriuskendick@gmail.com  
+- **Password**: pass123  
+
+---
+
+## 💻 **Teknologi yang Digunakan**
+- **Frontend**: Next.js  
+- **Backend**: Next.js
+- **Database**: MongoDB  
+- **Payment Gateway**: Midtrans  
+- **Email Service**: Nodemailer  
+
+---
+
+## 🚀 **Mulai Menggunakan Freelance Hub**
+
+1. **Clone repository**  
+   Jalankan perintah berikut di terminal:
+   ```bash
+   git clone https://github.com/Lyx312/project-fpw.git
+2. **Install dependencies dan jalankan aplikasi**  
+   Masukkan perintah berikut di terminal VSCode:
+   ```bash
+   npm i 
+   npm run dev
+3. **Buka website di browser**  
+   Akses website pada URL berikut:
+   ```bash
+   http://localhost:3000
+ 
