@@ -83,7 +83,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
         } else {
           if (currUser._id) {
             const transactionsResponse = await axios.get(
-              `/api/transaction?post_id=${id}&email=${user.email}`
+              `/api/transaction?post_id=${id}&email=${currUser.email}`
             );
             const transactionsData = transactionsResponse.data;
             const hasActiveTransaction = transactionsData.some(
