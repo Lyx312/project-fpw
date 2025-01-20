@@ -12,7 +12,14 @@ const colors = {
   text: "#EAD8B1",
 };
 
-const PostDetailPage = async ({ params }: { params: { id: string } }) => {
+interface PageProps {
+  params: {
+    id: string;
+  };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+const PostDetailPage = async ({ params }: PageProps) => {
   const { id } = await params;
 
   return (
