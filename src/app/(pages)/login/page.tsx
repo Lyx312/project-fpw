@@ -17,7 +17,6 @@ import {
 import {
   Visibility,
   VisibilityOff,
-  Close as CloseIcon,
 } from "@mui/icons-material";
 import axios from "axios";
 import Header from "@/app/(components)/Header";
@@ -32,11 +31,7 @@ import {
 } from "../../redux/slices/authSlice";
 import { RootState } from "../../redux/store";
 
-interface LoginFormProps {
-  onClose?: () => void;
-}
-
-const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
+const LoginForm = () => {
   const dispatch = useDispatch();
   const { email, password, rememberMe, isLoading } = useSelector(
     (state: RootState) => state.auth
@@ -136,20 +131,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
               bgcolor: "#FFF9F1",
             }}
           >
-            {onClose && (
-              <IconButton
-                onClick={onClose}
-                sx={{
-                  position: "absolute",
-                  right: 8,
-                  top: 8,
-                  color: "#C5AA89",
-                }}
-              >
-                <CloseIcon />
-              </IconButton>
-            )}
-
             <Typography
               variant="h5"
               component="h2"
@@ -238,18 +219,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
                   }
                   label="Remember me"
                 />
-                <Link
-                  href="#"
-                  variant="body2"
-                  sx={{
-                    color: "#6B4F4F",
-                    "&:hover": {
-                      textDecoration: "underline",
-                    },
-                  }}
-                >
-                  Forgot Password?
-                </Link>
               </Box>
 
               <Button
