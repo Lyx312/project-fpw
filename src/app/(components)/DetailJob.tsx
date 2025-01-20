@@ -30,7 +30,6 @@ import axios from "axios";
 import ChatIcon from "@mui/icons-material/Chat";
 import { ICategory } from "@/models/categoryModel";
 import { useAppSelector } from "@/app/redux/hooks";
-import { UserState } from "@/app/redux/slices/userSlice";
 
 interface DetailJobProps {
   id: string;
@@ -55,7 +54,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
   const [deadline, setDeadline] = useState<moment.Moment | null>(null);
 
   const router = useRouter();
-  const currUser = useAppSelector((state: UserState) => state.user);
+  const currUser = useAppSelector(state => state.user);
 
   const loadSnapScript = async () => {
     if (!snapLoaded) {
