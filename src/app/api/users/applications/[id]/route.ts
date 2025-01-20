@@ -20,7 +20,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
   }
 }
 
-export async function PUT(request: Request, context: { params: { id: string } }) {
+export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
   await connectDB();
 
   try {
@@ -46,7 +46,7 @@ export async function PUT(request: Request, context: { params: { id: string } })
   }
 }
 
-export async function DELETE(request: Request, context: { params: { id: string } }) {
+export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
   await connectDB();
 
   try {

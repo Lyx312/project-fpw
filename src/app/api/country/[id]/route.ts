@@ -4,7 +4,7 @@ import connectDB from '../../../../config/database'; // Utility function for Mon
 import Country from '../../../../models/countryModel'; // Adjust the path to your model
 
 // GET: Fetch country by ID from MongoDB
-export async function GET(request: Request, context: { params: { id: string } }) {
+export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
     // Destructure params after awaiting it
     const { id } = await context.params;
