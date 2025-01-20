@@ -23,7 +23,6 @@ import { ICategory } from "@/models/categoryModel";
 import { ICountry } from "@/models/countryModel";
 import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
 import { clearUser } from '@/app/redux/slices/userSlice';
-import { RootState } from '@/app/redux/store';
 
 const UserProfile = () => {
   const [countries, setCountries] = useState<ICountry[]>([]);
@@ -44,7 +43,7 @@ const UserProfile = () => {
   });
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const dispatch = useAppDispatch();
-  const currUser = useAppSelector((state: RootState) => state.user);
+  const currUser = useAppSelector((state) => state.user);
 
   const fetchUser = async () => {
     if (currUser._id) {

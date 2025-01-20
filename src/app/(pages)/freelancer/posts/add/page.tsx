@@ -22,7 +22,6 @@ import Header from "@/app/(components)/Header";
 import Footer from "@/app/(components)/Footer";
 import { ICategory } from "@/models/categoryModel";
 import { useAppSelector } from "@/app/redux/hooks";
-import { RootState } from "@/app/redux/store";
 
 const AddPostPage: React.FC = () => {
   const router = useRouter();
@@ -42,7 +41,7 @@ const AddPostPage: React.FC = () => {
     accent: "#6A9AB0",
     text: "#EAD8B1",
   };
-  const currUser = useAppSelector((state: RootState) => state.user);
+  const currUser = useAppSelector((state) => state.user);
 
   useEffect(() => {
     const fetchCategories = async () => {

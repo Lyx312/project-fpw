@@ -24,7 +24,6 @@ import Loading from "@/app/(pages)/loading";
 import { useRouter } from "next/navigation";
 import ChatIcon from "@mui/icons-material/Chat";
 import { useAppSelector } from "@/app/redux/hooks";
-import { RootState } from "@/app/redux/store";
 
 const FreelancerHistoryPage = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
@@ -36,7 +35,7 @@ const FreelancerHistoryPage = () => {
   const [transactionToCancel, setTransactionToCancel] = useState<string | null>(null);
 
   const router = useRouter();
-  const currUser = useAppSelector((state: RootState) => state.user);
+  const currUser = useAppSelector((state) => state.user);
 
   const fetchUserTransaction = async () => {
     if (!currUser?.email) return;

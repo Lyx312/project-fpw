@@ -10,7 +10,6 @@ import Loading from '@/app/(pages)/loading';
 import { useAppSelector } from '@/app/redux/hooks';
 import { pusherClient } from '@/lib/pusher';
 import { IPusherChat } from '@/app/api/chat/route';
-import { RootState } from '@/app/redux/store';
 
 interface User {
   _id: string;
@@ -26,7 +25,7 @@ const ChatPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [receiver, setReceiver] = useState<User | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const currUser = useAppSelector((state: RootState) => state.user);
+  const currUser = useAppSelector((state) => state.user);
 
   const { id } = useParams<{ id: string }>();
 

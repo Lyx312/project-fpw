@@ -22,7 +22,6 @@ import Header from "@/app/(components)/Header";
 import Footer from "@/app/(components)/Footer";
 import axios from "axios";
 import { useAppSelector } from "@/app/redux/hooks";
-import { RootState } from "@/app/redux/store";
 
 interface User {
   _id: string;
@@ -56,7 +55,7 @@ const ProfilePage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
   const router = useRouter();
-  const currUser = useAppSelector((state: RootState) => state.user);
+  const currUser = useAppSelector((state) => state.user);
 
   const [filters, setFilters] = useState<{
     name: string;

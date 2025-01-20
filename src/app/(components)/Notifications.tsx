@@ -9,13 +9,12 @@ import { INotification } from '@/models/notificationModel';
 import { useAppSelector } from "@/app/redux/hooks";
 import { pusherClient } from '@/lib/pusher';
 import { IPusherNotification } from '../api/notifications/route';
-import { RootState } from '@/app/redux/store';
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [unreadCount, setUnreadCount] = useState(0);
-  const currUser = useAppSelector((state: RootState) => state.user);
+  const currUser = useAppSelector((state) => state.user);
 
   useEffect(() => {
     const fetchNotifications = async () => {

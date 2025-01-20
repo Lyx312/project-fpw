@@ -18,7 +18,6 @@ import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import ChatIcon from "@mui/icons-material/Chat";
 import { useAppSelector } from "@/app/redux/hooks";
-import { RootState } from "@/app/redux/store";
 
 interface Freelancer {
   _id: string;
@@ -63,7 +62,7 @@ const UserProfile = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const currUser = useAppSelector((state: RootState) => state.user);
+  const currUser = useAppSelector((state) => state.user);
 
   const fetchFreelancer = async () => {
     try {

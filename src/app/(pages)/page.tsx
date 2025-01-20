@@ -19,7 +19,6 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ICategory } from "@/models/categoryModel";
 import { useAppSelector } from "@/app/redux/hooks";
-import { RootState } from "@/app/redux/store";
 
 const LandingPage = () => {
   interface Service {
@@ -33,7 +32,7 @@ const LandingPage = () => {
   const [serviceByRating, setServiceByRating] = useState<Service[]>([]);
   const [recommendedCategories, setRecommendedCategories] = useState<string[]>([]);
   const router = useRouter();
-  const currUser = useAppSelector((state: RootState) => state.user);
+  const currUser = useAppSelector((state) => state.user);
 
   const fetchCategories = async () => {
     try {

@@ -29,12 +29,11 @@ import {
   setLoading,
   resetForm,
 } from "../../redux/slices/authSlice";
-import { RootState } from "../../redux/store";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
   const { email, password, rememberMe, isLoading } = useSelector(
-    (state: RootState) => state.auth
+    (state) => state.auth
   );
   const [showPassword, setShowPassword] = useState(false);
 
