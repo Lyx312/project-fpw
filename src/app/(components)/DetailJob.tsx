@@ -30,6 +30,7 @@ import axios from "axios";
 import ChatIcon from "@mui/icons-material/Chat";
 import { ICategory } from "@/models/categoryModel";
 import { useAppSelector } from "@/app/redux/hooks";
+import { UserState } from "@/app/redux/slices/userSlice";
 
 interface DetailJobProps {
   id: string;
