@@ -5,7 +5,7 @@ import { RootState } from './store';
 const persistConfig: PersistConfig<RootState> = {
   key: 'root',
   storage,
-  whitelist: ['user'], // which reducer(s) you want to persist
+  whitelist: ['user', 'auth'], // which reducer(s) you want to persist
 };
 
 export default persistConfig;
