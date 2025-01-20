@@ -9,20 +9,11 @@ import {
   Box,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { getCurrUser } from "@/utils/utils";
 import Header from "@/app/(components)/Header";
 import Footer from "@/app/(components)/Footer";
 import Loading from "../../loading";
 import { ICategory } from "@/models/categoryModel";
-
-interface User {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: string;
-  exp: number;
-}
+import { useAppSelector } from "@/app/redux/hooks";
 
 interface Post {
   id: string;
@@ -36,7 +27,6 @@ interface Post {
 
 
 const FreelancerPostsPage: React.FC = () => {
-  const [currUser, setCurrUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -46,16 +36,14 @@ const FreelancerPostsPage: React.FC = () => {
     accent: "#6A9AB0",
     text: "#EAD8B1",
   };
+  const currUser = useAppSelector((state) => state.user);
 
   useEffect(() => {
     const fetchUserAndPosts = async () => {
       try {
-        const user = await getCurrUser();
-        if (user) {
-          setCurrUser(user as unknown as User);
-
+        if (currUser._id) {
           // Fetch posts for the current user
-          const res = await fetch(`/api/posts?freelancerId=${user.email}`);
+          const res = await fetch(`/api/posts?freelancerId=${currUser.email}`);
           const data = await res.json();
 
           if (res.ok) {
@@ -89,7 +77,7 @@ const FreelancerPostsPage: React.FC = () => {
   return (
     <>
       <Header />
-      {currUser ? (
+      {currUser._id ? (
         <Box sx={{ padding: "2rem", backgroundColor: colors.primary }}>
           <Typography
             variant="h4"

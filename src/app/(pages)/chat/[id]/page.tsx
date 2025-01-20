@@ -4,10 +4,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Box, TextField, Button, Typography, List, ListItem, ListItemText, Paper, Avatar } from '@mui/material';
 import axios from 'axios';
 import { IMessage, IChat } from '@/models/chatModel';
-import { getCurrUser } from '@/utils/utils';
 import { useParams } from 'next/navigation';
 import Header from '@/app/(components)/Header';
 import Loading from '@/app/(pages)/loading';
+import { useAppSelector } from '@/app/redux/hooks';
 
 interface User {
   _id: string;
@@ -21,29 +21,11 @@ const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
-  const [currUser, setCurrUser] = useState<User | null>(null);
   const [receiver, setReceiver] = useState<User | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const currUser = useAppSelector((state) => state.user);
 
   const { id } = useParams<{ id: string }>();
-
-  const fetchUser = async () => {
-    const user = await getCurrUser();
-    if (user) {
-      const mappedUser: User = {
-        _id: user._id as string,
-        email: user.email as string,
-        full_name: `${user.first_name} ${user.last_name}`,
-        role: user.role as string,
-        pfp_path: user.pfp_path as string,
-      };
-
-      setCurrUser(mappedUser);
-    } else {
-      console.log("No user found");
-      setCurrUser(null);
-    }
-  };
 
   const fetchReceiver = async () => {
     try {
@@ -60,7 +42,7 @@ const ChatPage: React.FC = () => {
           role: user.role,
           pfp_path: user.pfp_path,
         };
-        console.log(user);
+        // console.log(user);
 
         setReceiver(mappedUser);
       } else {
@@ -79,7 +61,7 @@ const ChatPage: React.FC = () => {
           receiverId: id,
         },
       });
-      console.log(response.data);
+      // console.log(response.data);
 
       setMessages(response.data.messages);
     } catch (error) {
@@ -90,12 +72,11 @@ const ChatPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchUser();
     fetchReceiver();
   }, []);
 
   useEffect(() => {
-    if (currUser && receiver) {
+    if (currUser._id && receiver) {
       fetchChat();
     }
   }, [currUser, receiver]);

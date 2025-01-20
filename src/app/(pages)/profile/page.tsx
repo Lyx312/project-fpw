@@ -21,21 +21,7 @@ import { useRouter } from "next/navigation";
 import Header from "@/app/(components)/Header";
 import Footer from "@/app/(components)/Footer";
 import axios from "axios";
-import { getCurrUser } from "@/utils/utils";
-
-interface User {
-  _id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  pfp_path: string;
-  status: string;
-  is_approved: boolean;
-  is_email_verified: boolean;
-  role: string;
-  categories: Category[];
-  country_name: string;
-}
+import { useAppSelector } from "@/app/redux/hooks";
 
 interface Category {
   _id: string;
@@ -54,8 +40,8 @@ const ProfilePage: React.FC = () => {
   const [userList, setUserList] = useState<User[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
-  const [currUser, setCurrUser] = useState<User | null>(null);
   const router = useRouter();
+  const currUser = useAppSelector((state) => state.user);
 
   const [filters, setFilters] = useState<{
     name: string;
@@ -67,31 +53,6 @@ const ProfilePage: React.FC = () => {
     categories: [],
   });
 
-  const fetchUser = async () => {
-    const user = await getCurrUser();
-    if (user) {
-      const mappedUser: User = {
-        _id: user._id as string,
-        email: user.email as string,
-        first_name: user.first_name as string,
-        last_name: user.last_name as string,
-        pfp_path: user.pfp_path as string,
-        role: user.role as string,
-        status: user.status as string,
-        is_approved: user.is_approved as boolean,
-        is_email_verified: user.is_email_verified as boolean,
-        categories: user.categories as Category[],
-        country_name: user.country_name as string,
-      };
-      console.log(mappedUser);
-      
-      setCurrUser(mappedUser);
-    } else {
-      console.log("No user found");
-      setCurrUser(null);
-    }
-  };
-
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchUsers();
@@ -101,7 +62,6 @@ const ProfilePage: React.FC = () => {
   }, [filters]);
 
   useEffect(() => {
-    fetchUser();
     fetchCategories();
     fetchCountries();
   }, []);
@@ -375,7 +335,7 @@ const ProfilePage: React.FC = () => {
                     </Box>
                   </Box>
                   {
-                    currUser && currUser.role === "client" && (
+                    currUser._id && currUser.role === "client" && (
                     <IconButton
                       sx={{ marginLeft: "auto" }}
                       onClick={(e) => {

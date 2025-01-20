@@ -16,9 +16,9 @@ import { Search as SearchIcon } from "@mui/icons-material";
 import Header from "../(components)/Header";
 import Footer from "../(components)/Footer";
 import axios from "axios";
-import { getCurrUser } from "@/utils/utils";
 import { useRouter } from "next/navigation";
 import { ICategory } from "@/models/categoryModel";
+import { useAppSelector } from "@/app/redux/hooks";
 
 const LandingPage = () => {
   interface Service {
@@ -32,6 +32,7 @@ const LandingPage = () => {
   const [serviceByRating, setServiceByRating] = useState<Service[]>([]);
   const [recommendedCategories, setRecommendedCategories] = useState<string[]>([]);
   const router = useRouter();
+  const currUser = useAppSelector((state) => state.user);
 
   const fetchCategories = async () => {
     try {
@@ -69,10 +70,9 @@ const LandingPage = () => {
 
   const fetchRecommendedCategories = async () => {
     try {
-      const user = await getCurrUser();
-      if (user && user.role === "client") {
+      if (currUser._id && currUser.role === "client") {
         const response = await axios.get("/api/category/recommended", {
-          params: { userId: user._id },
+          params: { userId: currUser._id },
         });
 
         if (response) {

@@ -2,7 +2,6 @@
 "use client";
 
 import Header from "@/app/(components)/Header";
-import { getCurrUser } from "@/utils/utils";
 import {
   Box,
   Typography,
@@ -24,22 +23,9 @@ import { useEffect, useState } from "react";
 import Loading from "@/app/(pages)/loading";
 import { useRouter } from "next/navigation";
 import ChatIcon from "@mui/icons-material/Chat";
-
-interface User {
-  _id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: string;
-  phone: string;
-  gender: string;
-  country_id: string;
-  exp: number;
-  pfp_path: string;
-}
+import { useAppSelector } from "@/app/redux/hooks";
 
 const FreelancerHistoryPage = () => {
-  const [currUser, setCurrUser] = useState<User | null>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,34 +35,7 @@ const FreelancerHistoryPage = () => {
   const [transactionToCancel, setTransactionToCancel] = useState<string | null>(null);
 
   const router = useRouter();
-
-  const fetchUser = async () => {
-    try {
-      const user = await getCurrUser();
-      if (user) {
-        setCurrUser({
-          _id: user._id as string,
-          email: user.email as string,
-          first_name: user.first_name as string,
-          last_name: user.last_name as string,
-          role: user.role as string,
-          phone: user.phone as string,
-          country_id: user.country_id as string,
-          gender: user.gender as string,
-          pfp_path: user.pfp_path as string,
-          exp: user.exp as number,
-        });
-      } else {
-        console.log("No user found");
-        setCurrUser(null);
-      }
-    } catch (err) {
-      setError("Failed to fetch user data");
-      console.log("Error fetching user data:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const currUser = useAppSelector((state) => state.user);
 
   const fetchUserTransaction = async () => {
     if (!currUser?.email) return;
@@ -88,9 +47,11 @@ const FreelancerHistoryPage = () => {
         }
       );
       setTransactions(response.data);
+      setLoading(false);
     } catch (err) {
       console.error("Error fetching transactions:", err);
       setError("Failed to fetch transactions");
+      setLoading(false);
     }
   };
 
@@ -180,11 +141,7 @@ const FreelancerHistoryPage = () => {
   }
 
   useEffect(() => {
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
-    if (currUser) {
+    if (currUser._id) {
       fetchUserTransaction();
     }
   }, [currUser, filterStatus]);

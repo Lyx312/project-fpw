@@ -18,28 +18,13 @@ import {
 } from "@mui/material";
 import Footer from "@/app/(components)/Footer";
 import Header from "@/app/(components)/Header";
-import { getCurrUser } from "@/utils/utils";
 import axios from "axios";
 import { ICategory } from "@/models/categoryModel";
 import { ICountry } from "@/models/countryModel";
-
-interface User {
-  _id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: string;
-  phone: string;
-  gender: string;
-  country_id: string;
-  categories?: string[];
-  exp: number;
-  pfp_path: string;
-  status?: string;
-}
+import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
+import { clearUser } from '@/app/redux/slices/userSlice';
 
 const UserProfile = () => {
-  const [currUser, setCurrUser] = useState<User | null>(null);
   const [countries, setCountries] = useState<ICountry[]>([]);
   const [allCategories, setAllCategories] = useState<ICategory[]>([]);
   const [formData, setFormData] = useState({
@@ -57,42 +42,27 @@ const UserProfile = () => {
     status: "",
   });
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const currUser = useAppSelector((state) => state.user);
 
   const fetchUser = async () => {
-    const user = await getCurrUser();
-    if (user) {
-      const mappedUser: User = {
-        _id: user._id as string,
-        email: user.email as string,
-        first_name: user.first_name as string,
-        last_name: user.last_name as string,
-        role: user.role as string,
-        phone: user.phone as string,
-        country_id: user.country_id as string,
-        gender: user.gender as string,
-        pfp_path: `${user.pfp_path}?t=${new Date().getTime()}`,
-        categories: user.categories as string[],
-        exp: user.exp as number,
-        status: user.status as string,
-      };
-      setCurrUser(mappedUser);
+    if (currUser._id) {
       setFormData({
-        first_name: user.first_name as string,
-        last_name: user.last_name as string,
+        first_name: currUser.first_name as string,
+        last_name: currUser.last_name as string,
         old_password: "",
         new_password: "",
         confirm_password: "",
-        gender: user.gender as string,
-        country_id: user.country_id as string,
-        phone: user.phone as string,
-        pfp_path: user.pfp_path as string,
-        categories: user.categories as string[],
+        gender: currUser.gender as string,
+        country_id: currUser.country_id as string,
+        phone: currUser.phone as string,
+        pfp_path: currUser.pfp_path as string,
+        categories: currUser.categories as string[],
         file: null,
-        status: user.status as string,
+        status: currUser.status as string,
       });
     } else {
       console.log("No user found");
-      setCurrUser(null);
     }
   };
 
@@ -123,7 +93,7 @@ const UserProfile = () => {
     fetchUser();
     fetchCountries();
     fetchCategories();
-  }, []);
+  }, [currUser]);
 
   const handleInputChange = (
     e:
@@ -206,6 +176,7 @@ const UserProfile = () => {
       );
       console.log("Profile updated:", response.data);
       alert("Profile updated successfully");
+      dispatch(clearUser());
       fetchUser();
     } catch (error) {
       console.error("Error updating profile:", error);

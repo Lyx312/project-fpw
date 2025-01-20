@@ -17,20 +17,11 @@ import {
   Alert,
   Snackbar,
 } from "@mui/material";
-import { getCurrUser } from "@/utils/utils";
 import axios from "axios";
 import Header from "@/app/(components)/Header";
 import Footer from "@/app/(components)/Footer";
 import { ICategory } from "@/models/categoryModel";
-
-interface User {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: string;
-  exp: number;
-}
+import { useAppSelector } from "@/app/redux/hooks";
 
 const AddPostPage: React.FC = () => {
   const router = useRouter();
@@ -40,7 +31,6 @@ const AddPostPage: React.FC = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [allCategories, setAllCategories] = useState<ICategory[]>([]);
   const [loading, setLoading] = useState(false);
-  const [currUser, setCurrUser] = useState<User | null>(null);
   const [alert, setAlert] = useState<{ open: boolean; message: string }>({
     open: false,
     message: "",
@@ -51,23 +41,7 @@ const AddPostPage: React.FC = () => {
     accent: "#6A9AB0",
     text: "#EAD8B1",
   };
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const user = await getCurrUser();
-        if (user) {
-          setCurrUser(user as unknown as User);
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, []);
+  const currUser = useAppSelector((state) => state.user);
 
   useEffect(() => {
     const fetchCategories = async () => {

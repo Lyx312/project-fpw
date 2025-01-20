@@ -24,12 +24,12 @@ import {
 } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
-import { getCurrUser } from "@/utils/utils";
 import { useRouter } from "next/navigation";
 import Loading from "../(pages)/loading";
 import axios from "axios";
 import ChatIcon from "@mui/icons-material/Chat";
 import { ICategory } from "@/models/categoryModel";
+import { useAppSelector } from "@/app/redux/hooks";
 
 interface DetailJobProps {
   id: string;
@@ -45,7 +45,6 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
   const [post, setPost] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
   const [activeTransaction, setActiveTransaction] = useState<boolean>(false);
-  const [currUser, setCurrUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [snapLoaded, setSnapLoaded] = useState(false);
@@ -55,6 +54,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
   const [deadline, setDeadline] = useState<moment.Moment | null>(null);
 
   const router = useRouter();
+  const currUser = useAppSelector((state) => state.user);
 
   const loadSnapScript = async () => {
     if (!snapLoaded) {
@@ -81,9 +81,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
         if (postResponse.data.status === "unavailable") {
           setActiveTransaction(true);
         } else {
-          const user = await getCurrUser();
-          setCurrUser(user);
-          if (user) {
+          if (currUser._id) {
             const transactionsResponse = await axios.get(
               `/api/transaction?post_id=${id}&email=${user.email}`
             );
@@ -121,7 +119,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
       : 0;
 
   const handleConfirmHire = () => {
-    if (!currUser) {
+    if (!currUser._id) {
       alert("Please login first");
       router.push("/login");
       return;
@@ -264,7 +262,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
                 </Typography>
               </Box>
             </Box>
-            {currUser && currUser.role === "client" && (
+            {currUser._id && currUser.role === "client" && (
               <IconButton
                 sx={{ marginLeft: "auto" }}
                 onClick={(e) => {

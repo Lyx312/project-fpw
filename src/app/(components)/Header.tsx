@@ -20,20 +20,13 @@ import AssignmentIcon from "@mui/icons-material/Assignment"; // Import the new i
 import Notifications from "@/app/(components)/Notifications"; // Import the Notifications component
 import Image from "next/image";
 import { getCurrUser, logout } from "@/utils/utils";
+import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
+import { setUser, clearUser } from '@/app/redux/slices/userSlice';
+import { useRouter } from "next/navigation";
 
 const Header = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  interface User {
-    id: string;
-    first_name: string;
-    last_name: string;
-    role: string;
-    pfp_path: string;
-    exp: number;
-  }
-
-  const [currUser, setCurrUser] = useState<User | null>(null);
-
+  
   const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -42,27 +35,33 @@ const Header = () => {
     setAnchorEl(null);
   };
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const user = await getCurrUser();
-      // console.log(user);
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const currUser = useAppSelector((state) => state.user);
 
-      if (user) {
-        const mappedUser: User = {
-          id: user.id as string,
-          first_name: user.first_name as string,
-          last_name: user.last_name as string,
-          role: user.role as string,
-          pfp_path: user.pfp_path as string,
-          exp: user.exp as number,
-        };
-        setCurrUser(mappedUser);
+  useEffect(() => {
+    const fetchFromCookie = async () => {
+      if (!currUser._id) {
+        const payload = await getCurrUser();
+        // console.log(payload)
+        if (payload) {
+          dispatch(setUser(payload));
+          console.log("User set from cookie");
+        } else {
+          console.log("No user in cookie");
+        }
       } else {
-        setCurrUser(null);
+        console.log("User already set");
       }
     };
-    fetchUser();
-  }, []); // Fetch once when the component mounts.
+    fetchFromCookie();
+  }, [currUser._id, dispatch]);
+
+  const handleLogout = async () => {
+    dispatch(clearUser());
+    await logout();
+    router.push("/login");
+  }
 
   const open = Boolean(anchorEl);
 
@@ -97,7 +96,7 @@ const Header = () => {
           </IconButton>
         </Link>
 
-        {currUser && currUser.role !== "admin" ? (
+        {currUser._id && currUser.role !== "admin" ? (
           <>
             <Link
               href={
@@ -121,7 +120,7 @@ const Header = () => {
 
           </>
         ) : null}
-        { currUser && (
+        { currUser._id && (
           <Box>
             <Notifications />
           </Box>
@@ -171,7 +170,7 @@ const Header = () => {
           }}
         >
           <div>
-            {currUser ? (
+            {currUser._id ? (
               <>
                 <Typography variant="body2" align="center" gutterBottom>
                   Welcome, {currUser.first_name + " " + currUser.last_name || "User"}!
@@ -187,7 +186,7 @@ const Header = () => {
                     </Link>
                   )}
                   <br />
-                  <Link href="/login" underline="hover" onClick={logout}>
+                  <Link underline="hover" onClick={handleLogout}>
                     Logout
                   </Link>
                 </Typography>

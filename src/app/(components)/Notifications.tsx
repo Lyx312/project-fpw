@@ -2,38 +2,21 @@
 
 import React, { useEffect, useState } from 'react';
 import { Box, IconButton, Badge, Menu, MenuItem, Typography, Card, CardContent } from '@mui/material';
-import { getCurrUser } from "@/utils/utils";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import { INotification } from '@/models/notificationModel';
-
-interface User {
-  _id: string;
-}
+import { useAppSelector } from "@/app/redux/hooks";
 
 const Notifications = () => {
-  const [currUser, setCurrUser] = useState<User | null>(null);
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const user = await getCurrUser() as unknown as User;
-
-      if (user) {
-        setCurrUser(user);
-      } else {
-        setCurrUser(null);
-      }
-    };
-    fetchUser();
-  }, []);
+  const currUser = useAppSelector((state) => state.user);
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      if (currUser) {
+      if (currUser._id) {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/notifications`, {
           params: { userId: currUser._id },
         });
@@ -53,7 +36,7 @@ const Notifications = () => {
 
   const handleMenuClose = async () => {
     setAnchorEl(null);
-    if (currUser && unreadCount > 0) {
+    if (currUser._id && unreadCount > 0) {
       await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/notifications`, { userId: currUser._id });
       setUnreadCount(0);
     }
