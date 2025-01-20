@@ -1,4 +1,5 @@
 'use server';
+import { UserState } from "@/app/redux/slices/userSlice";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
@@ -13,7 +14,7 @@ export const getCurrUser = async () => {
     const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
     // console.log(payload);
 
-    return payload;
+    return payload as UserState;
   } catch (error) {
     console.error("Error verifying token:", error);
     return null;
