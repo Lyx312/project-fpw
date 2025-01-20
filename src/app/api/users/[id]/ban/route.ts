@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import sendEmail, { emailTemplate } from "@/emails/mailer";
 
 // Update user endpoint logic
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
   const { id } = await params;
   const session = await mongoose.startSession();

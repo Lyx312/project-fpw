@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/config/database";
 import User_trans, { IUser_trans } from "@/models/user_transModel";
 
-export async function GET(req: Request, { params }: { params: { id: number } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: number }> }) {
     try {
         await connectDB();
         const { id } = await params;

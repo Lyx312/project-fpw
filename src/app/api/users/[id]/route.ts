@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import Country from "@/models/countryModel";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
   const { id } = await params;
 
@@ -87,7 +87,7 @@ const updateUserSchema = Joi.object({
   'object.and': '{#presentWithLabels} is provided without its required peers {#missingWithLabels}',
 });
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
   const {
     country_id,

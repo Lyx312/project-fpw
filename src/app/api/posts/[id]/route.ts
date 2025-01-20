@@ -4,7 +4,7 @@ import connectDB from "@/config/database";
 import Post, { IPost } from "@/models/postModel";
 import User from "@/models/userModel";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB();
     const { id } = await params;

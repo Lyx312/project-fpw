@@ -7,7 +7,7 @@ import User from '@/models/userModel';
 import Notification from '@/models/notificationModel';
 import { pusherServer } from '@/lib/pusher';
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { type, reason } = await req.json();
 

@@ -8,7 +8,7 @@ import Notification from '@/models/notificationModel';
 import User from '@/models/userModel';
 import { pusherServer } from '@/lib/pusher';
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
   const session = await mongoose.startSession();
   session.startTransaction();

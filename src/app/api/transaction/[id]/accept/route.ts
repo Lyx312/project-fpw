@@ -8,7 +8,7 @@ import sendEmail, { emailTemplate } from '@/emails/mailer';
 import mongoose from 'mongoose';
 import { pusherServer } from '@/lib/pusher';
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
   const session = await mongoose.startSession();
   session.startTransaction();
