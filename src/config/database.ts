@@ -14,7 +14,7 @@ const connectDB = async () => {
     process.exit(1);
   }
 
-  if (mongoose.connection.readyState) {
+  if (mongoose.connection.readyState === 1) {
     console.log("MongoDB is already connected");
     return true;
   }
@@ -22,7 +22,12 @@ const connectDB = async () => {
   try {
     console.log("Connecting to MongoDB...");
 
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    const conn = await mongoose.connect(process.env.MONGODB_URI as string, {
+      maxPoolSize: 10, // Increase connection pool size
+      serverSelectionTimeoutMS: 15000, // Increase timeout
+      socketTimeoutMS: 45000,
+      family: 4 // Use IPv4, skip trying IPv6
+    });
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     console.log(`Database: ${conn.connection.name}`);
 
