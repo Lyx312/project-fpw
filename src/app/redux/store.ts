@@ -11,7 +11,7 @@ const rootReducer = combineReducers({
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-export const store = configureStore({
+export const store: ReturnType<typeof configureStore> = configureStore({
   reducer: persistedReducer,
   // Add the middleware configuration:
   middleware: (getDefaultMiddleware) =>

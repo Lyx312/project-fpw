@@ -8,6 +8,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { INotification } from '@/models/notificationModel';
 import { useAppSelector } from "@/app/redux/hooks";
 import { pusherClient } from '@/lib/pusher';
+import { IPusherNotification } from '../api/notifications/route';
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState<INotification[]>([]);
@@ -32,7 +33,7 @@ const Notifications = () => {
 
   useEffect(() => {
     pusherClient.subscribe('notification');
-    pusherClient.bind('newNotif', async (data) => {
+    pusherClient.bind('newNotif', async (data: IPusherNotification) => {
       if (data.notification.userId === currUser._id && notifications.find((n) => n._id === data.notification._id) === undefined) {
         setNotifications((prev) => [data.notification, ...prev]);
         setUnreadCount((prev) => prev + 1);

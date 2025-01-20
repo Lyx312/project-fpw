@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     try {
         interface Query {
             role?: string;
-            $or?: { name: RegExp } | { email: RegExp }[];
+            $or?: ({ name: RegExp } | { email: RegExp })[];
             categories?: { $in: string[] };
             country_id?: string;
         }

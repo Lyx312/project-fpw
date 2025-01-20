@@ -9,6 +9,7 @@ import Header from '@/app/(components)/Header';
 import Loading from '@/app/(pages)/loading';
 import { useAppSelector } from '@/app/redux/hooks';
 import { pusherClient } from '@/lib/pusher';
+import { IPusherChat } from '@/app/api/chat/route';
 
 interface User {
   _id: string;
@@ -75,7 +76,7 @@ const ChatPage: React.FC = () => {
   useEffect(() => {
     fetchReceiver();
     pusherClient.subscribe('chat');
-    pusherClient.bind('newMessage', (data) => {
+    pusherClient.bind('newMessage', (data: IPusherChat) => {
       if ((data.freelancerId === id || data.freelancerId === currUser._id) && ((data.clientId === id || data.clientId === currUser._id))) {
         setMessages((prev) => [...prev, data.newMessage]);
       }

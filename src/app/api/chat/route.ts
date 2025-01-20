@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/config/database';
-import Chat from '@/models/chatModel';
+import Chat, { IMessage } from '@/models/chatModel';
 import User from '@/models/userModel';
 import Notification from '@/models/notificationModel';
 import { pusherServer } from '@/lib/pusher';
+
+export interface IPusherChat {
+  freelancerId: string;
+  clientId: string;
+  newMessage: IMessage;
+}
 
 export async function GET(req: Request) {
   await connectDB();

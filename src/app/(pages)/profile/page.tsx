@@ -23,6 +23,20 @@ import Footer from "@/app/(components)/Footer";
 import axios from "axios";
 import { useAppSelector } from "@/app/redux/hooks";
 
+interface User {
+  _id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  pfp_path: string;
+  status: string;
+  is_approved: boolean;
+  is_email_verified: boolean;
+  role: string;
+  categories: Category[];
+  country_name: string;
+}
+
 interface Category {
   _id: string;
   category_id: number;

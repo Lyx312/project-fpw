@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/config/database';
-import Notification from '@/models/notificationModel';
+import Notification, { INotification } from '@/models/notificationModel';
 import User from '@/models/userModel';
 import { pusherServer } from '@/lib/pusher';
+export interface IPusherNotification {
+  notification: INotification;
+}
 
 export async function GET(req: Request) {
   
@@ -44,12 +47,12 @@ export async function POST(req: Request) {
   
     const notification = new Notification({ userId, message, link, type });
     await notification.save();
-    return NextResponse.json(notification, { status: 201 });
-
+    
     pusherServer.trigger('notification', 'newNotif', {
       notification: notification,
     });
-
+    
+    return NextResponse.json(notification, { status: 201 });
   } catch (error) {
     return NextResponse.json({ message: 'Failed to create notification', error }, { status: 500 });
   }
