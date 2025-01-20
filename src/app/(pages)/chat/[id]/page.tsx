@@ -182,7 +182,7 @@ const ChatPage: React.FC = () => {
                     <ListItemText primary={message.content} />
                   </Box>
                   {message.sender.toString() === currUser?._id && (
-                    <Avatar alt={currUser?.full_name} src={currUser?.pfp_path} />
+                    <Avatar alt={`${currUser?.first_name} ${currUser?.last_name}`} src={currUser?.pfp_path} />
                   )}
                 </Box>
                 <Typography variant="caption" sx={{ marginTop: 0.5 }}>

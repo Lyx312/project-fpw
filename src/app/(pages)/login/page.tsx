@@ -21,7 +21,6 @@ import {
 import axios from "axios";
 import Header from "@/app/(components)/Header";
 import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
 import {
   setEmail,
   setPassword,
@@ -29,10 +28,11 @@ import {
   setLoading,
   resetForm,
 } from "../../redux/slices/authSlice";
+import { useAppDispatch, useAppSelector } from "@/app/redux/hooks";
 
 const LoginForm = () => {
-  const dispatch = useDispatch();
-  const { email, password, rememberMe, isLoading } = useSelector(
+  const dispatch = useAppDispatch();
+  const { email, password, rememberMe, isLoading } = useAppSelector(
     (state) => state.auth
   );
   const [showPassword, setShowPassword] = useState(false);

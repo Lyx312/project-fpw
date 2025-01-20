@@ -54,7 +54,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
   const [deadline, setDeadline] = useState<moment.Moment | null>(null);
 
   const router = useRouter();
-  const currUser = useAppSelector(state => state.user);
+  const currUser = useAppSelector((state) => state.user);
 
   const loadSnapScript = async () => {
     if (!snapLoaded) {

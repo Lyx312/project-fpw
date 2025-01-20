@@ -63,10 +63,12 @@ export async function POST(req: Request) {
     );
   }
 
-  const review_id = ReviewList.length + 1;
-
   try {
     await connectDB();
+
+    // find review with the biggest review_id
+    const review = await Post_review.findOne().sort({ review_id: -1 });
+    const review_id = review ? review.review_id + 1 : 1;
 
     const newReview = new Post_review({
       review_id,

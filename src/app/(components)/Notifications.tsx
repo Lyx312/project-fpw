@@ -34,7 +34,7 @@ const Notifications = () => {
   useEffect(() => {
     pusherClient.subscribe('notification');
     pusherClient.bind('newNotif', async (data: IPusherNotification) => {
-      if (data.notification.userId === currUser._id && notifications.find((n) => n._id === data.notification._id) === undefined) {
+      if (data.notification.userId.toString() === currUser._id && notifications.find((n) => n._id.toString() === data.notification._id.toString()) === undefined) {
         setNotifications((prev) => [data.notification, ...prev]);
         setUnreadCount((prev) => prev + 1);
 
@@ -42,16 +42,6 @@ const Notifications = () => {
         console.log(notifications);
       }
     });
-
-    // pusherClient.bind('readNotif', async (data) => {
-    //   console.log(data);
-    //   if (data.userId === currUser._id) {
-    //     setNotifications((prev) =>
-    //       prev.map((n) => (n._id === data.notificationId ? { ...n, read: true } : n))
-    //     );
-    //     setUnreadCount(0);
-    //   }
-    // });
 
     return () => {
       pusherClient.unsubscribe('notification');

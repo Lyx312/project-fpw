@@ -14,7 +14,7 @@ export const getCurrUser = async () => {
     const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
     // console.log(payload);
 
-    return payload as UserState;
+    return payload as unknown as UserState;
   } catch (error) {
     console.error("Error verifying token:", error);
     return null;

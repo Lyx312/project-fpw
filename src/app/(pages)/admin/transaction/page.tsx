@@ -32,6 +32,7 @@ interface Transaction {
   updatedAt: string;
   deletedAt: string | null;
   categories: string[];
+  user_id: string
 }
 
 const colors = {

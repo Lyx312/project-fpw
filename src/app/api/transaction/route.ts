@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import User from '@/models/userModel';
 import Notification from '@/models/notificationModel';
 import { pusherServer } from '@/lib/pusher';
+import { ICategory } from '@/models/categoryModel';
 
 export async function GET(req: Request) {
   await connectDB();
@@ -43,7 +44,7 @@ export async function GET(req: Request) {
       transactions.map(async (transaction) => {
         const post = await Post.findOne({ post_id: transaction.post_id }).populate('post_categories');
         const user = await User.findOne({ email: post.post_email });
-        const categoryNames = post.post_categories.map(category => category.category_name).join(', ') || 'No Categories';
+        const categoryNames = post.post_categories.map((category: ICategory) => category.category_name).join(', ') || 'No Categories';
         const userName = user ? `${user.first_name} ${user.last_name}` : "Unknown User";
         return {
           ...transaction.toObject(),
