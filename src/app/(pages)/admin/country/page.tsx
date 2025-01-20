@@ -165,7 +165,7 @@ const CountryManager: React.FC = () => {
       ) : countries.length > 0 ? (
         <List sx={{ backgroundColor: "white", borderRadius: '8px' }}>
           <Grid container spacing={2}>
-            {countries.map((country, index) => (
+            {countries.map((country) => (
               <Grid item xs={4} key={country.country_id}>
                 <ListItem sx={{ color: "black", display: 'flex', justifyContent: 'center' }}>
                   {country.country_name} ({country.country_id})

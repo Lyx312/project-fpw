@@ -12,7 +12,14 @@ export async function GET(request: Request) {
     const country = url.searchParams.get('country');
 
     try {
-        const query: any = {};
+        interface Query {
+            role?: string;
+            $or?: { name: RegExp } | { email: RegExp }[];
+            categories?: { $in: string[] };
+            country_id?: string;
+        }
+
+        const query: Query = {};
 
         if (role) {
             query.role = role;

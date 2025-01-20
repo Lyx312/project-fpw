@@ -16,7 +16,7 @@ import {
   LinearProgress,
   Link,
 } from "@mui/material";
-import axios from "axios";
+// import axios from "axios";
 
 interface Transaction {
   trans_id: number;
@@ -55,7 +55,6 @@ const TransactionPage = () => {
     role: 'admin'
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const fetchTransactions = async () => {
     setLoading(true);
@@ -77,30 +76,30 @@ const TransactionPage = () => {
     }
   };
 
-  const fetchUserPost = async (id: string) => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${id}`
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching Post", error);
-      setError("Failed to fetch Post");
-    }
-  };
+  // const fetchUserPost = async (id: string) => {
+  //   try {
+  //     const response = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${id}`
+  //     );
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("Error fetching Post", error);
+  //     setError("Failed to fetch Post");
+  //   }
+  // };
 
-  const groupTransactionsByCategory = (transactions: Transaction[]) => {
-    const grouped: Record<string, Transaction[]> = {};
-    transactions.forEach((transaction) => {
-      transaction.categories.forEach((category) => {
-        if (!grouped[category]) {
-          grouped[category] = [];
-        }
-        grouped[category].push(transaction);
-      });
-    });
-    return grouped;
-  };
+  // const groupTransactionsByCategory = (transactions: Transaction[]) => {
+  //   const grouped: Record<string, Transaction[]> = {};
+  //   transactions.forEach((transaction) => {
+  //     transaction.categories.forEach((category) => {
+  //       if (!grouped[category]) {
+  //         grouped[category] = [];
+  //       }
+  //       grouped[category].push(transaction);
+  //     });
+  //   });
+  //   return grouped;
+  // };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilters({

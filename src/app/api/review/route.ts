@@ -56,11 +56,14 @@ export async function POST(req: Request) {
     post_id,
   });
 
-  let review_id;
+  if (error) {
+    return NextResponse.json(
+      { message: "Validation error", error: error.details[0].message },
+      { status: 400 }
+    );
+  }
 
-  const ReviewList = await Post_review.find();
-
-  review_id = ReviewList.length + 1;
+  const review_id = ReviewList.length + 1;
 
   try {
     await connectDB();

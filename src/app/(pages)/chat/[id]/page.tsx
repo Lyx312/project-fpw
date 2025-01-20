@@ -102,7 +102,7 @@ const ChatPage: React.FC = () => {
     if (!newMessage.trim()) return;
   
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/chat`, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/chat`, {
         senderId: currUser?._id,
         receiverId: id,
         content: newMessage,
