@@ -7,6 +7,7 @@ import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import { INotification } from '@/models/notificationModel';
 import { useAppSelector } from "@/app/redux/hooks";
+import { pusherClient } from '@/lib/pusher';
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState<INotification[]>([]);
@@ -29,9 +30,35 @@ const Notifications = () => {
     fetchNotifications();
   }, [currUser]);
 
+  useEffect(() => {
+    pusherClient.subscribe('notification');
+    pusherClient.bind('newNotif', async (data) => {
+      if (data.notification.userId === currUser._id && notifications.find((n) => n._id === data.notification._id) === undefined) {
+        setNotifications((prev) => [data.notification, ...prev]);
+        setUnreadCount((prev) => prev + 1);
+
+        console.log(data.notification);
+        console.log(notifications);
+      }
+    });
+
+    // pusherClient.bind('readNotif', async (data) => {
+    //   console.log(data);
+    //   if (data.userId === currUser._id) {
+    //     setNotifications((prev) =>
+    //       prev.map((n) => (n._id === data.notificationId ? { ...n, read: true } : n))
+    //     );
+    //     setUnreadCount(0);
+    //   }
+    // });
+
+    return () => {
+      pusherClient.unsubscribe('notification');
+    }
+  }, []);
+
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
-    
   };
 
   const handleMenuClose = async () => {

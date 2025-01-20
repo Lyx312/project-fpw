@@ -64,7 +64,7 @@ export async function POST(req: Request) {
         await newUser.save({ session });
 
         // Send verification email
-        const verificationLink = `${process.env.BASE_URL}/api/verifyEmail`;
+        const verificationLink = `${process.env.NEXT_PUBLIC_BASE_URL}/api/verifyEmail`;
         const emailContent = emailTemplate(
             'Verify Your Email',
             `Hi ${first_name},<br/><br/>

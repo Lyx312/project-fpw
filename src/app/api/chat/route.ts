@@ -3,6 +3,7 @@ import connectDB from '@/config/database';
 import Chat from '@/models/chatModel';
 import User from '@/models/userModel';
 import Notification from '@/models/notificationModel';
+import { pusherServer } from '@/lib/pusher';
 
 export async function GET(req: Request) {
   await connectDB();
@@ -61,14 +62,21 @@ export async function POST(req: Request) {
     const clientId = sender.role === 'client' ? senderId : receiverId;
 
     const chat = await Chat.findOne({ freelancerId, clientId });
+    const newMessage = { sender: senderId, content, timestamp: new Date() };
 
     if (!chat) {
       const newChat = new Chat({
         freelancerId,
         clientId,
-        messages: [{ sender: senderId, content, timestamp: new Date() }],
+        messages: [newMessage],
       });
       await newChat.save();
+
+      pusherServer.trigger('chat', 'newMessage', {
+        freelancerId: freelancerId,
+        clientId: clientId,
+        newMessage: newMessage,
+      });
 
       // check if notification exists
       const exist = Notification.findOne({ userId: receiverId, type: "message", link: `/chat/${senderId}`, read: false });
@@ -94,6 +102,13 @@ export async function POST(req: Request) {
       chat.messages.push(newMessage);
       await chat.save();
 
+      pusherServer.trigger('chat', 'newMessage', {
+        freelancerId: freelancerId,
+        clientId: clientId,
+        newMessage: newMessage,
+      });
+
+
       // check if notification exists
       const exist = await Notification.findOne({ userId: receiverId, type: "message", link: `/chat/${senderId}`, read: false });
       console.log(exist);
@@ -107,12 +122,18 @@ export async function POST(req: Request) {
           type: "message" 
         });
         await notification.save();
+
+        pusherServer.trigger('notification', 'newNotif', {
+          // chatId: newChat._id,
+          notification: notification,
+        });
       }
       
       return NextResponse.json({messages: chat.messages}, { status: 200 });
     }
 
   } catch (error) {
+    console.log(error);
     return NextResponse.json({ message: 'Failed to process chat', error }, { status: 500 });
   }
 }

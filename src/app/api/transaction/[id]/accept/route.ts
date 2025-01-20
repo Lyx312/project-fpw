@@ -6,6 +6,7 @@ import User_trans from '@/models/user_transModel';
 import Post from '@/models/postModel';
 import sendEmail, { emailTemplate } from '@/emails/mailer';
 import mongoose from 'mongoose';
+import { pusherServer } from '@/lib/pusher';
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   await connectDB();
@@ -62,6 +63,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
         type: "transaction" 
       });
       await notification.save({ session });
+      pusherServer.trigger('notification', 'newNotif', {
+        notification: notification,
+      });
     }
 
     await session.commitTransaction();

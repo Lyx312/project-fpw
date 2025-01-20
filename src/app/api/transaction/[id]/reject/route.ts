@@ -6,6 +6,7 @@ import sendEmail, { emailTemplate } from '@/emails/mailer';
 import mongoose from 'mongoose';
 import Notification from '@/models/notificationModel';
 import User from '@/models/userModel';
+import { pusherServer } from '@/lib/pusher';
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   await connectDB();
@@ -54,12 +55,16 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
       // Send email to the client
       await sendEmail(freelancerEmail, subject, text, html);
       const notification = new Notification({ 
-      userId: freelancer._id, 
-      message: `The client has rejected your work for the post titled ${post.post_title}. Please revise the work and resubmit.`, 
-      link: "/freelancer/history", 
-      type: "transaction" 
+        userId: freelancer._id, 
+        message: `The client has rejected your work for the post titled ${post.post_title}. Please revise the work and resubmit.`, 
+        link: "/freelancer/history", 
+        type: "transaction" 
       });
       await notification.save({ session });
+
+      pusherServer.trigger('notification', 'newNotif', {
+        notification: notification,
+      });
     }
 
     await session.commitTransaction();

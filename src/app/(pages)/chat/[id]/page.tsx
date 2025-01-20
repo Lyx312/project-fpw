@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import Header from '@/app/(components)/Header';
 import Loading from '@/app/(pages)/loading';
 import { useAppSelector } from '@/app/redux/hooks';
+import { pusherClient } from '@/lib/pusher';
 
 interface User {
   _id: string;
@@ -73,6 +74,16 @@ const ChatPage: React.FC = () => {
 
   useEffect(() => {
     fetchReceiver();
+    pusherClient.subscribe('chat');
+    pusherClient.bind('newMessage', (data) => {
+      if ((data.freelancerId === id || data.freelancerId === currUser._id) && ((data.clientId === id || data.clientId === currUser._id))) {
+        setMessages((prev) => [...prev, data.newMessage]);
+      }
+    });
+
+    return () => {
+      pusherClient.unsubscribe('chat');
+    }
   }, []);
 
   useEffect(() => {
@@ -97,7 +108,6 @@ const ChatPage: React.FC = () => {
         content: newMessage,
       });
   
-      setMessages([...response.data.messages]);
       setNewMessage('');
 
     } catch (error) {

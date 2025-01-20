@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/config/database';
 import Notification from '@/models/notificationModel';
 import User from '@/models/userModel';
+import { pusherServer } from '@/lib/pusher';
 
 export async function GET(req: Request) {
   
@@ -45,6 +46,10 @@ export async function POST(req: Request) {
     await notification.save();
     return NextResponse.json(notification, { status: 201 });
 
+    pusherServer.trigger('notification', 'newNotif', {
+      notification: notification,
+    });
+
   } catch (error) {
     return NextResponse.json({ message: 'Failed to create notification', error }, { status: 500 });
   }
@@ -66,7 +71,11 @@ export async function PUT(req: Request) {
     }
 
     // Update all notifications for the user to read
-    await Notification.updateMany({ userId: userId, read: false }, { read: true });
+    const updatedNotif = await Notification.updateMany({ userId: userId, read: false }, { read: true });
+    
+    pusherServer.trigger('notification', 'readNotif', {
+      updated: updatedNotif,
+    });
 
     return NextResponse.json({ message: 'All notifications marked as read' }, { status: 200 });
 

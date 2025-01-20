@@ -5,6 +5,7 @@ import sendEmail, { emailTemplate } from '@/emails/mailer';
 import Post from '@/models/postModel';
 import User from '@/models/userModel';
 import Notification from '@/models/notificationModel';
+import { pusherServer } from '@/lib/pusher';
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   const { id } = await params;
@@ -74,6 +75,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
         type: "transaction" 
       });
       await notification.save({ session });
+      pusherServer.trigger('notification', 'newNotif', {
+        notification: notification,
+      });
     } catch (emailError) {
       await session.abortTransaction();
       session.endSession();
