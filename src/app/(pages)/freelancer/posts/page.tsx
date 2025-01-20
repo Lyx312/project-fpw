@@ -14,6 +14,7 @@ import Footer from "@/app/(components)/Footer";
 import Loading from "../../loading";
 import { ICategory } from "@/models/categoryModel";
 import { useAppSelector } from "@/app/redux/hooks";
+import { RootState } from "@/app/redux/store";
 
 interface Post {
   id: string;
@@ -36,7 +37,7 @@ const FreelancerPostsPage: React.FC = () => {
     accent: "#6A9AB0",
     text: "#EAD8B1",
   };
-  const currUser = useAppSelector((state) => state.user);
+  const currUser = useAppSelector((state: RootState) => state.user);
 
   useEffect(() => {
     const fetchUserAndPosts = async () => {

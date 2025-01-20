@@ -23,6 +23,7 @@ import { getCurrUser, logout } from "@/utils/utils";
 import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
 import { setUser, clearUser } from '@/app/redux/slices/userSlice';
 import { useRouter } from "next/navigation";
+import { RootState } from "@/app/redux/store";
 
 const Header = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -37,7 +38,7 @@ const Header = () => {
 
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const currUser = useAppSelector((state) => state.user);
+  const currUser = useAppSelector((state: RootState) => state.user);
 
   useEffect(() => {
     const fetchFromCookie = async () => {

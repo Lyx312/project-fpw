@@ -22,6 +22,7 @@ import Loading from "@/app/(pages)/loading";
 import { useRouter } from "next/navigation";
 import ChatIcon from "@mui/icons-material/Chat";
 import { useAppSelector } from "@/app/redux/hooks";
+import { RootState } from "@/app/redux/store";
 
 declare global {
   interface Window {
@@ -45,7 +46,7 @@ const ClientHistory = () => {
   const [reviewTransId, setReviewTransId] = useState<string>("");
   const [reviewPostId, setReviewPostId] = useState<string>("");
   const [reviewPostTitle, setReviewPostTitle] = useState<string>("");
-  const currUser = useAppSelector((state) => state.user);
+  const currUser = useAppSelector((state: RootState) => state.user);
 
   // Utility to load Snap.js dynamically
   const loadSnapScript = async () => {
