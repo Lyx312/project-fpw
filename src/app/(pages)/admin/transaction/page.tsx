@@ -80,7 +80,7 @@ const TransactionPage = () => {
   // const fetchUserPost = async (id: string) => {
   //   try {
   //     const response = await axios.get(
-  //       `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${id}`
+  //       `${baseUrl}/api/posts/${id}`
   //     );
   //     return response.data;
   //   } catch (error) {

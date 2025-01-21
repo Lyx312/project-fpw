@@ -24,6 +24,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
 import { useRouter } from 'next/navigation'
 import Header from '@/app/(components)/Header';
+import { baseUrl } from '@/config/url';
 
 interface RegisterFormData {
   first_name: string;
@@ -86,7 +87,7 @@ const RegisterPage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/country`);
+        const response = await axios.get(`${baseUrl}/api/country`);
         setCountries(response.data.data);
         console.log(response.data.data);
       } catch (error) {
@@ -100,7 +101,7 @@ const RegisterPage: React.FC = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/category`);
+        const response = await axios.get(`${baseUrl}/api/category`);
         setAllCategories(response.data.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -170,19 +171,19 @@ const RegisterPage: React.FC = () => {
           return;
         }
         const formData = new FormData();
-        formData.append('file', file, `${dataToSubmit.email}.pdf`);
+        formData.append('file', file as Blob, `${dataToSubmit.email}.pdf`);
         formData.append('type', 'cvs');
 
-        const uploadResponse = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/upload`, formData, {
+        const uploadResponse = await axios.post(`${baseUrl}/api/upload`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
 
-        dataToSubmit.cv_path = uploadResponse.data.path;
+        dataToSubmit.cv_path = uploadResponse.data.blob.url;
       }
 
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/register`, dataToSubmit);
+      const response = await axios.post(`${baseUrl}/api/register`, dataToSubmit);
       const data = await response.data;
       console.log(data);
 

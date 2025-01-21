@@ -24,6 +24,7 @@ import Loading from "@/app/(pages)/loading";
 import { useRouter } from "next/navigation";
 import ChatIcon from "@mui/icons-material/Chat";
 import { useAppSelector } from "@/app/redux/hooks";
+import { baseUrl } from "@/config/url";
 
 const FreelancerHistoryPage = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
@@ -41,7 +42,7 @@ const FreelancerHistoryPage = () => {
     if (!currUser?.email) return;
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/freelancer`,
+        `${baseUrl}/api/transaction/freelancer`,
         {
           params: { userEmail: currUser.email, status: filterStatus },
         }
@@ -63,16 +64,16 @@ const FreelancerHistoryPage = () => {
     if (!transactionToCancel) return;
     try {
       await axios.put(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}/cancel`,
+        `${baseUrl}/api/transaction/${transactionToCancel}/cancel`,
         {
           type: "freelancer",
           reason: cancelReason
         }
       );
       const trans = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}`
+        `${baseUrl}/api/transaction/${transactionToCancel}`
       );
-      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`, {
+      await axios.put(`${baseUrl}/api/midtrans`, {
         transactionId: trans.data.trans_id,
         status: "refund"
       });
@@ -91,7 +92,7 @@ const FreelancerHistoryPage = () => {
   const handleSubmitTransaction = async (transactionId: string) => {
     try {
       await axios.put(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/submit`
+        `${baseUrl}/api/transaction/${transactionId}/submit`
       );
       fetchUserTransaction();
       alert("Transaction submitted successfully");
@@ -105,7 +106,7 @@ const FreelancerHistoryPage = () => {
   const handleAcceptTransaction = async (transactionId: string) => {
     try {
       await axios.put(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/accept`,
+        `${baseUrl}/api/transaction/${transactionId}/accept`,
       );
       fetchUserTransaction();
       alert("Transaction accepted successfully");

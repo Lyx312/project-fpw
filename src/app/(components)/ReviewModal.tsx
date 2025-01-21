@@ -15,6 +15,7 @@ import {
   import StarBorderIcon from "@mui/icons-material/StarBorder";
   import { useState } from "react";
   import axios from "axios";
+import { baseUrl } from "@/config/url";
   
   interface ReviewModalProps {
     open: boolean;
@@ -54,7 +55,7 @@ import {
           post_id: postId,
         });
         await axios.put(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transId}/complete`
+          `${baseUrl}/api/transaction/${transId}/complete`
         );
         alert("Transaction completed successfully. Thank you for your review!");
         onSubmitSuccess();

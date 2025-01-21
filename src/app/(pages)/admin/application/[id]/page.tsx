@@ -158,18 +158,22 @@ const ApplicationDetailsPage = () => {
                 <ListItemText primary="Country" secondary={countryName || 'N/A'} />
               </ListItem>
               <ListItem>
-                <ListItemText 
-                  primary="Categories" 
-                  secondary={
-                    application.categories.length > 0 ? (
-                      <ul>
-                        {application.categories.map((category) => (
-                          <li key={category._id}>{category.category_name}</li>
-                        ))}
-                      </ul>
-                    ) : 'No categories assigned'
-                  } 
-                />
+                <Box>
+                  <Typography variant="subtitle1" color={colorPalette.darkBlue}>
+                  Categories
+                  </Typography>
+                  {application.categories.length > 0 ? (
+                  <ul>
+                    {application.categories.map((category) => (
+                    <li key={category._id}>{category.category_name}</li>
+                    ))}
+                  </ul>
+                  ) : (
+                  <Typography variant="body2" color="textSecondary">
+                    No categories assigned
+                  </Typography>
+                  )}
+                </Box>
               </ListItem>
             </List>
 

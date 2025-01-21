@@ -22,6 +22,7 @@ import Loading from "@/app/(pages)/loading";
 import { useRouter } from "next/navigation";
 import ChatIcon from "@mui/icons-material/Chat";
 import { useAppSelector } from "@/app/redux/hooks";
+import { baseUrl } from "@/config/url";
 
 declare global {
   interface Window {
@@ -66,7 +67,7 @@ const ClientHistory = () => {
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction`,
+        `${baseUrl}/api/transaction`,
         {
           params: { email: currUser.email, status: filterStatus },
         }
@@ -89,12 +90,12 @@ const ClientHistory = () => {
 
     try {
       await axios.put(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}/cancel`,
+        `${baseUrl}/api/transaction/${transactionToCancel}/cancel`,
         { type: "client", reason: cancelReason }
       );
-      const trans = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionToCancel}`)
+      const trans = await axios.get(`${baseUrl}/api/transaction/${transactionToCancel}`)
       
-      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
+      await axios.put(`${baseUrl}/api/midtrans`,
         {
           transactionId: trans.data.trans_id,
           status: "refund"
@@ -117,7 +118,7 @@ const ClientHistory = () => {
   const handleRejectTransaction = async (transactionId: string) => {
     try {
       await axios.put(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/transaction/${transactionId}/reject`
+        `${baseUrl}/api/transaction/${transactionId}/reject`
       );
       fetchUserTransaction();
       alert("Transaction rejected successfully");

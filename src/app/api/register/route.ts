@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import sendEmail, { emailTemplate } from '@/emails/mailer';
 import { SignJWT } from 'jose';
 import mongoose from 'mongoose';
+import { baseUrl } from '@/config/url';
 
 export async function POST(req: Request) {
     const { first_name, last_name, email, phone, password, confirm_password, country_id, role, cv_path, categories } = await req.json();
@@ -64,7 +65,7 @@ export async function POST(req: Request) {
         await newUser.save({ session });
 
         // Send verification email
-        const verificationLink = `${process.env.NEXT_PUBLIC_BASE_URL}/api/verifyEmail`;
+        const verificationLink = `${baseUrl}/api/verifyEmail`;
         const emailContent = emailTemplate(
             'Verify Your Email',
             `Hi ${first_name},<br/><br/>
@@ -87,6 +88,7 @@ export async function POST(req: Request) {
         } catch (emailError) {
             await session.abortTransaction();
             session.endSession();
+            console.log(emailError);
             return NextResponse.json({ message: "Failed to send verification email. Please try again.", emailError }, { status: 500 });
         }
 

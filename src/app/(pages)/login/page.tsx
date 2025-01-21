@@ -29,6 +29,7 @@ import {
   resetForm,
 } from "../../redux/slices/authSlice";
 import { useAppDispatch, useAppSelector } from "@/app/redux/hooks";
+import { baseUrl } from "@/config/url";
 
 const LoginForm = () => {
   const dispatch = useAppDispatch();
@@ -52,7 +53,7 @@ const LoginForm = () => {
     try {
       dispatch(setLoading(true));
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/login`,
+        `${baseUrl}/api/login`,
         { email, password, rememberMe }
       );
       const data = await response.data;

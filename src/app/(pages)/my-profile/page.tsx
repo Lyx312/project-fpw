@@ -23,6 +23,7 @@ import { ICategory } from "@/models/categoryModel";
 import { ICountry } from "@/models/countryModel";
 import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
 import { clearUser } from '@/app/redux/slices/userSlice';
+import { baseUrl } from "@/config/url";
 
 const UserProfile = () => {
   const [countries, setCountries] = useState<ICountry[]>([]);
@@ -69,7 +70,7 @@ const UserProfile = () => {
   const fetchCountries = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/country`
+        `${baseUrl}/api/country`
       );
       setCountries(response.data.data);
       // console.log(response.data.data);
@@ -81,7 +82,7 @@ const UserProfile = () => {
   const fetchCategories = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/category`
+        `${baseUrl}/api/category`
       );
       setAllCategories(response.data.data);
     } catch (error) {
@@ -154,11 +155,11 @@ const UserProfile = () => {
 
       if (file) {
         const formData = new FormData();
-        formData.append("file", file, `/pfp/${currUser?.email}.png`);
+        formData.append("file", file as Blob, `/pfp/${currUser?.email}.png`);
         formData.append("type", "pfp");
 
         const uploadResponse = await axios.post(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/upload`,
+          `${baseUrl}/api/upload`,
           formData,
           {
             headers: {
@@ -167,11 +168,11 @@ const UserProfile = () => {
           }
         );
 
-        dataToSubmit.pfp_path = uploadResponse.data.path;
+        dataToSubmit.pfp_path = uploadResponse.data.blob.url;
       }
 
       const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${currUser?._id}`,
+        `${baseUrl}/api/users/${currUser?._id}`,
         dataToSubmit
       );
       console.log("Profile updated:", response.data);

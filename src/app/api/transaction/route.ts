@@ -8,6 +8,7 @@ import User from '@/models/userModel';
 import Notification from '@/models/notificationModel';
 import { pusherServer } from '@/lib/pusher';
 import { ICategory } from '@/models/categoryModel';
+import { baseUrl } from '@/config/url';
 
 export async function GET(req: Request) {
   await connectDB();
@@ -112,10 +113,10 @@ export async function POST(req: Request) {
     if (post) {
       const freelancerEmail = post.post_email;
       const subject = 'Client Request to Hire - Freelance Hub';
-      const text = `A client has requested to hire you for the post titled "${post.post_title}" on Freelance Hub. Please review the request and choose to accept or decline. You can review the request at the following link: ${process.env.NEXT_PUBLIC_BASE_URL}/freelancer/history`;
+      const text = `A client has requested to hire you for the post titled "${post.post_title}" on Freelance Hub. Please review the request and choose to accept or decline. You can review the request at the following link: ${baseUrl}/freelancer/history`;
       const html = emailTemplate(
       'Client Request to Hire - Freelance Hub',
-      `A client has requested to hire you for the post titled "<strong>${post.post_title}</strong>" on Freelance Hub. Please review the request and choose to accept or decline. You can review the request at the following link: <a href="${process.env.NEXT_PUBLIC_BASE_URL}/freelancer/history">Review Request</a>`
+      `A client has requested to hire you for the post titled "<strong>${post.post_title}</strong>" on Freelance Hub. Please review the request and choose to accept or decline. You can review the request at the following link: <a href="${baseUrl}/freelancer/history">Review Request</a>`
       );
 
       // Send email to the freelancer

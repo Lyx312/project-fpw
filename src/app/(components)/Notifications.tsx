@@ -9,6 +9,7 @@ import { INotification } from '@/models/notificationModel';
 import { useAppSelector } from "@/app/redux/hooks";
 import { pusherClient } from '@/lib/pusher';
 import { IPusherNotification } from '../api/notifications/route';
+import { baseUrl } from '@/config/url';
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState<INotification[]>([]);
@@ -19,7 +20,7 @@ const Notifications = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       if (currUser._id) {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/notifications`, {
+        const response = await axios.get(`${baseUrl}/api/notifications`, {
           params: { userId: currUser._id },
         });
         // console.log(response.data)
@@ -55,7 +56,7 @@ const Notifications = () => {
   const handleMenuClose = async () => {
     setAnchorEl(null);
     if (currUser._id && unreadCount > 0) {
-      await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/notifications`, { userId: currUser._id });
+      await axios.put(`${baseUrl}/api/notifications`, { userId: currUser._id });
       setUnreadCount(0);
     }
   };

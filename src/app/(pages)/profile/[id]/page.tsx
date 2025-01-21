@@ -18,6 +18,7 @@ import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import ChatIcon from "@mui/icons-material/Chat";
 import { useAppSelector } from "@/app/redux/hooks";
+import { baseUrl } from "@/config/url";
 
 interface Freelancer {
   _id: string;
@@ -67,7 +68,7 @@ const UserProfile = () => {
   const fetchFreelancer = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${id}`
+        `${baseUrl}/api/users/${id}`
       );
       const user = response.data;
 
@@ -84,7 +85,7 @@ const UserProfile = () => {
   const fetchPosts = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts?freelancerId=${freelancer?.email}`
+        `${baseUrl}/api/posts?freelancerId=${freelancer?.email}`
       );
       setPosts(response.data.data);
     } catch (error) {
@@ -95,7 +96,7 @@ const UserProfile = () => {
   const fetchComments = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/reviews/?clientId=${freelancer?.email}`
+        `${baseUrl}/api/posts/reviews/?clientId=${freelancer?.email}`
       );
       setReviews(response.data.data);
     } catch (error) {

@@ -30,6 +30,7 @@ import axios from "axios";
 import ChatIcon from "@mui/icons-material/Chat";
 import { ICategory } from "@/models/categoryModel";
 import { useAppSelector } from "@/app/redux/hooks";
+import { baseUrl } from "@/config/url";
 
 interface DetailJobProps {
   id: string;
@@ -144,7 +145,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
       if (response.status === 201) {
         try {
           const { data } = await axios.post(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`,
+            `${baseUrl}/api/midtrans`,
             {
               transactionId: response.data.savedUserTrans.trans_id,
             }
@@ -157,7 +158,7 @@ const DetailJob: React.FC<DetailJobProps> = ({ id }) => {
           window.snap.pay(snapToken, {
             onSuccess: async (result: any) => {
               try {
-                await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/midtrans`, {
+                await axios.put(`${baseUrl}/api/midtrans`, {
                   transactionId: response.data.savedUserTrans.trans_id,
                 });
                 alert("Successfully hired freelancer. Please wait for acceptance.");

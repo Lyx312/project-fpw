@@ -7,6 +7,7 @@ import {
 } from "@mui/icons-material";
 import SocialMediaIcons from "./SocialMediaIcons";
 import axios from "axios";
+import { baseUrl } from "@/config/url";
 
 const footerLinks = {
   Category: ["Categories", "Projects", "Freelancers", "Membership"],
@@ -26,14 +27,14 @@ const Footer = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users`
+        `${baseUrl}/api/users`
       );
       setTotalUsers(response.data.length-1);
     };
 
     const fetchJobs = async () => {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts`
+        `${baseUrl}/api/posts`
       );
       setTotalJobs(response.data.data.length);
     };

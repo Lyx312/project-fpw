@@ -10,6 +10,7 @@ import Loading from '@/app/(pages)/loading';
 import { useAppSelector } from '@/app/redux/hooks';
 import { pusherClient } from '@/lib/pusher';
 import { IPusherChat } from '@/app/api/chat/route';
+import { baseUrl } from '@/config/url';
 
 interface User {
   _id: string;
@@ -32,7 +33,7 @@ const ChatPage: React.FC = () => {
   const fetchReceiver = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${id}`
+        `${baseUrl}/api/users/${id}`
       );
       const user = response.data;
 
@@ -57,7 +58,7 @@ const ChatPage: React.FC = () => {
 
   const fetchChat = async () => {
     try {
-      const response = await axios.get<IChat>(`${process.env.NEXT_PUBLIC_BASE_URL}/api/chat`, {
+      const response = await axios.get<IChat>(`${baseUrl}/api/chat`, {
         params: {
           senderId: currUser?._id,
           receiverId: id,
@@ -103,7 +104,7 @@ const ChatPage: React.FC = () => {
     if (!newMessage.trim()) return;
   
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/chat`, {
+      await axios.post(`${baseUrl}/api/chat`, {
         senderId: currUser?._id,
         receiverId: id,
         content: newMessage,

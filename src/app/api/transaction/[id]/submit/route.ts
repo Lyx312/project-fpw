@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import Notification from '@/models/notificationModel';
 import User from '@/models/userModel';
 import { pusherServer } from '@/lib/pusher';
+import { baseUrl } from '@/config/url';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
@@ -50,7 +51,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       const text = `The freelancer has submitted their work for the post titled "${post.post_title}" on Freelance Hub. Please review the work and accept or reject it.`;
       const html = emailTemplate(
       'Freelancer Submitted Their Work - Freelance Hub',
-      `The freelancer has submitted their work for the post titled "<strong>${post.post_title}</strong>" on Freelance Hub. Please review the work and accept or reject it. <a href="${process.env.NEXT_PUBLIC_BASE_URL}/client/history">Click here to review</a>.`
+      `The freelancer has submitted their work for the post titled "<strong>${post.post_title}</strong>" on Freelance Hub. Please review the work and accept or reject it. <a href="${baseUrl}/client/history">Click here to review</a>.`
       );
 
       // Send email to the client
